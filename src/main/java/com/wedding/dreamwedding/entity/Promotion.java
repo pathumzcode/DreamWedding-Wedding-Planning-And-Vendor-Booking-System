@@ -14,11 +14,10 @@ public class Promotion {
     private String description;
     private String imageBase64;
     private String discountDetails;
-    private String category;      // e.g., Photography, Venues, etc.
-    private String buttonText;    // e.g., "Book Now", "View Details"
+    private String category;
+    private String buttonText;
     private String startDate;
     private String endDate;
     private String submittedBy;   // vendorId or hotelId
-    private String submitterName; // Business Name
     private String status = "PENDING"; // PENDING, APPROVED
 }
