@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Details - DreamWedding</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .flatpickr-calendar {
+      width: 100% !important;
+      box-shadow: none !important;
+      border: 1px solid #e1e1e1;
+      border-radius: 10px;
+      padding: 10px 0;
+    }
+  </style>
+  <script src="../js/navbar-loader.js" defer></script>
+</head>
+<body class="bg-light">
+
+  <div id="navbar-placeholder"></div>
+
+  <!-- Loading Spinner -->
+  <div id="pageLoader" class="container my-5 py-5 text-center">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted mt-3 fs-5">Loading vendor details...</p>
+  </div>
+
+  <!-- Main Content (Hidden until loaded) -->
+  <div id="mainContent" style="display: none;">
+  <!-- Vendor Header Image Gallery -->
+  <div class="container-fluid px-0">
+    <div id="vendorGalleryCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000">
+      <div class="carousel-inner" id="carouselInner">
+        <div class="carousel-item active">
+          <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=80" class="d-block w-100" style="height: 450px; object-fit: cover;" alt="Main Image">
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#vendorGalleryCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#vendorGalleryCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="row">
+      <div class="col-lg-8 mb-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <span class="badge bg-secondary mb-2" id="vendorCategory">Vendor</span>
+            <h1 class="fw-bold mb-1" id="vendorName" style="font-family: 'Playfair Display', serif;">Vendor Name</h1>
+            <p class="text-muted"><i class="fa-solid fa-location-dot"></i> <span id="vendorLocation">Location</span></p>
+          </div>
+          <div class="text-end">
+            <button class="wishlist-btn position-static d-inline-flex me-2 mb-2" id="detailWishlistBtn" onclick="toggleDetailWishlist()">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+            <div class="d-flex align-items-center mt-2">
+              <i class="fa-solid fa-star text-warning me-1"></i> <span class="fw-bold me-1" id="avgRatingText">5.0</span> <span class="text-muted" id="reviewCountText">(0 reviews)</span>
+            </div>
+          </div>
+        </div>
+        
+        <hr>
+        <h4 class="mt-4 fw-bold">About us</h4>
+        <p class="text-muted lh-lg" id="vendorAbout">Description goes here...</p>
+
+        <h4 class="mt-5 fw-bold">Service packages</h4>
+        <div class="row g-4 mt-1" id="packagesContainer"></div>
+
+        <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+          <h4 class="fw-bold mb-0">Guest reviews</h4>
+          <button id="addReviewBtn" class="btn btn-outline-gold rounded-pill px-4 btn-sm d-none">
+            <i class="fa-solid fa-pen-to-square me-2"></i>Write a review
+          </button>
+        </div>
+        <div id="reviewsContainer" class="card border-0 shadow-sm p-4 mb-5">
+           <div class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading reviews...</div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
+          <h5 class="fw-bold mb-4">Check availability</h5>
+          <div class="mb-4">
+            <input type="text" id="availabilityCalendar">
+          </div>
+          <button class="btn btn-custom w-100 btn-lg rounded-pill" id="bookVendorBtn">Book now</button>
+          
+          <hr class="my-4">
+          <h6 class="fw-bold mb-3">Contact information</h6>
+          <p class="mb-2 small"><i class="fa-solid fa-phone me-2 text-primary"></i> <span id="contactPhone"></span></p>
+          <p class="mb-2 small"><i class="fa-solid fa-envelope me-2 text-primary"></i> <span id="contactEmail"></span></p>
+          <p class="mb-3 small"><i class="fa-solid fa-globe me-2 text-primary"></i> <a href="#" id="contactWeb" target="_blank" class="text-decoration-none text-dark"></a></p>
+          
+          <div id="socialLinks" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="../js/script.js"></script>
+  <script src="../js/wishlist-utils.js"></script>
+  <script>
+    let vendorId;
+    let vendorData;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      vendorId = urlParams.get('id');
+      const userStr = sessionStorage.getItem('dreamWeddingUser');
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      if (!vendorId) {
+        document.body.innerHTML = '<div class="container mt-5 text-center"><h2>Vendor not found.</h2></div>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/vendors/${vendorId}`);
+        vendorData = await response.json();
+
+        document.getElementById('vendorName').textContent = vendorData.businessName;
+        document.getElementById('vendorCategory').textContent = vendorData.category || 'Vendor';
+        document.getElementById('vendorLocation').textContent = vendorData.location || 'N/A';
+        document.getElementById('vendorAbout').textContent = vendorData.aboutUs || 'No description available.';
+        document.getElementById('avgRatingText').textContent = vendorData.averageRating || '5.0';
+        document.getElementById('reviewCountText').textContent = `(${vendorData.reviewCount || 0} reviews)`;
+
+        if (vendorData.galleryPhotos && vendorData.galleryPhotos.length > 0) {
+          document.getElementById('carouselInner').innerHTML = vendorData.galleryPhotos.map((p, i) => `
+            <div class="carousel-item ${i === 0 ? 'active' : ''}">
+              <img src="${p}" class="d-block w-100" style="height: 450px; object-fit: cover;">
+            </div>
+          `).join('');
+        }
+
+        document.getElementById('contactPhone').textContent = vendorData.businessContact?.phone || vendorData.phoneNumber || 'N/A';
+        document.getElementById('contactEmail').textContent = vendorData.businessContact?.email || vendorData.email || 'N/A';
+        const web = document.getElementById('contactWeb');
+        if (vendorData.businessContact?.website) { 
+            web.href = vendorData.businessContact.website; 
+            web.textContent = vendorData.businessContact.website.replace(/^https?:\/\//, ''); 
+        }
+
+        const packages = document.getElementById('packagesContainer');
+        if (vendorData.packages && vendorData.packages.length > 0) {
+          packages.innerHTML = vendorData.packages.map(p => `
+            <div class="col-md-6">
+              <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
+                <h5 class="fw-bold">${p.name}</h5>
+                <h3 class="fw-bold text-primary my-3">${p.priceRange}</h3>
+                <p class="text-muted small">${p.description}</p>
+                <button class="btn btn-outline-dark rounded-pill w-100 mt-auto" onclick="handleBooking('${p.name}', '${p.priceRange}')">Select</button>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        document.getElementById('bookVendorBtn').onclick = () => handleBooking('', '');
+        document.getElementById('pageLoader').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+
+        // Availability Calendar
+        const bookingsRes = await fetch(`/api/bookings/vendor/${vendorId}`);
+        const bookings = await bookingsRes.json();
+        const bookedDates = bookings
+            .filter(b => b.status !== 'REJECTED')
+            .map(b => b.eventDate);
+
+        flatpickr("#availabilityCalendar", {
+            inline: true,
+            minDate: "today",
+            disable: bookedDates,
+            onChange: (selectedDates, dateStr) => {
+                // You could auto-fill the booking date if we were booking on the same page
+            }
+        });
+
+        // Wishlist Status
+        if (user && user.role === 'CUSTOMER' && window.Wishlist) {
+            const wishlist = await window.Wishlist.get(user.id);
+            if (wishlist.find(wi => wi.vendorId === vendorId)) {
+                document.getElementById('detailWishlistBtn').classList.add('active');
+            }
+
+            // Check if customer can review (has booking)
+            const bRes = await fetch(`/api/bookings/customer/${user.id}`);
+            const userBookings = await bRes.json();
+            const myBooking = userBookings.find(b => b.vendorId === vendorId);
+            if (myBooking) {
+                const btn = document.getElementById('addReviewBtn');
+                btn.classList.remove('d-none');
+                btn.onclick = () => window.location.href = `add-review.html?vendorId=${vendorId}&bookingId=${myBooking.id}`;
+            }
+        }
+
+        loadReviews();
+      } catch(e) { console.error(e); }
+    });
+
+    async function loadReviews() {
+        const container = document.getElementById('reviewsContainer');
+        try {
+            const res = await fetch(`/api/reviews/vendor/${vendorId}`);
+            const reviews = await res.json();
+            
+            if (reviews.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center py-3">No reviews yet. Be the first to review!</p>';
+                return;
+            }
+
+            container.innerHTML = reviews.map(r => {
+                let stars = '';
+                for(let i=1; i<=5; i++) stars += `<i class="${i <= r.rating ? 'fa-solid text-warning' : 'fa-regular text-muted'} fa-star"></i>`;
+                
+                return `
+                    <div class="mb-4 pb-4 ${reviews.indexOf(r) < reviews.length - 1 ? 'border-bottom' : ''}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center">
+                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(r.reviewerName)}&background=fdf4e7&color=b8963e" class="rounded-circle me-3" width="45" height="45">
+                                <div>
+                                    <h6 class="fw-bold mb-0">${r.reviewerName} ${r.verified ? '<i class="fa-solid fa-circle-check text-primary ms-1" style="font-size: 0.8rem;"></i>' : ''}</h6>
+                                    <small class="text-muted">${new Date(r.reviewDate).toLocaleDateString()}</small>
+                                </div>
+                            </div>
+                            <div class="text-warning">${stars}</div>
+                        </div>
+                        <h6 class="fw-bold mb-2">${r.reviewTitle}</h6>
+                        <p class="text-muted small mb-3">${r.reviewMessage}</p>
+                        ${r.photos && r.photos.length > 0 ? `
+                            <div class="d-flex gap-2 mb-3">
+                                ${r.photos.map(p => `<img src="${p}" class="rounded shadow-sm" width="80" height="80" style="object-fit: cover; cursor: pointer;" onclick="window.open('${p}', '_blank')">`).join('')}
+                            </div>
+                        ` : ''}
+                        ${r.vendorReply ? `
+                            <div class="bg-light p-3 rounded-3 mt-2 border-start border-primary border-4">
+                                <p class="mb-1 fw-bold small">Vendor Reply:</p>
+                                <p class="mb-0 text-muted small italic">${r.vendorReply}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        } catch(e) { container.innerHTML = '<p class="text-danger">Failed to load reviews.</p>'; }
+    }
+
+    window.toggleDetailWishlist = async function() {
+        const btn = document.getElementById('detailWishlistBtn');
+        const img = (vendorData.galleryPhotos && vendorData.galleryPhotos.length > 0) ? vendorData.galleryPhotos[0] : '';
+        await window.Wishlist.toggle({
+            vendorId: vendorId,
+            vendorName: vendorData.businessName,
+            vendorCategory: vendorData.category || 'Vendor',
+            vendorLocation: vendorData.location || 'N/A',
+            vendorImage: img
+        }, btn);
+    };
+
+    window.handleBooking = function(pkg, price) {
+        const u = sessionStorage.getItem('dreamWeddingUser');
+        if (!u) { window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href); return; }
+        const user = JSON.parse(u);
+        if (user.role !== 'CUSTOMER') { alert('Only customers can book.'); return; }
+        window.location.href = `booking.html?vendorId=${vendorId}&pkgName=${encodeURIComponent(pkg)}`;
+    };
+  </script>
+</body>
+</html>

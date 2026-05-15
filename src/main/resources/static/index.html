@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DreamWedding - Plan Your Dream Wedding</title>
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/testimonials.css">
+
+  <!-- Navbar loader (before Bootstrap JS) -->
+  <script src="js/navbar-loader.js" defer></script>
+  <script src="js/wishlist-utils.js" defer></script>
+</head>
+
+<body>
+
+  <!-- Navigation (loaded dynamically by navbar-loader.js) -->
+  <div id="navbar-placeholder"></div>
+
+  <!-- Hero Section -->
+  <section class="hero-section cinematic-overlay">
+    <div class="container hero-content">
+      <h1>Plan your dream wedding</h1>
+      <p>Discover the best vendors, venues, and professionals to make your day perfect.</p>
+
+      <div class="search-box mt-4 p-3 bg-white rounded shadow-lg mx-auto" style="max-width: 800px;">
+        <form action="pages/vendor-list.html" method="GET" class="row g-2 align-items-center">
+          <div class="col-md-4">
+            <select class="form-select form-control" aria-label="Vendor category" name="category">
+              <option selected>All categories</option>
+
+              <optgroup label="Venues">
+                <option value="ceremony-venues">Ceremony Venues</option>
+                <option value="reception-venues">Reception Venues</option>
+                <option value="rehearsal-dinner">Rehearsal Dinner Venues</option>
+              </optgroup>
+
+              <optgroup label="Food & Beverage">
+                <option value="caterers">Caterers</option>
+                <option value="bakers">Wedding Cake Bakers</option>
+                <option value="bartenders">Bartenders & Beverages</option>
+              </optgroup>
+
+              <optgroup label="Photo & Video">
+                <option value="photographers">Wedding Photographers</option>
+                <option value="videographers">Wedding Videographers</option>
+                <option value="photo-booths">Photo Booth Rentals</option>
+              </optgroup>
+
+              <optgroup label="Decor & Rentals">
+                <option value="florists">Florists</option>
+                <option value="decorators">Decorators & Event Stylists</option>
+                <option value="rentals">Furniture & Equipment Rentals</option>
+              </optgroup>
+
+              <optgroup label="Entertainment">
+                <option value="djs">Wedding DJs</option>
+                <option value="live-bands">Live Bands</option>
+                <option value="musicians">Ceremony Musicians</option>
+              </optgroup>
+
+              <optgroup label="Beauty & Hair">
+                <option value="makeup-artists">Bridal Makeup Artists</option>
+                <option value="hair-stylists">Hair Stylists</option>
+                <option value="spa-wellness">Spa & Wellness</option>
+              </optgroup>
+
+              <optgroup label="Attire & Jewelry">
+                <option value="bridal-salons">Bridal Salons & Boutiques</option>
+                <option value="mens-attire">Tuxedos & Men's Attire</option>
+                <option value="jewelry">Jewelry & Accessories</option>
+              </optgroup>
+
+              <optgroup label="Planners & Management">
+                <option value="planners">Full-Service Planners</option>
+                <option value="coordinators">Day-Of Coordinators</option>
+              </optgroup>
+
+              <optgroup label="Other Services">
+                <option value="invitations">Invitations & Stationery</option>
+                <option value="transportation">Transportation</option>
+                <option value="officiants">Wedding Officiants</option>
+                <option value="favors">Favors & Gifts</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="col-md-5">
+            <input class="form-control" list="srilanka-cities" name="location" id="location"
+              placeholder="City or District (e.g. Colombo)">
+            <datalist id="srilanka-cities">
+              <option value="Ampara">
+              <option value="Anuradhapura">
+              <option value="Badulla">
+              <option value="Batticaloa">
+              <option value="Colombo">
+              <option value="Galle">
+              <option value="Gampaha">
+              <option value="Hambantota">
+              <option value="Jaffna">
+              <option value="Kalutara">
+              <option value="Kandy">
+              <option value="Kegalle">
+              <option value="Kilinochchi">
+              <option value="Kurunegala">
+              <option value="Mannar">
+              <option value="Matale">
+              <option value="Matara">
+              <option value="Monaragala">
+              <option value="Mullaitivu">
+              <option value="Negombo">
+              <option value="Nuwara Eliya">
+              <option value="Polonnaruwa">
+              <option value="Puttalam">
+              <option value="Ratnapura">
+              <option value="Trincomalee">
+              <option value="Vavuniya">
+            </datalist>
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-custom w-100">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Scroll Down Arrow -->
+    <div id="heroScrollArrow" style="
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: opacity 0.4s ease;
+      z-index: 10;
+    ">
+      <span style="
+        font-size: 0.72rem;
+        letter-spacing: 2.5px;
+        text-transform: none;
+        color: rgba(255,255,255,0.7);
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+      ">Scroll down</span>
+      <div style="
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 2px solid rgba(184,150,62,0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: heroArrowBounce 1.8s ease-in-out infinite;
+        background: rgba(184,150,62,0.1);
+        backdrop-filter: blur(4px);
+      ">
+        <i class="fa-solid fa-chevron-down" style="color: #e8c96a; font-size: 0.85rem;"></i>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Categories -->
+  <section class="py-5 bg-light overflow-hidden">
+    <div class="container py-4">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-3" style="font-family: 'Playfair Display', serif;">Explore categories</h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">Everything you need to plan your special day</p>
+      </div>
+    </div>
+
+    <!-- Horizontal Scroll Container - Moved outside container for full width -->
+    <div class="category-slider-wrapper position-relative">
+      <div class="category-slider" id="categorySlider">
+        <!-- First Set -->
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-church"></i>
+          <h4>Venues</h4>
+          <a href="pages/vendor-list.html?category=venues" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-utensils"></i>
+          <h4>Food & Beverage</h4>
+          <a href="pages/vendor-list.html?category=caterers" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-camera"></i>
+          <h4>Photography</h4>
+          <a href="pages/vendor-list.html?category=photographers" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-seedling"></i>
+          <h4>Decor & Rentals</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-music"></i>
+          <h4>Entertainment</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <h4>Beauty & Hair</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-gem"></i>
+          <h4>Attire & Jewelry</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-clipboard-list"></i>
+          <h4>Management</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-gift"></i>
+          <h4>Other Services</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+
+        <!-- Second Set (for seamless loop) -->
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-church"></i>
+          <h4>Venues</h4>
+          <a href="pages/vendor-list.html?category=venues" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-utensils"></i>
+          <h4>Food & Beverage</h4>
+          <a href="pages/vendor-list.html?category=caterers" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-camera"></i>
+          <h4>Photography</h4>
+          <a href="pages/vendor-list.html?category=photographers" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-seedling"></i>
+          <h4>Decor & Rentals</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-music"></i>
+          <h4>Entertainment</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <h4>Beauty & Hair</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-gem"></i>
+          <h4>Attire & Jewelry</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-clipboard-list"></i>
+          <h4>Management</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+        <div class="category-card slider-card">
+          <i class="fa-solid fa-gift"></i>
+          <h4>Other Services</h4>
+          <a href="pages/vendor-list.html" class="stretched-link"></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Vendors -->
+  <section class="py-5">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-3" style="font-family: 'Playfair Display', serif;">Featured vendors</h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">Handpicked top-rated professionals for your big day</p>
+        <a href="pages/vendor-list.html" class="btn btn-custom btn-lg rounded-pill px-5 shadow-sm mt-4">View all
+          vendors</a>
+      </div>
+      <div class="row g-4" id="featuredVendorsContainer">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (async function loadFeaturedVendors() {
+      const container = document.getElementById('featuredVendorsContainer');
+      try {
+        const response = await fetch('/api/vendors/top');
+        if (!response.ok) throw new Error('Failed to fetch top vendors');
+        const vendors = await response.json();
+
+        if (vendors.length === 0) {
+          container.innerHTML = '<div class="col-12 text-center text-muted py-5">No vendors found.</div>';
+          return;
+        }
+
+        container.innerHTML = vendors.map(v => {
+          const mainImg = v.galleryPhotos && v.galleryPhotos.length > 0 
+            ? v.galleryPhotos[0] 
+            : 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80';
+          
+          return `
+            <div class="col-md-4">
+              <div class="card vendor-card h-100 shadow-sm border-0 rounded-4 overflow-hidden position-relative">
+                <button class="wishlist-btn" data-vendor-id="${v.id}" onclick="event.preventDefault(); toggleWishlist('${v.id}', '${v.businessName.replace(/'/g, "\\'")}', '${v.category}', '${v.location}', '${mainImg}', this)">
+                  <i class="fa-regular fa-heart"></i>
+                </button>
+                <div class="position-relative">
+                  <img src="${mainImg}" class="card-img-top" alt="${v.businessName}" style="height: 240px; object-fit: cover;">
+                  <span class="badge bg-white text-dark position-absolute top-0 end-0 m-3 shadow-sm rounded-pill px-3 py-2" style="font-size: 0.75rem; font-weight: 700; border: 1px solid #eee;">
+                    <i class="fa-solid fa-star text-warning me-1"></i> ${v.averageRating || '0.0'}
+                  </span>
+                </div>
+                <div class="card-body p-4">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="badge bg-light text-primary border rounded-pill px-3 py-1" style="font-size: 0.7rem; text-transform: none; letter-spacing: 1px; font-weight: 700;">${v.category || 'Vendor'}</span>
+                    <span class="text-muted small"><i class="fa-solid fa-location-dot me-1"></i>${v.location || 'N/A'}</span>
+                  </div>
+                  <h5 class="card-title fw-bold mb-3" style="font-family: 'Playfair Display', serif; font-size: 1.25rem;">${v.businessName}</h5>
+                  <div class="d-flex justify-content-between align-items-center mt-auto">
+                    <div>
+                      <div class="text-muted small">
+                        <i class="fa-solid fa-comment-dots me-1"></i> ${v.reviewCount || 0} reviews
+                      </div>
+                      ${v.packages && v.packages.length > 0 ? `<div class="fw-bold text-primary" style="font-size: 0.9rem;">From ${v.packages[0].priceRange}</div>` : '<div class="text-muted small">Price on request</div>'}
+                    </div>
+                    <a href="pages/vendor-details.html?id=${v.id}" class="btn btn-outline-gold rounded-pill px-4 btn-sm fw-bold">View Details</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Check wishlist status
+        const userStr = sessionStorage.getItem('dreamWeddingUser');
+        if (userStr && window.Wishlist) {
+            const user = JSON.parse(userStr);
+            if (user.role === 'CUSTOMER') {
+                const vendorIds = vendors.map(v => v.id);
+                window.Wishlist.checkStatus(vendorIds, user.id);
+            }
+        }
+      } catch (error) {
+        console.error('Error loading featured vendors:', error);
+        container.innerHTML = '<div class="col-12 text-center text-danger py-5">Failed to load featured vendors.</div>';
+      }
+    })();
+
+    async function toggleWishlist(id, name, cat, loc, img, btn) {
+        if (!window.Wishlist) return;
+        await window.Wishlist.toggle({
+            vendorId: id,
+            vendorName: name,
+            vendorCategory: cat,
+            vendorLocation: loc,
+            vendorImage: img
+        }, btn);
+    }
+  </script>
+
+
+  <!-- ===================== PROMOTIONS SECTION ===================== -->
+  <section id="promotions-section"
+    style="position: relative; overflow: hidden; padding: 50px 0 0 0; background: #ffffff;">
+    <div class="container-fluid px-0" style="position: relative; z-index: 2;">
+      <div class="text-center mb-4 px-3">
+        <span class="badge mb-2"
+          style="background: #b8963e; font-size: 0.85rem; padding: 6px 16px; border: 1px solid rgba(0,0,0,0.1);">✨
+          Special offers</span>
+        <h2 style="font-family:'Playfair Display',serif; font-size: 2.8rem; font-weight:700; color:#2c2416;">Exclusive
+          promotions</h2>
+        <p class="text-muted" style="font-weight: 500;">Hand-picked deals from our top vendors and hotels — limited time
+          only!</p>
+      </div>
+      <div id="promoCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="10000">
+        <!-- Indicators -->
+        <div class="carousel-indicators" id="promoIndicators"></div>
+
+        <!-- Slides -->
+        <div class="carousel-inner shadow-lg" id="promoSlides" style="min-height: 650px;">
+          <!-- Loading State -->
+          <div class="carousel-item active">
+            <div class="d-flex align-items-center justify-content-center bg-dark text-white" style="height: 650px;">
+              <div class="text-center">
+                <i class="fa-solid fa-spinner fa-spin fs-1 mb-3"></i>
+                <p>Loading Promotions...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel" data-bs-slide="prev"
+          style="width: 60px; background: rgba(0,0,0,0.4); height: 60px; border-radius: 50%; top: 50%; transform: translateY(-50%); margin-left: 30px; border: 2px solid rgba(255,255,255,0.3); backdrop-filter: blur(5px);">
+          <span class="carousel-control-prev-icon" aria-hidden="true" style="width: 30px; height: 30px;"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel" data-bs-slide="next"
+          style="width: 60px; background: rgba(0,0,0,0.4); height: 60px; border-radius: 50%; top: 50%; transform: translateY(-50%); margin-right: 30px; border: 2px solid rgba(255,255,255,0.3); backdrop-filter: blur(5px);">
+          <span class="carousel-control-next-icon" aria-hidden="true" style="width: 30px; height: 30px;"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  </section>
+
+  <style>
+    .promo-banner-premium {
+      width: 100%;
+      height: 650px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      color: white;
+      user-select: none;
+      /* Prevent text selection during drag */
+    }
+
+    @media (max-width: 768px) {
+      .promo-banner-premium {
+        height: 550px;
+      }
+
+      .carousel-control-prev,
+      .carousel-control-next {
+        width: 45px;
+        height: 45px;
+        margin: 0 10px;
+      }
+    }
+
+    .carousel-indicators [data-bs-target] {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: white;
+      opacity: 0.5;
+      margin: 0 5px;
+      transition: all 0.3s ease;
+    }
+
+    .carousel-indicators .active {
+      opacity: 1;
+      background-color: #f0e68c;
+      width: 35px;
+      border-radius: 10px;
+    }
+
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover {
+      background: rgba(0, 0, 0, 0.6) !important;
+      transform: translateY(-50%) scale(1.1);
+    }
+  </style>
+
+  <script>
+    (async () => {
+      const slides = document.getElementById('promoSlides');
+      const indicators = document.getElementById('promoIndicators');
+      const carouselEl = document.getElementById('promoCarousel');
+
+      try {
+        const res = await fetch('/api/promotions/active');
+        const promos = await res.json();
+
+        if (!promos.length) {
+          const sect = document.getElementById('promotions-section');
+          if (sect) sect.style.display = 'none';
+          return;
+        }
+
+        indicators.innerHTML = promos.map((_, i) => `
+          <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="${i}" class="${i === 0 ? 'active' : ''}" aria-current="${i === 0 ? 'true' : ''}"></button>
+        `).join('');
+
+        slides.innerHTML = promos.map((p, i) => {
+          const gradients = [
+            'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
+            'linear-gradient(135deg, #2d5a27 0%, #1e3c1a 100%)',
+            'linear-gradient(135deg, #800020 0%, #4a0012 100%)',
+            'linear-gradient(135deg, #4b0082 0%, #2e004f 100%)',
+            'linear-gradient(135deg, #d44e5d 0%, #9e3340 100%)'
+          ];
+          const bg = gradients[i % gradients.length];
+
+          return `
+          <div class="carousel-item ${i === 0 ? 'active' : ''}">
+            <div class="promo-banner-premium" style="background: ${bg}; cursor: grab;">
+              <!-- Background Decorative Image -->
+              ${p.imageBase64 ? `<div style="position: absolute; right: 0; top: 0; width: 50%; height: 100%; background: url('${p.imageBase64}') center/cover; mask-image: linear-gradient(to left, black 60%, transparent); -webkit-mask-image: linear-gradient(to left, black 60%, transparent); pointer-events: none;"></div>` : ''}
+              
+              <div class="container d-flex flex-column justify-content-center h-100" style="position: relative; z-index: 5;">
+                <div style="max-width: 650px;">
+                  <div class="d-flex align-items-center gap-2 mb-3">
+                    <span style="background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); padding: 8px 20px; border-radius: 50px; font-size: 0.8rem; font-weight: 700; text-transform: none; letter-spacing: 1.5px; border: 1px solid rgba(255,255,255,0.3);">${p.category || 'Special offer'}</span>
+                  </div>
+                  <h3 style="font-family: 'Playfair Display', serif; font-weight: 700; font-size: 2.8rem; margin-bottom: 15px; line-height: 1.1;">${p.title}</h3>
+                  <h2 style="font-weight: 800; color: #f0e68c; font-size: 4.5rem; margin-bottom: 20px; letter-spacing: -2px;">${p.discountDetails}</h2>
+                  <p style="font-size: 1.1rem; opacity: 0.95; margin-bottom: 45px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.6;">${p.description || 'Exclusive deal for your perfect wedding day.'}</p>
+                  
+                  <div class="d-flex align-items-center gap-4">
+                    <a href="${p.category && p.category.toLowerCase().includes('hotel') ? 'pages/hotel-details.html' : 'pages/vendor-details.html'}?id=${p.submittedBy}" class="btn btn-lg px-5 py-3" style="background: white; color: #2c3e50; font-weight: 800; border-radius: 50px; font-size: 1.1rem; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                      ${p.buttonText || 'Book Now'}
+                    </a>
+                    <div class="d-flex flex-column text-white">
+                      <span class="small opacity-75" style="font-size: 0.75rem; text-transform: none; letter-spacing: 1px;">Limited time only</span>
+                      <span class="fw-bold" style="font-size: 1.2rem;">Ends ${p.endDate}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+
+        // SWIPE / DRAG SUPPORT
+        let startX = 0;
+        let endX = 0;
+        const threshold = 70; // min distance for swipe
+
+        const handleGesture = () => {
+          const bsCarousel = bootstrap.Carousel.getOrCreateInstance(carouselEl);
+          if (startX - endX > threshold) bsCarousel.next();
+          if (endX - startX > threshold) bsCarousel.prev();
+        };
+
+        carouselEl.addEventListener('touchstart', e => startX = e.touches[0].clientX, { passive: true });
+        carouselEl.addEventListener('touchend', e => {
+          endX = e.changedTouches[0].clientX;
+          handleGesture();
+        }, { passive: true });
+
+        // Mouse Drag Support
+        carouselEl.addEventListener('mousedown', e => {
+          startX = e.clientX;
+          carouselEl.style.cursor = 'grabbing';
+        });
+        carouselEl.addEventListener('mouseup', e => {
+          endX = e.clientX;
+          carouselEl.style.cursor = 'grab';
+          handleGesture();
+        });
+
+      } catch (e) {
+        console.error('Promotion Load Error:', e);
+      }
+    })();
+  </script>
+  t>
+
+
+  <!-- Budget Planner CTA Section -->
+  <section class="py-5"
+    style="background-color: #fdfbf7; border-top: 1px solid #f0e9df; border-bottom: 1px solid #f0e9df;">
+    <div class="container my-4">
+      <div class="row align-items-center">
+        <!-- Topic/Heading: Top on all screens -->
+        <div class="col-12 d-lg-none mb-4">
+          <h2 class="display-5 fw-bold mb-0" style="font-family: 'Playfair Display', serif;">Let's Plan Your Budget</h2>
+        </div>
+
+        <!-- Image Column: 2nd on mobile, side on desktop -->
+        <div class="col-lg-6 mb-5 mb-lg-0 order-lg-2">
+          <div class="position-relative">
+            <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80"
+              alt="Wedding Budget Planner" class="img-fluid rounded-4 shadow-lg w-100 object-fit-cover"
+              style="aspect-ratio: 3/4; object-position: center;">
+            <div
+              class="position-absolute top-0 start-0 translate-middle p-4 bg-white rounded-circle shadow d-flex align-items-center justify-content-center"
+              style="width: 80px; height: 80px;">
+              <i class="fa-solid fa-calculator fa-2x" style="color: var(--primary-color);"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Text/Description Column -->
+        <div class="col-lg-6 order-lg-1 pe-lg-5">
+          <div class="mb-5">
+            <!-- Desktop Head: Only visible on lg -->
+            <h2 class="display-5 fw-bold mb-3 d-none d-lg-block" style="font-family: 'Playfair Display', serif;">Let's
+              plan your budget</h2>
+
+            <p class="text-muted" style="font-size: 1.1rem; line-height: 1.8;">
+              Keep your dream wedding from becoming a financial strain. Our intuitive budget planner helps you track
+              every expense and manage vendor payments seamlessly.
+            </p>
+          </div>
+          <ul class="list-unstyled mb-5 text-muted" style="font-size: 1.05rem;">
+            <li class="mb-3 d-flex align-items-center">
+              <i class="fa-solid fa-circle-check fs-5 me-3" style="color: var(--primary-color);"></i>
+              Automatically divide your budget across customized categories.
+            </li>
+            <li class="mb-3 d-flex align-items-center">
+              <i class="fa-solid fa-circle-check fs-5 me-3" style="color: var(--primary-color);"></i>
+              Stay on top of paid, pending, and upcoming vendor payments.
+            </li>
+            <li class="mb-3 d-flex align-items-center">
+              <i class="fa-solid fa-circle-check fs-5 me-3" style="color: var(--primary-color);"></i>
+              Get visual charts showing exactly how close you are to your limit.
+            </li>
+          </ul>
+          <a href="pages/budget-calculator.html" class="btn btn-custom btn-lg rounded-pill px-5 shadow-sm">
+            <i class="fa-solid fa-wallet me-2"></i> Start budget planning
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TESTIMONIALS SECTION ===================== -->
+  <section class="testimonials-section">
+    <div class="container">
+      <div class="testimonials-header">
+        <span>Couples' Experiences</span>
+        <h2>Voices of Our <span>Happy Couples</span></h2>
+      </div>
+      
+      <div class="testimonials-grid" id="testimonialsGrid">
+        <!-- Testimonials will be loaded here dynamically -->
+      </div>
+
+      <div class="load-more-container d-flex justify-content-center gap-3">
+        <button class="btn-load-more" id="loadMoreTestimonials">Load More</button>
+        <a href="pages/add-site-review.html" class="btn btn-outline-gold rounded-pill px-4 d-flex align-items-center" style="border: 2px solid #b8963e; color: #b8963e; font-weight: 600; transition: all 0.3s;">
+          <i class="fa-solid fa-pen-to-square me-2"></i> Share Your Story
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- JS for Testimonials -->
+  <script src="js/testimonials.js" defer></script>
+
+  <!-- FAQ Section -->
+  <section class="py-5" style="
+    background: linear-gradient(rgba(15,14,12,0.72), rgba(26,23,20,0.78)),
+    url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=2000&q=80') center/cover fixed;
+    position: relative;
+  ">
+    <div class="container py-3">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-3" style="font-family: 'Playfair Display', serif; color: #f5efe0;">Quick Answers
+          for Curious Minds</h2>
+        <p class="mx-auto" style="color: rgba(255,255,255,0.65); max-width: 600px;">Everything you need to know about
+          planning your perfect wedding.</p>
+      </div>
+
+      <div class="row justify-content-center">
+
+        <!-- Tabs + Accordion — full width centered -->
+        <div class="col-lg-9">
+
+          <!-- Tab Buttons -->
+          <div class="d-flex gap-2 mb-4 flex-wrap justify-content-center">
+            <button class="btn rounded-pill px-4 py-2 faq-tab active-tab" id="tab-vendors"
+              onclick="switchFaqTab('vendors', this)"
+              style="background-color: var(--primary-color); color: white; font-weight: 600; border: none;">Vendors</button>
+            <button class="btn rounded-pill px-4 py-2 faq-tab" id="tab-features"
+              onclick="switchFaqTab('features', this)"
+              style="background-color: transparent; color: #f0ebe1; border: 2px solid rgba(255,255,255,0.3); font-weight: 500;">Features</button>
+            <button class="btn rounded-pill px-4 py-2 faq-tab" id="tab-assistance"
+              onclick="switchFaqTab('assistance', this)"
+              style="background-color: transparent; color: #f0ebe1; border: 2px solid rgba(255,255,255,0.3); font-weight: 500;">Assistance</button>
+          </div>
+
+          <!-- Vendors FAQs -->
+          <div id="faq-vendors" class="faq-panel">
+            <div class="accordion" id="accordionVendors">
+              <div class="accordion-item faq-item border-0 mb-3 rounded-3 shadow-sm">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#v1" style="background-color: #fdf3d8;">
+                    How do I find and book a vendor on DreamWedding?
+                  </button>
+                </h2>
+                <div id="v1" class="accordion-collapse collapse" data-bs-parent="#accordionVendors">
+                  <div class="accordion-body text-muted">
+                    Browse vendors by category or location using our search bar. Click on any vendor card to view their
+                    full profile, portfolio, reviews, and pricing. Then use the "Request Booking" button to get in touch
+                    directly.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item faq-item border-0 mb-3 rounded-3 shadow-sm">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#v2" style="background-color: #fdf3d8;">
+                    Who can list as a vendor?
+                  </button>
+                </h2>
+                <div id="v2" class="accordion-collapse collapse" data-bs-parent="#accordionVendors">
+                  <div class="accordion-body text-muted">
+                    Any professional wedding service provider — photographers, caterers, decorators, DJs, makeup
+                    artists, and more — can register and list their services on DreamWedding.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item faq-item border-0 mb-3 rounded-3 shadow-sm">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#v3" style="background-color: #fdf3d8;">
+                    Is there a cost to list as a vendor?
+                  </button>
+                </h2>
+                <div id="v3" class="accordion-collapse collapse" data-bs-parent="#accordionVendors">
+                  <div class="accordion-body text-muted">
+                    Basic vendor listings are completely free. We offer premium plans with enhanced visibility, featured
+                    placement, and analytics tools to help your business grow.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item faq-item border-0 mb-3 rounded-3 shadow-sm">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#v4" style="background-color: #fdf3d8;">
+                    Can I read reviews before booking a vendor?
+                  </button>
+                </h2>
+                <div id="v4" class="accordion-collapse collapse" data-bs-parent="#accordionVendors">
+                  <div class="accordion-body text-muted">
+                    Absolutely! Every vendor profile includes verified reviews from real couples. You can filter vendors
+                    by rating to find the highest-rated professionals for your big day.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Features FAQs -->
+          <div id="faq-features" class="faq-panel d-none">
+            <div class="accordion" id="accordionFeatures">
+              <div class="accordion-item faq-item border-0 mb-3 rounded-3 shadow-sm">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#f1" style="background-color: #fdf3d8;">
+                    What is the Budget Planner feature?
+                  </button>
+                </h2>
+                <div id="f1" class="accordion-collapse collapse" data-bs-parent="#accordionFeatures">
+                  <div class="accordion-body text-muted">
+                    The Budget Planner helps you set a total wedding budget, divide it across categories like venue,
+                    catering, and decor, and track payments to vendors. Visual charts show you how much you've spent and
+                    how much remains.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item faq-item border-0 mb-3 rounded-3 shadow-sm">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#f2" style="background-color: #fdf3d8;">
+                    Can I manage multiple events on the platform?
+                  </button>
+                </h2>
+                <div id="f2" class="accordion-collapse collapse" data-bs-parent="#accordionFeatures">
+                  <div class="accordion-body text-muted">
+                    Yes! You can create and manage multiple wedding events from your dashboard. Each event has its own
+                    vendor list, budget, and checklist.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item faq-item border-0 mb-3 rounded-3 shadow-sm">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#f3" style="background-color: #fdf3d8;">
+                    Is DreamWedding available on mobile devices?
+                  </button>
+                </h2>
+                <div id="f3" class="accordion-collapse collapse" data-bs-parent="#accordionFeatures">
+                  <div class="accordion-body text-muted">
+                    Our platform is fully responsive and works beautifully on all devices — phones, tablets, and
+                    desktops. Plan your dream wedding from anywhere!
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assistance FAQs -->
+          <div id="faq-assistance" class="faq-panel d-none">
+            <div class="accordion" id="accordionAssistance">
+              <div class="accordion-item faq-item border-0 mb-3 rounded-3 shadow-sm">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#a1" style="background-color: #fdf3d8;">
+                    How do I contact customer support?
+                  </button>
+                </h2>
+                <div id="a1" class="accordion-collapse collapse" data-bs-parent="#accordionAssistance">
+                  <div class="accordion-body text-muted">
+                    You can reach our support team at <strong>contact@dreamwedding.com</strong> or call us at
+                    <strong>+94 77 123 4567</strong>. We're available Monday–Saturday, 9am–6pm.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item faq-item border-0 mb-3 rounded-3 shadow-sm">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#a2" style="background-color: #fdf3d8;">
+                    Can I get help selecting the right vendors?
+                  </button>
+                </h2>
+                <div id="a2" class="accordion-collapse collapse" data-bs-parent="#accordionAssistance">
+                  <div class="accordion-body text-muted">
+                    Yes! Our team of wedding experts is available to guide you through selecting vendors that match your
+                    style, budget, and location preferences. Simply reach out through the contact page.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item faq-item border-0 mb-3 rounded-3 shadow-sm">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed rounded-3 fw-semibold" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#a3" style="background-color: #fdf3d8;">
+                    What if I have a dispute with a vendor?
+                  </button>
+                </h2>
+                <div id="a3" class="accordion-collapse collapse" data-bs-parent="#accordionAssistance">
+                  <div class="accordion-body text-muted">
+                    We take vendor disputes seriously. Report any issue through your dashboard and our team will
+                    investigate and mediate within 48 hours to ensure a fair resolution.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end right col -->
+      </div><!-- end row -->
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="py-5 bg-white">
+    <div class="container py-4">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-3" style="font-family: 'Playfair Display', serif;">How it works</h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">Plan your dream wedding in three simple steps. We handle
+          the complexity so you can focus on the memories.</p>
+      </div>
+
+      <div class="row g-4 justify-content-center">
+        <!-- Step 1 -->
+        <div class="col-md-4">
+          <div class="how-it-works-card text-center">
+            <div class="how-icon-wrapper mb-4">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span class="step-number">1</span>
+            </div>
+            <h4 class="fw-bold mb-3">Discover vendors</h4>
+            <p class="text-muted">Thousands of verified photographers, caterers, and venues at your fingertips. Filter
+              by style, price, and location.</p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="col-md-4">
+          <div class="how-it-works-card text-center">
+            <div class="how-icon-wrapper mb-4">
+              <i class="fa-solid fa-calendar-check"></i>
+              <span class="step-number">2</span>
+            </div>
+            <h4 class="fw-bold mb-3">Plan & manage</h4>
+            <p class="text-muted">Use our powerful budget tracker and registry tools to stay organized. Everything you
+              need in one elegant dashboard.</p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="col-md-4">
+          <div class="how-it-works-card text-center">
+            <div class="how-icon-wrapper mb-4">
+              <i class="fa-solid fa-champagne-glasses"></i>
+              <span class="step-number">3</span>
+            </div>
+            <h4 class="fw-bold mb-3">Book & celebrate</h4>
+            <p class="text-muted">Compare packages, read real reviews, and book with confidence. Your perfect wedding
+              day is just a click away.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+
+
+
+
+  <!-- Footer -->
+  <footer class="pt-5 pb-0"
+    style="background: linear-gradient(180deg, #0f0e0c 0%, #1a1714 100%); color: #c8bfb3; border-top: 1px solid rgba(184,150,62,0.15);">
+    <div class="container">
+
+      <!-- Brand -->
+      <div class="text-center mb-4">
+        <a href="index.html"
+          style="font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; background: linear-gradient(135deg, #b8963e, #e8c96a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; letter-spacing: 1px;">
+          <i class="fa-solid fa-ring" style="-webkit-text-fill-color: #b8963e; margin-right: 8px;"></i>DreamWedding
+        </a>
+      </div>
+
+      <!-- Connect With Us -->
+      <div class="text-center mb-4">
+        <p class="fw-bold mb-3"
+          style="color: #f0ebe1; font-size: 1rem; letter-spacing: 1px; text-transform: none;">Connect with us</p>
+        <div class="d-flex justify-content-center gap-3">
+          <a href="#" class="footer-social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" class="footer-social-icon"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="footer-social-icon"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="footer-social-icon"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+      </div>
+
+      <hr style="border-color: rgba(255,255,255,0.08);">
+
+      <!-- Nav Links -->
+      <div class="text-center mb-4">
+        <nav class="d-flex justify-content-center flex-wrap gap-3">
+          <a href="#" class="footer-nav-link">Privacy policy</a>
+          <a href="#" class="footer-nav-link">Terms of service</a>
+          <a href="pages/vendor-list.html" class="footer-nav-link">Vendors</a>
+          <a href="pages/hotel-list.html" class="footer-nav-link">Hotels</a>
+          <a href="pages/add-site-review.html" class="footer-nav-link" style="color: #e8c96a;">Review Our Site</a>
+          <a href="pages/budget-calculator.html" class="footer-nav-link">Budget Calculator</a>
+          <a href="#" class="footer-nav-link">Blog</a>
+          <a href="#" class="footer-nav-link">Help</a>
+        </nav>
+      </div>
+
+      <hr style="border-color: rgba(255,255,255,0.08);">
+
+      <!-- Description -->
+      <div class="row justify-content-center mb-5">
+        <div class="col-md-8 text-center">
+          <p style="color: #a09690; font-size: 0.95rem; line-height: 1.8;">
+            We combine the beauty of tradition with modern technology, making it effortless to plan your perfect wedding
+            day. DreamWedding is Sri Lanka's most trusted platform for discovering top-rated vendors, comparing
+            packages, and booking with confidence. Your dream day starts here.
+          </p>
+        </div>
+      </div>
+
+      <!-- Contact Grid -->
+      <div class="row mb-5 g-4">
+        <!-- Sri Lanka -->
+        <div class="col-md-6 col-lg-3">
+          <div class="footer-contact-block">
+            <p class="footer-contact-title"><i class="fa-solid fa-location-dot me-2" style="color: #b8963e;"></i>Sri
+              Lanka</p>
+            <p class="footer-contact-text">
+              No. 25, Galle Road,<br>
+              Colombo 03,<br>
+              Sri Lanka
+            </p>
+          </div>
+        </div>
+
+        <!-- Hotline -->
+        <div class="col-md-6 col-lg-3">
+          <div class="footer-contact-block">
+            <p class="footer-contact-title"><i class="fa-solid fa-headset me-2" style="color: #b8963e;"></i>Hotline</p>
+            <p class="footer-contact-text" style="color: #e8c96a; font-weight: 600;">+94 112 824 814</p>
+            <p class="footer-contact-text" style="color: #e8c96a; font-weight: 600;">+94 707 824 814</p>
+            <p style="color: #7a6f65; font-size: 0.8rem;">(8.30 Am To 8.30 Pm GMT+5.30)</p>
+          </div>
+        </div>
+        <!-- Live Chat -->
+        <div class="col-md-6 col-lg-3">
+          <div class="footer-contact-block">
+            <p class="footer-contact-title"><i class="fa-regular fa-message me-2" style="color: #b8963e;"></i>Live Chat
+            </p>
+            <a href="#" class="footer-chat-link"><i class="fa-brands fa-whatsapp me-2"></i>Whatsapp</a>
+            <a href="#" class="footer-chat-link"><i class="fa-brands fa-facebook-messenger me-2"></i>Messenger</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Copyright -->
+      <div style="border-top: 1px solid rgba(255,255,255,0.07); padding: 20px 0;" class="text-center">
+        <p style="color: #5a5550; font-size: 0.85rem; margin: 0;">
+          &copy; 2026 DreamWedding. All Rights Reserved. Designed with <i class="fa-solid fa-heart"
+            style="color: #b8963e;"></i> for couples.
+        </p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JS -->
+  <script src="js/script.js"></script>
+  <script src="js/scroll-reveal.js"></script>
+</body>
+
+</html>
