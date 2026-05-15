@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Vendor - DreamWedding</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .flatpickr-calendar { border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
+    .flatpickr-day.disabled { color: #ccc !important; text-decoration: line-through; }
+  </style>
+</head>
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+    <div class="container d-flex justify-content-center">
+      <a class="navbar-brand fs-3" href="../index.html">DreamWedding Checkout</a>
+    </div>
+  </nav>
+
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4">
+          <h2 class="fw-bold mb-4 font-playfair text-center">Booking Request</h2>
+          
+          <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3 border">
+            <img id="vendorBookingImg" src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=150&q=80" class="rounded object-fit-cover me-3" width="80" height="80">
+            <div>
+              <h5 class="fw-bold mb-0" id="vendorBookingName">Loading...</h5>
+              <p class="text-muted small mb-0" id="vendorBookingCategory">Vendor</p>
+            </div>
+          </div>
+
+          <form action="customer-dashboard.html?tab=bookings" class="needs-validation" novalidate>
+            <h5 class="fw-bold mb-3 border-bottom pb-2">1. Event Details</h5>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">Event Date</label>
+                <input type="text" id="eventDate" class="form-control" placeholder="Select Date" required>
+                <div class="invalid-feedback">Please select a date.</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">Estimated Guest Count</label>
+                <input type="number" class="form-control" placeholder="e.g. 150" required>
+              </div>
+            </div>
+
+            <h5 class="fw-bold mb-3 border-bottom pb-2">2. Package Selection</h5>
+            <div class="mb-4" id="bookingPackagesContainer">
+              <p class="text-muted small">Loading packages...</p>
+            </div>
+
+            <h5 class="fw-bold mb-3 border-bottom pb-2">3. Additional Information</h5>
+            <div class="mb-4">
+              <label class="form-label fw-bold small">Special Requests / Notes</label>
+              <textarea id="specialRequests" class="form-control" rows="3" placeholder="Tell the vendor about specific themes or requirements..."></textarea>
+            </div>
+
+            <div class="bg-secondary bg-opacity-10 p-4 rounded-3 mb-4">
+              <h6 class="fw-bold">Booking Summary</h6>
+              <p class="small text-muted mb-0">Note: This is a booking request. You will not be charged until the vendor confirms availability and sends an invoice.</p>
+            </div>
+
+            <div id="bookingMessage" class="alert d-none"></div>
+
+            <div class="d-grid gap-2">
+              <button type="button" id="submitBookingBtn" class="btn btn-custom py-3 fs-5">Submit Booking Request</button>
+              <a href="vendor-list.html" class="btn btn-link text-muted text-decoration-none">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="../js/script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Check Auth
+      const userStr = sessionStorage.getItem('dreamWeddingUser');
+      if (!userStr) {
+        window.location.href = 'login.html?redirect=booking';
+        return;
+      }
+      const user = JSON.parse(userStr);
+      if (user.role !== 'CUSTOMER') {
+        alert('Error: Only customers can do booking operations.');
+        window.location.href = '../index.html';
+        return;
+      }
+
+      // 2. Parse URL Params
+      const urlParams = new URLSearchParams(window.location.search);
+      const vendorId = urlParams.get('vendorId');
+      const preselectedPkgName = urlParams.get('pkgName');
+      
+      if (!vendorId) {
+        document.body.innerHTML = '<div class="container mt-5 text-center"><h2>Invalid Booking Request</h2><a href="vendor-list.html" class="btn btn-custom mt-3">Back to Directory</a></div>';
+        return;
+      }
+
+      // 3. Fetch Vendor Details
+      try {
+        const response = await fetch(`/api/vendors/${vendorId}`);
+        if (!response.ok) throw new Error('Vendor fetch failed');
+        const vendor = await response.json();
+
+        document.getElementById('vendorBookingName').textContent = vendor.businessName;
+        document.getElementById('vendorBookingCategory').textContent = vendor.category;
+        if (vendor.galleryPhotos && vendor.galleryPhotos.length > 0) {
+          document.getElementById('vendorBookingImg').src = vendor.galleryPhotos[0];
+        }
+
+        const packagesContainer = document.getElementById('bookingPackagesContainer');
+        packagesContainer.innerHTML = ''; // clear loading
+
+        if (vendor.packages && vendor.packages.length > 0) {
+          vendor.packages.forEach((pkg, index) => {
+            const isChecked = preselectedPkgName === pkg.name ? 'checked' : (index === 0 && !preselectedPkgName ? 'checked' : '');
+            packagesContainer.innerHTML += `
+              <div class="form-check mb-2 p-3 border rounded-3 bg-white">
+                <input class="form-check-input ms-1" type="radio" name="package" id="pkg${index}" value="${pkg.name}|${pkg.priceRange}" ${isChecked}>
+                <label class="form-check-label ms-2 d-flex justify-content-between w-100" for="pkg${index}">
+                  <span><strong>${pkg.name}</strong> <br><small class="text-muted">${pkg.description}</small></span>
+                  <span class="fw-bold text-success">${pkg.priceRange}</span>
+                </label>
+              </div>
+            `;
+          });
+        } else {
+          packagesContainer.innerHTML = '<div class="alert alert-warning">This vendor has no packages. Contact them directly.</div>';
+        }
+
+        // Fetch Bookings for this vendor to disable dates
+        const bookingsRes = await fetch(`/api/bookings/vendor/${vendorId}`);
+        const bookings = await bookingsRes.json();
+        const bookedDates = bookings.filter(b => b.status !== 'REJECTED').map(b => b.eventDate);
+
+        flatpickr("#eventDate", {
+            minDate: "today",
+            disable: bookedDates,
+            dateFormat: "Y-m-d"
+        });
+
+      } catch (err) {
+        console.error(err);
+      }
+
+      // 4. Handle Form Submission
+      const submitBtn = document.getElementById('submitBookingBtn');
+      submitBtn.addEventListener('click', async () => {
+        const eventDate = document.getElementById('eventDate').value;
+        const guestCount = document.querySelector('input[type="number"]').value;
+        const specialRequests = document.getElementById('specialRequests').value;
+        
+        const selectedPkgRadio = document.querySelector('input[name="package"]:checked');
+        if (!eventDate || !guestCount || !selectedPkgRadio) {
+          const msg = document.getElementById('bookingMessage');
+          msg.className = 'alert alert-danger';
+          msg.textContent = 'Please fill out all required fields and select a package.';
+          return;
+        }
+
+        const [pkgName, pkgPrice] = selectedPkgRadio.value.split('|');
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
+        const payload = {
+          vendorId: vendorId,
+          vendorName: document.getElementById('vendorBookingName').textContent,
+          vendorCategory: document.getElementById('vendorBookingCategory').textContent,
+          customerId: user.id,
+          eventDate: eventDate,
+          guestCount: parseInt(guestCount),
+          packageName: pkgName,
+          packagePrice: pkgPrice,
+          specialRequests: specialRequests
+        };
+
+        try {
+          const res = await fetch('/api/bookings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (res.ok) {
+            const msg = document.getElementById('bookingMessage');
+            msg.className = 'alert alert-success';
+            msg.textContent = 'Booking request sent successfully! Redirecting...';
+            setTimeout(() => {
+              window.location.href = 'customer-dashboard.html?tab=bookings';
+            }, 2000);
+          } else {
+            throw new Error('Failed to submit booking');
+          }
+        } catch (error) {
+          const msg = document.getElementById('bookingMessage');
+          msg.className = 'alert alert-danger';
+          msg.textContent = 'An error occurred. Please try again.';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Booking Request';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
