@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotels and Venues - DreamWedding</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+  <script src="../js/navbar-loader.js" defer></script>
+</head>
+<body class="bg-light">
+
+  <!-- Navigation (loaded dynamically) -->
+  <div id="navbar-placeholder"></div>
+
+  <!-- Page Header -->
+  <div class="bg-dark text-white py-5 text-center cinematic-overlay" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1542314831-c53cd3816002?q=80&w=2070&auto=format&fit=crop') center/cover;">
+    <div class="container py-4">
+      <h1 class="display-4 fw-bold">Find your dream venue</h1>
+      <p class="lead">Explore the finest hotels and wedding halls.</p>
+    </div>
+  </div>
+
+  <div class="container my-5">
+    <div class="row">
+      <!-- Filter Sidebar -->
+      <div class="col-md-3 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 premium-card">
+          <h5 class="fw-bold mb-3">Filters</h5>
+          <form id="hotelFilterForm">
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted">Location</label>
+              <select class="form-select form-select-sm" id="filterLocation">
+                <option selected value="">All districts</option>
+                <option value="Ampara">Ampara</option>
+                <option value="Anuradhapura">Anuradhapura</option>
+                <option value="Badulla">Badulla</option>
+                <option value="Batticaloa">Batticaloa</option>
+                <option value="Colombo">Colombo</option>
+                <option value="Galle">Galle</option>
+                <option value="Gampaha">Gampaha</option>
+                <option value="Hambantota">Hambantota</option>
+                <option value="Jaffna">Jaffna</option>
+                <option value="Kalutara">Kalutara</option>
+                <option value="Kandy">Kandy</option>
+                <option value="Kegalle">Kegalle</option>
+                <option value="Kilinochchi">Kilinochchi</option>
+                <option value="Kurunegala">Kurunegala</option>
+                <option value="Mannar">Mannar</option>
+                <option value="Matale">Matale</option>
+                <option value="Matara">Matara</option>
+                <option value="Moneragala">Moneragala</option>
+                <option value="Mullaitivu">Mullaitivu</option>
+                <option value="Nuwara Eliya">Nuwara Eliya</option>
+                <option value="Polonnaruwa">Polonnaruwa</option>
+                <option value="Puttalam">Puttalam</option>
+                <option value="Ratnapura">Ratnapura</option>
+                <option value="Trincomalee">Trincomalee</option>
+                <option value="Vavuniya">Vavuniya</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted">Price range</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="0-500000" id="price1">
+                <label class="form-check-label small" for="price1">Under Rs. 500,000</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="500000-1500000" id="price2">
+                <label class="form-check-label small" for="price2">Rs. 500,000 - 1,500,000</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="1500000-10000000" id="price3">
+                <label class="form-check-label small" for="price3">Above Rs. 1,500,000</label>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-custom w-100 btn-sm">Apply filters</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Hotel Grid -->
+      <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <p class="mb-0 text-muted" id="resultsCount">Showing 0 results</p>
+          <select class="form-select w-auto form-select-sm">
+            <option>Sort by: Recommended</option>
+            <option>Rating (high to low)</option>
+          </select>
+        </div>
+
+        <div class="row g-4" id="hotelGrid">
+          <!-- Loading Spinner -->
+          <div class="col-12 text-center py-5" id="loadingSpinner">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2">Loading hotels...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="../js/wishlist-utils.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const hotelGrid = document.getElementById('hotelGrid');
+      const resultsCount = document.getElementById('resultsCount');
+      const userStr = sessionStorage.getItem('dreamWeddingUser');
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      async function fetchHotels() {
+        try {
+          const response = await fetch('/api/hotels');
+          if (!response.ok) throw new Error('Failed to fetch hotels');
+          
+          const hotels = await response.json();
+          renderHotels(hotels);
+        } catch (error) {
+          console.error(error);
+          document.getElementById('loadingSpinner').innerHTML = '<p class="text-danger">Error loading hotels.</p>';
+        }
+      }
+
+      function renderHotels(hotels) {
+        resultsCount.textContent = `Showing ${hotels.length} results`;
+        const spinner = document.getElementById('loadingSpinner');
+        if (spinner) spinner.style.display = 'none';
+        
+        if (hotels.length === 0) {
+          hotelGrid.innerHTML = '<div class="col-12 text-center py-5"><h5 class="text-muted">No hotels found.</h5></div>';
+          return;
+        }
+
+        hotelGrid.innerHTML = hotels.map(hotel => {
+          const hName = hotel.hotelName || 'Unnamed Hotel';
+          const hLoc = hotel.location || 'Location Pending';
+          const hRating = hotel.averageRating || '5.0';
+          const hReviews = hotel.reviewCount || 0;
+          
+          let mainImage = 'https://images.unsplash.com/photo-1542314831-c53cd3816002?q=80&w=600&auto=format&fit=crop';
+          if (hotel.galleryPhotos && hotel.galleryPhotos.length > 0) {
+            mainImage = hotel.galleryPhotos[0];
+          }
+
+          const priceHtml = (hotel.hallArrangements && hotel.hallArrangements.length > 0) 
+            ? `<div class="fw-bold text-primary">From ${hotel.hallArrangements[0].pricePerPlate} per plate</div>` 
+            : '<div class="text-muted small">Price on request</div>';
+
+          const sanitizedName = hName.replace(/'/g, "\\'");
+
+          return `
+            <div class="col-lg-4 col-sm-6">
+              <div class="card h-100 shadow-sm border-0 premium-card p-0 overflow-hidden position-relative">
+                <button class="wishlist-btn" data-vendor-id="${hotel.id}" onclick="event.preventDefault(); toggleWishlist('${hotel.id}', '${sanitizedName}', 'Hotel & Venue', '${hLoc}', '${mainImage}', this)">
+                  <i class="fa-regular fa-heart"></i>
+                </button>
+                <img src="${mainImage}" class="card-img-top" alt="${hName}" style="height:200px; object-fit:cover;">
+                <div class="card-body p-4">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                     <span class="badge bg-light text-primary border rounded-pill px-3 py-1" style="font-size: 0.7rem; text-transform: none; letter-spacing: 1px; font-weight: 700;">Hotel & venue</span>
+                  </div>
+                  <h5 class="card-title fw-bold text-truncate" title="${hName}" style="font-family: 'Playfair Display', serif;">${hName}</h5>
+                  <p class="text-muted small mb-2 text-truncate"><i class="fa-solid fa-location-dot me-1"></i> ${hLoc}</p>
+                  <div class="mb-3">${priceHtml}</div>
+                  <div class="d-flex justify-content-between align-items-center mb-0 mt-2">
+                    <div>
+                      <i class="fa-solid fa-star text-warning me-1"></i> 
+                      <span class="fw-bold">${hRating}</span>
+                      <span class="text-muted small">(${hReviews})</span>
+                    </div>
+                    <a href="hotel-details.html?id=${hotel.id}" class="btn btn-sm btn-outline-gold rounded-pill px-3 fw-bold">Details</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Check wishlist status
+        if (user && user.role === 'CUSTOMER' && window.Wishlist) {
+            const hotelIds = hotels.map(h => h.id);
+            window.Wishlist.checkStatus(hotelIds, user.id);
+        }
+      }
+
+      fetchHotels();
+    });
+
+    /**
+     * toggleWishlist
+     */
+    async function toggleWishlist(id, name, cat, loc, img, btn) {
+        if (!window.Wishlist) return;
+        await window.Wishlist.toggle({
+            vendorId: id,
+            vendorName: name,
+            vendorCategory: cat,
+            vendorLocation: loc,
+            vendorImage: img
+        }, btn);
+    }
+  </script>
+</body>
+</html>

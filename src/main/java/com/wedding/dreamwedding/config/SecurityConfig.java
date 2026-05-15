@@ -1,4 +1,4 @@
-package com.wedding.dreamwedding.security;
+package com.wedding.dreamwedding.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

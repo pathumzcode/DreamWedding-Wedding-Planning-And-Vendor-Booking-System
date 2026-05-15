@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Details - DreamWedding</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .flatpickr-calendar {
+      width: 100% !important;
+      box-shadow: none !important;
+      border: 1px solid #e1e1e1;
+      border-radius: 10px;
+      padding: 10px 0;
+    }
+    .badge-amenity {
+      background-color: #f0f0f0;
+      color: #555;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      display: inline-block;
+      font-size: 0.85rem;
+    }
+  </style>
+  <script src="../js/navbar-loader.js" defer></script>
+</head>
+<body class="bg-light">
+
+  <div id="navbar-placeholder"></div>
+
+  <!-- Loading Spinner -->
+  <div id="pageLoader" class="container my-5 py-5 text-center">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted mt-3 fs-5">Loading hotel details...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div id="mainContent" style="display: none;">
+    <div class="container-fluid px-0">
+      <div id="hotelGalleryCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000">
+        <div class="carousel-inner" id="carouselInner">
+          <div class="carousel-item active">
+            <img src="https://images.unsplash.com/photo-1542314831-c53cd3816002?q=80&w=1200&auto=format&fit=crop" class="d-block w-100" style="height: 450px; object-fit: cover;">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#hotelGalleryCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#hotelGalleryCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="container my-5">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <span class="badge bg-secondary mb-2">Hotel & Venue</span>
+              <h1 class="fw-bold mb-1" id="hotelName" style="font-family: 'Playfair Display', serif;">Hotel Name</h1>
+              <p class="text-muted"><i class="fa-solid fa-location-dot"></i> <span id="hotelLocation">Location</span></p>
+            </div>
+            <div class="text-end">
+                <button class="wishlist-btn position-static d-inline-flex me-2 mb-2" id="detailWishlistBtn" onclick="toggleDetailWishlist()">
+                  <i class="fa-regular fa-heart"></i>
+                </button>
+                <div class="d-flex align-items-center mt-2">
+                  <i class="fa-solid fa-star text-warning me-1"></i> <span class="fw-bold me-1" id="avgRatingText">5.0</span> <span class="text-muted" id="reviewCountText">(0 reviews)</span>
+                </div>
+              </div>
+          </div>
+
+          <hr>
+          <h4 class="mt-4 fw-bold">About us</h4>
+          <p class="text-muted lh-lg" id="hotelAbout">Loading description...</p>
+
+          <h4 class="mt-4 fw-bold">Amenities</h4>
+          <div id="amenitiesContainer" class="mb-4"></div>
+
+          <h4 class="mt-5 fw-bold">Hall Arrangements</h4>
+          <div class="row g-4 mt-1 mb-5" id="hallsContainer"></div>
+
+          <h4 class="mt-5 fw-bold">Accommodation</h4>
+          <div class="row g-4 mt-1 mb-5" id="roomsContainer"></div>
+
+          <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+            <h4 class="fw-bold mb-0">Guest reviews</h4>
+            <button id="addReviewBtn" class="btn btn-outline-gold rounded-pill px-4 btn-sm d-none">
+              <i class="fa-solid fa-pen-to-square me-2"></i>Write a review
+            </button>
+          </div>
+          <div id="reviewsContainer" class="card border-0 shadow-sm p-4 mb-5">
+             <div class="text-center py-4 text-muted"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading reviews...</div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 100px;">
+            <h5 class="fw-bold mb-4">Check availability</h5>
+            <div class="mb-4">
+              <input type="text" id="availabilityCalendar">
+            </div>
+            <button class="btn btn-custom w-100 btn-lg rounded-pill" id="bookHotelBtn">Book venue now</button>
+            <hr class="my-4">
+            <h6 class="fw-bold mb-3">Contact information</h6>
+            <p class="mb-2 small"><i class="fa-solid fa-phone me-2 text-primary"></i> <span id="contactPhone"></span></p>
+            <p class="mb-2 small"><i class="fa-solid fa-envelope me-2 text-primary"></i> <span id="contactEmail"></span></p>
+            <p class="mb-3 small"><i class="fa-solid fa-globe me-2 text-primary"></i> <a href="#" id="contactWeb" target="_blank" class="text-decoration-none text-dark"></a></p>
+            <div id="socialLinks"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="../js/script.js"></script>
+  <script src="../js/wishlist-utils.js"></script>
+  <script>
+    let hotelId;
+    let hotelData;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      hotelId = urlParams.get('id');
+      const userStr = sessionStorage.getItem('dreamWeddingUser');
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      if (!hotelId) { window.location.href = 'hotel-list.html'; return; }
+
+      try {
+        const response = await fetch(`/api/hotels/${hotelId}`);
+        hotelData = await response.json();
+
+        document.getElementById('hotelName').textContent = hotelData.hotelName;
+        document.getElementById('hotelLocation').textContent = hotelData.location || 'N/A';
+        document.getElementById('hotelAbout').textContent = hotelData.aboutUs || 'No description available.';
+        
+        if (hotelData.galleryPhotos && hotelData.galleryPhotos.length > 0) {
+            document.getElementById('carouselInner').innerHTML = hotelData.galleryPhotos.map((p, i) => `
+                <div class="carousel-item ${i === 0 ? 'active' : ''}">
+                <img src="${p}" class="d-block w-100" style="height: 450px; object-fit: cover;">
+                </div>`).join('');
+        }
+
+        if (hotelData.amenities && hotelData.amenities.length > 0) {
+            document.getElementById('amenitiesContainer').innerHTML = hotelData.amenities.map(a => `<span class="badge-amenity">${a}</span>`).join('');
+        } else {
+            document.getElementById('amenitiesContainer').innerHTML = '<p class="text-muted small">No amenities listed.</p>';
+        }
+
+        if (hotelData.hallArrangements && hotelData.hallArrangements.length > 0) {
+            document.getElementById('hallsContainer').innerHTML = hotelData.hallArrangements.map(h => `
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
+                        <h5 class="fw-bold">${h.hallName || 'Unnamed Hall'}</h5>
+                        <p class="text-primary fw-bold mb-2">Price Per Plate: ${h.pricePerPlate || 'N/A'}</p>
+                        <p class="text-muted small">Capacity: ${h.seatingCapacity || 'N/A'}</p>
+                        <button class="btn btn-outline-dark rounded-pill w-100 mt-auto" onclick="handleBooking('${(h.hallName || '').replace(/'/g, "\\'")}')">Select Hall</button>
+                    </div>
+                </div>`).join('');
+        } else {
+            document.getElementById('hallsContainer').innerHTML = '<div class="col-12 text-muted">No hall arrangements available.</div>';
+        }
+
+        if (hotelData.rooms && hotelData.rooms.length > 0) {
+            document.getElementById('roomsContainer').innerHTML = hotelData.rooms.map(r => `
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
+                        <h5 class="fw-bold">${r.type || 'Unnamed Room'}</h5>
+                        <p class="text-primary fw-bold mb-2">${r.priceRange || 'N/A'}</p>
+                        <p class="text-muted small">Capacity: ${r.capacity || 'N/A'}</p>
+                        <button class="btn btn-outline-dark rounded-pill w-100 mt-auto" onclick="handleBooking('${(r.type || '').replace(/'/g, "\\'")}')">Select Room</button>
+                    </div>
+                </div>`).join('');
+        } else {
+            document.getElementById('roomsContainer').innerHTML = '<div class="col-12 text-muted">No accommodation details available.</div>';
+        }
+
+        document.getElementById('contactPhone').textContent = hotelData.contactDetails?.phone || hotelData.phoneNumber || 'N/A';
+        document.getElementById('contactEmail').textContent = hotelData.contactDetails?.email || hotelData.email || 'N/A';
+        if (hotelData.contactDetails?.website) {
+            const web = document.getElementById('contactWeb');
+            web.href = hotelData.contactDetails.website;
+            web.textContent = hotelData.contactDetails.website.replace(/^https?:\/\//, '');
+        }
+
+        // Availability Calendar
+        const bookingsRes = await fetch(`/api/bookings/vendor/${hotelId}`);
+        const bookings = await bookingsRes.json();
+        const bookedDates = bookings
+            .filter(b => b.status !== 'REJECTED')
+            .map(b => b.eventDate);
+
+        flatpickr("#availabilityCalendar", {
+            inline: true,
+            minDate: "today",
+            disable: bookedDates
+        });
+        document.getElementById('bookHotelBtn').onclick = () => handleBooking('');
+        document.getElementById('pageLoader').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+
+        // Wishlist Status
+        if (user && user.role === 'CUSTOMER' && window.Wishlist) {
+            const wishlist = await window.Wishlist.get(user.id);
+            if (wishlist.find(wi => wi.vendorId === hotelId)) {
+                document.getElementById('detailWishlistBtn').classList.add('active');
+            }
+
+            // Check if customer can review (has booking)
+            const bRes = await fetch(`/api/bookings/customer/${user.id}`);
+            const userBookings = await bRes.json();
+            const myBooking = userBookings.find(b => b.vendorId === hotelId);
+            if (myBooking) {
+                const btn = document.getElementById('addReviewBtn');
+                btn.classList.remove('d-none');
+                btn.onclick = () => window.location.href = `add-review.html?vendorId=${hotelId}&bookingId=${myBooking.id}`;
+            }
+        }
+
+        loadReviews();
+      } catch (e) { console.error(e); }
+    });
+
+    async function loadReviews() {
+        const container = document.getElementById('reviewsContainer');
+        try {
+            const res = await fetch(`/api/reviews/vendor/${hotelId}`);
+            const reviews = await res.json();
+            
+            if (reviews.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center py-3">No guest reviews yet. Be the first to share your experience!</p>';
+                return;
+            }
+
+            container.innerHTML = reviews.map(r => {
+                let stars = '';
+                for(let i=1; i<=5; i++) stars += `<i class="${i <= r.rating ? 'fa-solid text-warning' : 'fa-regular text-muted'} fa-star"></i>`;
+                
+                return `
+                    <div class="mb-4 pb-4 ${reviews.indexOf(r) < reviews.length - 1 ? 'border-bottom' : ''}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center">
+                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(r.reviewerName)}&background=fdf4e7&color=b8963e" class="rounded-circle me-3" width="45" height="45">
+                                <div>
+                                    <h6 class="fw-bold mb-0">${r.reviewerName} ${r.verified ? '<i class="fa-solid fa-circle-check text-primary ms-1" style="font-size: 0.8rem;"></i>' : ''}</h6>
+                                    <small class="text-muted">${new Date(r.reviewDate).toLocaleDateString()}</small>
+                                </div>
+                            </div>
+                            <div class="text-warning">${stars}</div>
+                        </div>
+                        <h6 class="fw-bold mb-2">${r.reviewTitle}</h6>
+                        <p class="text-muted small mb-3">${r.reviewMessage}</p>
+                        ${r.photos && r.photos.length > 0 ? `
+                            <div class="d-flex gap-2 mb-3">
+                                ${r.photos.map(p => `<img src="${p}" class="rounded shadow-sm" width="80" height="80" style="object-fit: cover; cursor: pointer;" onclick="window.open('${p}', '_blank')">`).join('')}
+                            </div>
+                        ` : ''}
+                        ${r.vendorReply ? `
+                            <div class="bg-light p-3 rounded-3 mt-2 border-start border-primary border-4">
+                                <p class="mb-1 fw-bold small">Hotel Reply:</p>
+                                <p class="mb-0 text-muted small italic">${r.vendorReply}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        } catch(e) { container.innerHTML = '<p class="text-danger">Failed to load reviews.</p>'; }
+    }
+
+    window.toggleDetailWishlist = async function() {
+        const btn = document.getElementById('detailWishlistBtn');
+        const img = (hotelData.galleryPhotos && hotelData.galleryPhotos.length > 0) ? hotelData.galleryPhotos[0] : '';
+        await window.Wishlist.toggle({
+            vendorId: hotelId,
+            vendorName: hotelData.hotelName,
+            vendorCategory: 'Hotel & Venue',
+            vendorLocation: hotelData.location || 'N/A',
+            vendorImage: img
+        }, btn);
+    };
+
+    window.handleBooking = function(hall) {
+        const u = sessionStorage.getItem('dreamWeddingUser');
+        if (!u) { window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href); return; }
+        const user = JSON.parse(u);
+        if (user.role !== 'CUSTOMER') { alert('Only customers can book.'); return; }
+        window.location.href = `hotel-booking.html?hotelId=${hotelId}&hallName=${encodeURIComponent(hall)}`;
+    };
+  </script>
+</body>
+</html>

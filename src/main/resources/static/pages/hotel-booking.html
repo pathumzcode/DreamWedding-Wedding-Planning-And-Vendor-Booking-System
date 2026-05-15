@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Hotel Venue - DreamWedding</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f8f5f0; }
+    .package-card { cursor: pointer; border: 2px solid #e5e5e5; border-radius: 12px; padding: 1rem; transition: all .2s; }
+    .package-card:hover { border-color: #b8963e; background: #fffbf4; }
+    .package-card.selected { border-color: #b8963e; background: #fffbf4; }
+    .package-card .check-icon { display: none; color: #b8963e; }
+    .package-card.selected .check-icon { display: inline-block; }
+    .navbar-brand { font-family: 'Playfair Display', serif; color: #b8963e !important; }
+    .flatpickr-calendar { border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
+    .flatpickr-day.disabled { color: #ccc !important; text-decoration: line-through; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+    <div class="container d-flex justify-content-center">
+      <a class="navbar-brand fs-3" href="../index.html">DreamWedding Checkout</a>
+    </div>
+  </nav>
+
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4">
+          <h2 class="fw-bold mb-4 text-center" style="font-family:'Playfair Display',serif;">Hotel Booking Request</h2>
+
+          <!-- Hotel Info Header -->
+          <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3 border">
+            <img id="hotelBookingImg"
+              src="https://images.unsplash.com/photo-1542314831-c53cd3816002?auto=format&fit=crop&w=150&q=80"
+              class="rounded object-fit-cover me-3" width="80" height="80" alt="Hotel">
+            <div>
+              <h5 class="fw-bold mb-0" id="hotelBookingName">Loading...</h5>
+              <p class="text-muted small mb-0" id="hotelBookingLocation"><i class="fa-solid fa-location-dot me-1"></i>Loading...</p>
+            </div>
+          </div>
+
+          <!-- Step 1: Event Details -->
+          <h5 class="fw-bold mb-3 border-bottom pb-2">1. Event Details</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label fw-bold small">Event Date</label>
+                <input type="text" id="hotelEventDate" class="form-control" placeholder="Select Date" required>
+              <div class="invalid-feedback">Please select a date.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small">Estimated Guest Count</label>
+              <input type="number" class="form-control" id="hotelGuestCount" placeholder="e.g. 200" min="1" required>
+            </div>
+          </div>
+
+          <!-- Step 2: Hall / Package Selection -->
+          <h5 class="fw-bold mb-3 border-bottom pb-2">2. Hall / Venue Selection</h5>
+          <div class="mb-4" id="hotelPackagesContainer">
+            <div class="text-muted small">Loading venues...</div>
+          </div>
+
+          <!-- Step 3: Additional Info -->
+          <h5 class="fw-bold mb-3 border-bottom pb-2">3. Special Requests</h5>
+          <div class="mb-4">
+            <label class="form-label fw-bold small">Notes / Special Requirements</label>
+            <textarea id="hotelSpecialRequests" class="form-control" rows="3"
+              placeholder="e.g. Floral theme, specific menu requests, decoration style..."></textarea>
+          </div>
+
+          <!-- Summary Note -->
+          <div class="bg-secondary bg-opacity-10 p-4 rounded-3 mb-4">
+            <h6 class="fw-bold mb-2">Booking Summary</h6>
+            <ul id="selectedItemsSummary" class="list-unstyled mb-3">
+                <li class="text-muted small">No items selected</li>
+            </ul>
+            <p class="small text-muted mb-0 border-top pt-2">This is a booking request. You will not be charged until the hotel confirms availability and sends an invoice.</p>
+          </div>
+
+          <div id="hotelBookingMessage" class="alert d-none"></div>
+
+          <div class="d-grid gap-2">
+            <button type="button" id="submitHotelBookingBtn" class="btn btn-custom py-3 fs-5">Submit Booking Request</button>
+            <a href="hotel-list.html" class="btn btn-link text-muted text-decoration-none">Cancel</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Auth check
+      const userStr = sessionStorage.getItem('dreamWeddingUser');
+      if (!userStr) { window.location.href = 'login.html?redirect=hotel-booking'; return; }
+      const user = JSON.parse(userStr);
+      if (user.role !== 'CUSTOMER') {
+        alert('Error: Only customers can make bookings.');
+        window.location.href = '../index.html';
+        return;
+      }
+
+      // 2. Parse params
+      const params = new URLSearchParams(window.location.search);
+      const hotelId = params.get('hotelId');
+      const preselectedHall = params.get('hallName');
+
+      if (!hotelId) {
+        document.body.innerHTML = '<div class="container mt-5 text-center"><h2>Invalid Booking Request</h2><a href="hotel-list.html" class="btn btn-custom mt-3">Back to Hotels</a></div>';
+        return;
+      }
+
+      // 3. Set today as min date
+      // 4. Fetch Bookings for this hotel to disable dates
+      const bookingsResRaw = await fetch(`/api/bookings/vendor/${hotelId}`);
+      const hotelBookings = await bookingsResRaw.json();
+      const bookedDates = hotelBookings.filter(b => b.status !== 'REJECTED').map(b => b.eventDate);
+
+      flatpickr("#hotelEventDate", {
+          minDate: "today",
+          disable: bookedDates,
+          dateFormat: "Y-m-d"
+      });
+
+      // 4. Fetch hotel details
+      let selectedPackages = [];
+      try {
+        const res = await fetch(`/api/hotels/${hotelId}`);
+        if (!res.ok) throw new Error('Hotel not found');
+        const hotel = await res.json();
+
+        document.getElementById('hotelBookingName').textContent = hotel.hotelName;
+        document.getElementById('hotelBookingLocation').innerHTML = `<i class="fa-solid fa-location-dot me-1"></i>${hotel.location || ''}`;
+        if (hotel.galleryPhotos && hotel.galleryPhotos.length > 0) {
+          document.getElementById('hotelBookingImg').src = hotel.galleryPhotos[0];
+        }
+
+        // Build hall + room package list
+        const container = document.getElementById('hotelPackagesContainer');
+        container.innerHTML = '';
+
+        const allOptions = [];
+
+        // Halls
+        if (hotel.hallArrangements && hotel.hallArrangements.length > 0) {
+          hotel.hallArrangements.forEach(h => {
+            allOptions.push({
+              name: h.hallName,
+              price: `Price/Plate: ${h.pricePerPlate}`,
+              detail: `Capacity: ${h.seatingCapacity} guests — ${h.description || ''}`,
+              type: 'Hall'
+            });
+          });
+        }
+
+        // Rooms
+        if (hotel.rooms && hotel.rooms.length > 0) {
+          hotel.rooms.forEach(r => {
+            allOptions.push({
+              name: r.type,
+              price: `${r.priceRange} / Night`,
+              detail: `Capacity: ${r.capacity}`,
+              type: 'Room'
+            });
+          });
+        }
+
+        if (allOptions.length === 0) {
+          container.innerHTML = '<div class="alert alert-warning">This hotel has no halls or rooms set up yet. Contact them directly.</div>';
+        } else {
+          allOptions.forEach((opt, i) => {
+            const isPreselected = preselectedHall && opt.name === preselectedHall;
+            const card = document.createElement('div');
+            card.className = `package-card mb-3 ${isPreselected ? 'selected' : ''}`;
+            card.dataset.name = opt.name;
+            card.dataset.price = opt.price;
+            card.innerHTML = `
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <span class="badge bg-secondary me-2">${opt.type}</span>
+                  <strong>${opt.name}</strong>
+                  <i class="fa-solid fa-circle-check check-icon ms-2"></i>
+                  <p class="text-muted small mb-0 mt-1">${opt.detail}</p>
+                </div>
+                <span class="fw-bold text-success">${opt.price}</span>
+              </div>`;
+
+            card.addEventListener('click', () => {
+              card.classList.toggle('selected');
+              const name = card.dataset.name;
+              const price = card.dataset.price;
+              
+              if (card.classList.contains('selected')) {
+                selectedPackages.push({ name, price });
+              } else {
+                selectedPackages = selectedPackages.filter(p => p.name !== name);
+              }
+              updateSummary();
+            });
+
+            if (isPreselected) {
+              selectedPackages.push({ name: opt.name, price: opt.price });
+              updateSummary();
+            }
+
+            container.appendChild(card);
+          });
+        }
+
+        function updateSummary() {
+            const summaryList = document.getElementById('selectedItemsSummary');
+            if (selectedPackages.length === 0) {
+                summaryList.innerHTML = '<li class="text-muted small">No items selected</li>';
+                return;
+            }
+            summaryList.innerHTML = selectedPackages.map(p => `
+                <li class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="small">${p.name}</span>
+                    <span class="fw-bold small">${p.price}</span>
+                </li>
+            `).join('');
+        }
+
+      } catch (err) {
+        console.error(err);
+        document.body.innerHTML = '<div class="container mt-5 text-center"><h2>Hotel not found</h2><a href="hotel-list.html" class="btn btn-custom mt-3">Back to Hotels</a></div>';
+        return;
+      }
+
+      // 5. Submit handler
+      document.getElementById('submitHotelBookingBtn').addEventListener('click', async () => {
+        const eventDate = document.getElementById('hotelEventDate').value;
+        const guestCount = document.getElementById('hotelGuestCount').value;
+        const specialRequests = document.getElementById('hotelSpecialRequests').value;
+        const msgEl = document.getElementById('hotelBookingMessage');
+
+        if (!eventDate || !guestCount) {
+          msgEl.className = 'alert alert-danger';
+          msgEl.textContent = 'Please fill in the event date and guest count.';
+          return;
+        }
+        if (!selectedPackages.length) {
+          msgEl.className = 'alert alert-danger';
+          msgEl.textContent = 'Please select at least one hall or room.';
+          return;
+        }
+
+        const combinedNames = selectedPackages.map(p => p.name).join(', ');
+        const combinedPrices = selectedPackages.map(p => p.price).join(' + ');
+
+        const btn = document.getElementById('submitHotelBookingBtn');
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+
+        const payload = {
+          vendorId: hotelId,
+          vendorName: document.getElementById('hotelBookingName').textContent,
+          vendorCategory: 'Hotel & Venue',
+          customerId: user.id,
+          eventDate: eventDate,
+          guestCount: parseInt(guestCount),
+          packageName: combinedNames,
+          packagePrice: combinedPrices,
+          specialRequests: specialRequests
+        };
+
+        try {
+          const res = await fetch('/api/bookings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (res.ok) {
+            msgEl.className = 'alert alert-success';
+            msgEl.textContent = 'Booking request sent successfully! Redirecting to your dashboard...';
+            setTimeout(() => {
+              window.location.href = 'customer-dashboard.html?tab=bookings';
+            }, 2000);
+          } else {
+            throw new Error('Booking failed');
+          }
+        } catch (err) {
+          msgEl.className = 'alert alert-danger';
+          msgEl.textContent = 'An error occurred. Please try again.';
+          btn.disabled = false;
+          btn.textContent = 'Submit Booking Request';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
