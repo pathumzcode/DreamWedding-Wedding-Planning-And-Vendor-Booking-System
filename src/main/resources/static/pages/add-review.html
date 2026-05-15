@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write a Review - DreamWedding</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        :root {
+            --primary-gold: #b8963e;
+            --soft-gold: #fdf4e7;
+            --dark-gold: #8a6d2d;
+            --premium-black: #1a1a1a;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #f8f5f0 0%, #ffffff 100%);
+            min-height: 100vh;
+            color: var(--premium-black);
+        }
+
+        .review-header {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 80px 0;
+            color: white;
+            text-align: center;
+            border-radius: 0 0 50px 50px;
+            margin-bottom: -50px;
+        }
+
+        .review-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+
+        .form-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            padding: 50px;
+            margin-bottom: 50px;
+            border: 1px solid rgba(184, 150, 62, 0.1);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-gold);
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary-gold);
+            border-radius: 2px;
+        }
+
+        .vendor-info-card {
+            background: var(--soft-gold);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 40px;
+            border-left: 5px solid var(--primary-gold);
+        }
+
+        .badge-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .badge-icon {
+            font-size: 2.5rem;
+            color: var(--primary-gold);
+        }
+
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 2.5rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: var(--primary-gold);
+            transform: scale(1.1);
+        }
+
+        .detail-rating-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .mini-stars {
+            display: flex;
+            gap: 5px;
+        }
+
+        .mini-stars i {
+            cursor: pointer;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+
+        .mini-stars i.active {
+            color: var(--primary-gold);
+        }
+
+        .form-control, .form-select {
+            border-radius: 12px;
+            padding: 12px 20px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 0 4px rgba(184, 150, 62, 0.1);
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-gold);
+            background: var(--soft-gold);
+        }
+
+        .preview-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .preview-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: all 0.3s;
+            margin-top: 30px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(184, 150, 62, 0.3);
+            color: white;
+        }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tag-pill {
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+
+        .tag-pill:hover {
+            border-color: var(--primary-gold);
+            color: var(--primary-gold);
+        }
+
+        .tag-pill.selected {
+            background: var(--primary-gold);
+            color: white;
+            border-color: var(--primary-gold);
+            box-shadow: 0 5px 15px rgba(184, 150, 62, 0.2);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+<div id="navbar-placeholder"></div>
+
+<header class="review-header">
+    <div class="container">
+        <h1>DreamWedding review section</h1>
+        <p class="fs-5 opacity-75">Share your experience with this vendor</p>
+    </div>
+</header>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-container">
+                <div class="vendor-info-card">
+                    <h5 class="fw-bold mb-1" id="displayVendorName">Loading Vendor...</h5>
+                    <p class="text-muted mb-0 small"><i class="fa-solid fa-location-dot me-2"></i><span id="displayLocation">---</span></p>
+                </div>
+
+                <div class="badge-card">
+                    <div class="badge-icon"><i class="fa-solid fa-medal"></i></div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Become a trusted reviewer</h6>
+                        <p class="mb-0 small opacity-75">Complete your first review to earn a reviewer badge on DreamWedding.</p>
+                    </div>
+                </div>
+
+                <form id="detailedReviewForm">
+                    <!-- Step 1: Overall Rating -->
+                    <div class="mb-5 text-center">
+                        <h5 class="fw-bold mb-2">How would you rate this vendor?</h5>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars"><i class="fa-solid fa-star"></i></label>
+                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"><i class="fa-solid fa-star"></i></label>
+                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"><i class="fa-solid fa-star"></i></label>
+                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"><i class="fa-solid fa-star"></i></label>
+                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"><i class="fa-solid fa-star"></i></label>
+                        </div>
+                        <p class="text-muted small" id="ratingText">Select a rating</p>
+                    </div>
+
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">When was your event?</label>
+                            <input type="month" class="form-control" id="eventDate" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">What type of event was it?</label>
+                            <select class="form-select" id="eventType" required>
+                                <option value="" selected disabled>Choose event type</option>
+                                <option value="Wedding Ceremony">Wedding Ceremony</option>
+                                <option value="Engagement">Engagement</option>
+                                <option value="Homecoming">Homecoming</option>
+                                <option value="Pre-shoot">Pre-shoot</option>
+                                <option value="Bridal Shower">Bridal Shower</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Who booked this service?</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <input type="radio" class="btn-check" name="bookedBy" id="booker1" value="Bride" autocomplete="off">
+                                <label class="btn btn-outline-dark rounded-pill px-3" for="booker1">Bride</label>
+                                
+                                <input type="radio" class="btn-check" name="bookedBy" id="booker2" value="Groom" autocomplete="off">
+                                <label class="btn btn-outline-dark rounded-pill px-3" for="booker2">Groom</label>
+                                
+                                <input type="radio" class="btn-check" name="bookedBy" id="booker3" value="Family" autocomplete="off">
+                                <label class="btn btn-outline-dark rounded-pill px-3" for="booker3">Family</label>
+                                
+                                <input type="radio" class="btn-check" name="bookedBy" id="booker4" value="Wedding Planner" autocomplete="off">
+                                <label class="btn btn-outline-dark rounded-pill px-3" for="booker4">Wedding Planner</label>
+                                
+                                <input type="radio" class="btn-check" name="bookedBy" id="booker5" value="Friend" autocomplete="off">
+                                <label class="btn btn-outline-dark rounded-pill px-3" for="booker5">Friend</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Detailed Ratings -->
+                    <div class="mb-5">
+                        <h5 class="section-title">Rate service details</h5>
+                        <div id="serviceDetails">
+                            <div class="detail-rating-row" data-category="Quality">
+                                <span>Quality of service</span>
+                                <div class="mini-stars" data-value="0">
+                                    <i class="fa-solid fa-star" data-idx="1"></i>
+                                    <i class="fa-solid fa-star" data-idx="2"></i>
+                                    <i class="fa-solid fa-star" data-idx="3"></i>
+                                    <i class="fa-solid fa-star" data-idx="4"></i>
+                                    <i class="fa-solid fa-star" data-idx="5"></i>
+                                </div>
+                            </div>
+                            <div class="detail-rating-row" data-category="Pricing">
+                                <span>Pricing</span>
+                                <div class="mini-stars" data-value="0">
+                                    <i class="fa-solid fa-star" data-idx="1"></i>
+                                    <i class="fa-solid fa-star" data-idx="2"></i>
+                                    <i class="fa-solid fa-star" data-idx="3"></i>
+                                    <i class="fa-solid fa-star" data-idx="4"></i>
+                                    <i class="fa-solid fa-star" data-idx="5"></i>
+                                </div>
+                            </div>
+                            <div class="detail-rating-row" data-category="Communication">
+                                <span>Communication</span>
+                                <div class="mini-stars" data-value="0">
+                                    <i class="fa-solid fa-star" data-idx="1"></i>
+                                    <i class="fa-solid fa-star" data-idx="2"></i>
+                                    <i class="fa-solid fa-star" data-idx="3"></i>
+                                    <i class="fa-solid fa-star" data-idx="4"></i>
+                                    <i class="fa-solid fa-star" data-idx="5"></i>
+                                </div>
+                            </div>
+                            <div class="detail-rating-row" data-category="Punctuality">
+                                <span>Punctuality</span>
+                                <div class="mini-stars" data-value="0">
+                                    <i class="fa-solid fa-star" data-idx="1"></i>
+                                    <i class="fa-solid fa-star" data-idx="2"></i>
+                                    <i class="fa-solid fa-star" data-idx="3"></i>
+                                    <i class="fa-solid fa-star" data-idx="4"></i>
+                                    <i class="fa-solid fa-star" data-idx="5"></i>
+                                </div>
+                            </div>
+                            <div class="detail-rating-row" data-category="Professionalism">
+                                <span>Professionalism</span>
+                                <div class="mini-stars" data-value="0">
+                                    <i class="fa-solid fa-star" data-idx="1"></i>
+                                    <i class="fa-solid fa-star" data-idx="2"></i>
+                                    <i class="fa-solid fa-star" data-idx="3"></i>
+                                    <i class="fa-solid fa-star" data-idx="4"></i>
+                                    <i class="fa-solid fa-star" data-idx="5"></i>
+                                </div>
+                            </div>
+                            <div class="detail-rating-row" data-category="FinalDelivery">
+                                <span>Final delivery</span>
+                                <div class="mini-stars" data-value="0">
+                                    <i class="fa-solid fa-star" data-idx="1"></i>
+                                    <i class="fa-solid fa-star" data-idx="2"></i>
+                                    <i class="fa-solid fa-star" data-idx="3"></i>
+                                    <i class="fa-solid fa-star" data-idx="4"></i>
+                                    <i class="fa-solid fa-star" data-idx="5"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tags Section -->
+                    <div class="mb-5">
+                        <h5 class="section-title">What impressed you most about the vendor?</h5>
+                        <p class="text-muted small mb-3">Choose as many as you like</p>
+                        <div class="tag-container" id="vendorTags">
+                            <div class="tag-pill" data-tag="Professional Service">Professional Service</div>
+                            <div class="tag-pill" data-tag="Friendly Communication">Friendly Communication</div>
+                            <div class="tag-pill" data-tag="On-Time Delivery">On-Time Delivery</div>
+                            <div class="tag-pill" data-tag="High Quality Work">High Quality Work</div>
+                            <div class="tag-pill" data-tag="Value for Money">Value for Money</div>
+                            <div class="tag-pill" data-tag="Creative Ideas">Creative Ideas</div>
+                            <div class="tag-pill" data-tag="Flexible Packages">Flexible Packages</div>
+                            <div class="tag-pill" data-tag="Good Customer Care">Good Customer Care</div>
+                            <div class="tag-pill" data-tag="Beautiful Final Results">Beautiful Final Results</div>
+                            <div class="tag-pill" data-tag="Would Recommend to Others">Would Recommend to Others</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Message -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Title your review</label>
+                        <input type="text" class="form-control" id="reviewTitle" placeholder="Example: Excellent photography and friendly service" required>
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="form-label fw-bold">Share your experience</label>
+                        <textarea class="form-control" id="reviewMessage" rows="6" placeholder="Tell couples about your experience with this vendor. Was the service good? Were they professional? Would you recommend them?" required></textarea>
+                    </div>
+
+                    <!-- Step 4: Photos -->
+                    <div class="mb-5">
+                        <label class="form-label fw-bold">Add photos (Optional)</label>
+                        <p class="text-muted small">Upload wedding photos or sample results.</p>
+                        <div class="upload-area" onclick="document.getElementById('photoInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up fs-1 text-muted mb-2"></i>
+                            <p class="mb-0">Click to add photos or drag and drop</p>
+                            <p class="text-muted small">Upload up to 3 images</p>
+                            <input type="file" id="photoInput" class="d-none" multiple accept="image/*">
+                        </div>
+                        <div class="preview-container" id="previewContainer"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-submit" id="submitBtn">Submit review</button>
+                    <div id="errorMsg" class="alert alert-danger mt-3 d-none"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="text-center">
+        <div class="spinner-border text-gold mb-3" role="status"></div>
+        <h5 class="fw-bold">Submitting your review...</h5>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/navbar-loader.js"></script>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const vendorId = params.get('vendorId');
+    const bookingId = params.get('bookingId');
+    let base64Photos = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const userStr = sessionStorage.getItem('dreamWeddingUser');
+        if (!userStr) {
+            window.location.href = `login.html?redirect=pages/add-review.html?vendorId=${vendorId}`;
+            return;
+        }
+
+        const user = JSON.parse(userStr);
+        if (user.role !== 'CUSTOMER') {
+            alert('Only customers can write reviews.');
+            window.location.href = '../index.html';
+            return;
+        }
+
+        // Fetch Vendor or Hotel Details
+        try {
+            let res = await fetch(`/api/vendors/${vendorId}`);
+            if (!res.ok) {
+                // Try hotels if vendor not found
+                res = await fetch(`/api/hotels/${vendorId}`);
+            }
+
+            if (res.ok) {
+                const data = await res.json();
+                // Handle different field names for hotels/vendors
+                const name = data.businessName || data.hotelName || `${data.firstName} ${data.lastName}`;
+                document.getElementById('displayVendorName').textContent = name;
+                document.getElementById('displayLocation').textContent = data.location || 'Location not specified';
+                
+                // Customize labels based on category
+                if (data.category === 'Photography') {
+                    const qualityLabel = document.querySelector('.detail-rating-row[data-category="Quality"] span');
+                    if (qualityLabel) qualityLabel.textContent = 'Photography Quality';
+                }
+            }
+        } catch (e) { console.error('Error fetching reviewer target details:', e); }
+
+        // Star Rating Label logic
+        const stars = document.querySelectorAll('.star-rating input');
+        stars.forEach(s => {
+            s.addEventListener('change', () => {
+                document.getElementById('ratingText').textContent = `${s.value}.0 of 5 stars`;
+            });
+        });
+
+        // Detail Rating Star Logic
+        const miniStarContainers = document.querySelectorAll('.mini-stars');
+        miniStarContainers.forEach(container => {
+            const stars = container.querySelectorAll('i');
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    const val = parseInt(star.dataset.idx);
+                    container.dataset.value = val;
+                    stars.forEach(s => {
+                        if (parseInt(s.dataset.idx) <= val) s.classList.add('active');
+                        else s.classList.remove('active');
+                    });
+                });
+            });
+        });
+
+        // Tag selection
+        const tags = document.querySelectorAll('.tag-pill');
+        tags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                tag.classList.toggle('selected');
+            });
+        });
+
+        // Photo Upload handling
+        const photoInput = document.getElementById('photoInput');
+        photoInput.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (files.length + base64Photos.length > 3) {
+                alert('You can only upload up to 3 photos.');
+                return;
+            }
+
+            for (const file of files) {
+                const base64 = await toBase64(file);
+                base64Photos.push(base64);
+                
+                const img = document.createElement('img');
+                img.src = base64;
+                img.className = 'preview-img';
+                document.getElementById('previewContainer').appendChild(img);
+            }
+        });
+
+        // Form Submit
+        document.getElementById('detailedReviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const err = document.getElementById('errorMsg');
+            err.classList.add('d-none');
+
+            const rating = document.querySelector('input[name="rating"]:checked')?.value;
+            if (!rating) {
+                err.textContent = 'Please provide an overall rating.';
+                err.classList.remove('d-none');
+                return;
+            }
+
+            const bookedBy = document.querySelector('input[name="bookedBy"]:checked')?.value;
+            if (!bookedBy) {
+                err.textContent = 'Please specify who booked this service.';
+                err.classList.remove('d-none');
+                return;
+            }
+
+            // Collect Service Ratings
+            const serviceRatings = {};
+            miniStarContainers.forEach(c => {
+                const cat = c.parentElement.dataset.category;
+                serviceRatings[cat] = parseInt(c.dataset.value);
+            });
+
+            const payload = {
+                type: 'VENDOR',
+                vendorId: vendorId,
+                bookingId: bookingId,
+                rating: parseInt(rating),
+                reviewTitle: document.getElementById('reviewTitle').value,
+                reviewMessage: document.getElementById('reviewMessage').value,
+                photos: base64Photos,
+                eventDate: document.getElementById('eventDate').value,
+                eventType: document.getElementById('eventType').value,
+                bookedBy: bookedBy,
+                serviceRatings: serviceRatings,
+                reviewTags: Array.from(document.querySelectorAll('.tag-pill.selected')).map(t => t.dataset.tag),
+                reviewerId: user.id,
+                bookingId: bookingId
+            };
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            try {
+                const res = await fetch('/api/reviews/vendor', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    alert('Thank you for your review! It has been published successfully.');
+                    // Intelligent redirect back to details page
+                    const isHotel = document.getElementById('displayVendorName').textContent.toLowerCase().includes('hotel');
+                    const targetPage = isHotel ? 'hotel-details.html' : 'vendor-details.html';
+                    window.location.href = `${targetPage}?id=${vendorId}`;
+                } else {
+                    const data = await res.json();
+                    err.textContent = data.error || 'Failed to submit review';
+                    err.classList.remove('d-none');
+                }
+            } catch (e) {
+                err.textContent = 'An error occurred. Please try again.';
+                err.classList.remove('d-none');
+            } finally {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        });
+    });
+
+    const toBase64 = file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+</script>
+</body>
+</html>
