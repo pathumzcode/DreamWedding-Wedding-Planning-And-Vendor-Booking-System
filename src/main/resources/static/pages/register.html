@@ -143,32 +143,34 @@
                         <div class="row mb-3">
                             <div class="col-md-6 mb-3 mb-md-0">
                                 <label for="firstName" class="form-label fw-semibold">First name</label>
-                                <input type="text" class="form-control" id="firstName" placeholder="Pathum" required>
+                                <input type="text" class="form-control" id="firstName" placeholder="First Name" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="lastName" class="form-label fw-semibold">Last name</label>
-                                <input type="text" class="form-control" id="lastName" placeholder="Bandara" required>
+                                <input type="text" class="form-control" id="lastName" placeholder="Last Name" required>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="email" class="form-label fw-semibold">Email address</label>
-                            <input type="email" class="form-control" id="email" placeholder="pathum@example.com" required>
+                            <input type="email" class="form-control" id="email" placeholder="example@example.com" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="phoneNumber" class="form-label fw-semibold">Phone number</label>
-                            <input type="tel" class="form-control" id="phoneNumber" placeholder="0771234567" required>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted fw-bold border-end-0">+94</span>
+                                <input type="tel" class="form-control border-start-0" id="phoneNumber" placeholder="771234567" pattern="^\d{9}$" title="Enter exactly 9 digits" maxlength="9" required>
+                            </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="role" class="form-label fw-semibold">I am a...</label>
                             <select class="form-select" id="role" required>
                                 <option value="" selected disabled>Select your role</option>
-                                <option value="CUSTOMER">Customer (Planning a wedding)</option>
-                                <option value="VENDOR">Vendor (Providing services)</option>
-                                <option value="HOTEL">Hotel / Venue Owner</option>
-                                <option value="ADMIN">Administrator</option>
+                                <option value="CUSTOMER">Customer</option>
+                                <option value="VENDOR">Vendor</option>
+                                <option value="HOTEL">Hotel</option>
                             </select>
                         </div>
                         
@@ -281,15 +283,23 @@
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
             const email = document.getElementById('email').value.trim();
-            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const phoneNumberInput = document.getElementById('phoneNumber').value.trim();
             const role = document.getElementById('role').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            if (!firstName || !lastName || !email || !phoneNumber || !role || !password || !confirmPassword) {
+            if (!firstName || !lastName || !email || !phoneNumberInput || !role || !password || !confirmPassword) {
                 showMessage('All fields are required.', 'error');
                 return;
             }
+
+            const phonePattern = /^\d{9}$/;
+            if (!phonePattern.test(phoneNumberInput)) {
+                showMessage('Please enter a valid 9-digit phone number.', 'error');
+                return;
+            }
+            
+            const phoneNumber = '+94' + phoneNumberInput;
 
             if (password.length < 6) {
                 showMessage('Password must be at least 6 characters.', 'error');
@@ -347,6 +357,13 @@
                         errorMsg = result.fieldErrors[firstErrorField];
                     }
                     showMessage(errorMsg, 'error');
+                    
+                    // Automatically redirect to login if email already exists
+                    if (response.status === 409 || errorMsg.toLowerCase().includes('already registered')) {
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 2500);
+                    }
                 }
             } catch (error) {
                 console.error('Error:', error);

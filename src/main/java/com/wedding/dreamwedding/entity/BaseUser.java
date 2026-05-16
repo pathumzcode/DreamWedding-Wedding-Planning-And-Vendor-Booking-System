@@ -35,7 +35,7 @@ public abstract class BaseUser {
     @NotBlank(message = "Last name is required")
     private String lastName;
     
-    @Pattern(regexp = "^\\+94\\d{9}$", message = "Phone number must start with +94 followed by 9 digits")
+    @Pattern(regexp = "^\\+94\\d{9}$", message = "Invalid phone number format")
     private String phoneNumber;
     
     @NotBlank(message = "Email is required")
