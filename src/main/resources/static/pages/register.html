@@ -115,6 +115,44 @@
             border-color: #198754;
             box-shadow: none;
         }
+
+        /* Profile Picture Upload */
+        .avatar-upload-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .avatar-preview {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+            background: #f0ece3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .avatar-preview:hover { opacity: 0.85; }
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        .avatar-preview .avatar-placeholder {
+            font-size: 2.2rem;
+            color: #b8963e;
+        }
+        .avatar-hint {
+            font-size: 0.78rem;
+            color: #999;
+        }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -148,6 +186,26 @@
                             <div class="col-md-6">
                                 <label for="lastName" class="form-label fw-semibold">Last name</label>
                                 <input type="text" class="form-control" id="lastName" placeholder="Last Name" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold d-block">Profile picture <span class="text-muted fw-normal">(optional)</span></label>
+                            <div class="avatar-upload-wrapper">
+                                <div class="avatar-preview" id="avatarPreview" onclick="document.getElementById('profilePictureInput').click()" title="Click to upload">
+                                    <i class="fa-solid fa-user avatar-placeholder" id="avatarPlaceholder"></i>
+                                    <img id="avatarImg" alt="Profile Preview">
+                                </div>
+                                <div class="text-center">
+                                    <input type="file" id="profilePictureInput" accept="image/*" style="display:none;" onchange="handleAvatarChange(event)">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('profilePictureInput').click()">
+                                        <i class="fa-solid fa-upload me-1"></i> Choose Photo
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-link text-danger" id="removeAvatarBtn" style="display:none;" onclick="removeAvatar()">
+                                        Remove
+                                    </button>
+                                    <p class="avatar-hint mt-1 mb-0">JPG, PNG, WEBP — max 2MB</p>
+                                </div>
                             </div>
                         </div>
 
@@ -219,6 +277,38 @@
         const submitBtn = document.getElementById('submitBtn');
         const submitSpinner = document.getElementById('submitSpinner');
         const btnText = document.getElementById('btnText');
+
+        // --- Profile Picture Handling ---
+        let profilePictureBase64 = null;
+
+        function handleAvatarChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                showMessage('Profile picture must be under 2MB.', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                profilePictureBase64 = e.target.result; // Full Base64 data URL
+                document.getElementById('avatarImg').src = profilePictureBase64;
+                document.getElementById('avatarImg').style.display = 'block';
+                document.getElementById('avatarPlaceholder').style.display = 'none';
+                document.getElementById('removeAvatarBtn').style.display = 'inline-block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeAvatar() {
+            profilePictureBase64 = null;
+            document.getElementById('profilePictureInput').value = '';
+            document.getElementById('avatarImg').src = '';
+            document.getElementById('avatarImg').style.display = 'none';
+            document.getElementById('avatarPlaceholder').style.display = 'block';
+            document.getElementById('removeAvatarBtn').style.display = 'none';
+        }
 
         // Toggle Password Visibility (works for both password fields)
         function togglePassword(inputId, iconId) {
@@ -319,7 +409,8 @@
                 email,
                 phoneNumber,
                 role,
-                password
+                password,
+                profilePicture: profilePictureBase64 || null
             };
 
             // Loading state

@@ -72,9 +72,12 @@
               </label>
               <div class="input-group">
                 <span class="input-group-text bg-white"><i class="fa-solid fa-lock"></i></span>
-                <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
-                <div class="invalid-feedback">Please enter your password.</div>
+                <input type="password" class="form-control border-end-0" id="password" placeholder="Enter your password" required>
+                <span class="input-group-text bg-white border-start-0" style="cursor: pointer;" onclick="toggleLoginPassword()">
+                  <i class="fa-solid fa-eye" id="toggleLoginIcon"></i>
+                </span>
               </div>
+              <div class="invalid-feedback">Please enter your password.</div>
             </div>
 
             <div class="mb-4 form-check">
@@ -98,6 +101,19 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/script.js"></script>
+  <script>
+    function toggleLoginPassword() {
+      const input = document.getElementById('password');
+      const icon  = document.getElementById('toggleLoginIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+  </script>
   <script>
     const loginForm = document.getElementById('loginForm');
     const messageBox = document.getElementById('loginMessageBox');

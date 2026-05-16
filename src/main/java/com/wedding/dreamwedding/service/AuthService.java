@@ -140,5 +140,8 @@ public class AuthService {
         user.setPassword(plainPassword);
         user.setRole(request.getRole());
         user.setCreatedAt(LocalDateTime.now());
+        if (request.getProfilePicture() != null && !request.getProfilePicture().isEmpty()) {
+            user.setProfilePicture(request.getProfilePicture());
+        }
     }
 }
