@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Venue Setup - DreamWedding</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #b8963e;
+            --primary-hover: #a38535;
+            --bg-light: #fdfbf7;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: transparent !important;
+            color: #333;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: -20px; left: -20px; right: -20px; bottom: -20px;
+            z-index: -1;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1542314831-c53cd3816002?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+            background-size: cover;
+            filter: blur(8px);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+        }
+
+        .auth-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-custom {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background-color: var(--primary-hover);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e1e1e1;
+            background-color: #fcfcfc;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(184,150,62,0.1);
+            background-color: #fff;
+        }
+
+        #messageBox {
+            display: none;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .spinner-border {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-right: 0.5rem;
+            display: none;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+            border-bottom: 2px solid #f0e6d2;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg py-3">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">DreamWedding</a>
+        </div>
+    </nav>
+
+    <!-- Setup Section -->
+    <div class="container my-auto py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="card auth-card p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold mb-2" style="font-family: 'Playfair Display', serif;">Complete Your Hotel Profile</h2>
+                        <p class="text-muted">Let couples know about your amazing venue and services</p>
+                    </div>
+
+                    <div id="messageBox"></div>
+                    
+                    <form id="setupForm" novalidate>
+                        
+                        <h4 class="section-title">Basic Information</h4>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="hotelName" class="form-label fw-semibold">Hotel Name *</label>
+                                <input type="text" class="form-control" id="hotelName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="location" class="form-label fw-semibold">Location (District) *</label>
+                                <select class="form-select" id="location" required>
+                                    <option value="" selected disabled>Select District</option>
+                                    <option value="Ampara">Ampara</option>
+                                    <option value="Anuradhapura">Anuradhapura</option>
+                                    <option value="Badulla">Badulla</option>
+                                    <option value="Batticaloa">Batticaloa</option>
+                                    <option value="Colombo">Colombo</option>
+                                    <option value="Galle">Galle</option>
+                                    <option value="Gampaha">Gampaha</option>
+                                    <option value="Hambantota">Hambantota</option>
+                                    <option value="Jaffna">Jaffna</option>
+                                    <option value="Kalutara">Kalutara</option>
+                                    <option value="Kandy">Kandy</option>
+                                    <option value="Kegalle">Kegalle</option>
+                                    <option value="Kilinochchi">Kilinochchi</option>
+                                    <option value="Kurunegala">Kurunegala</option>
+                                    <option value="Mannar">Mannar</option>
+                                    <option value="Matale">Matale</option>
+                                    <option value="Matara">Matara</option>
+                                    <option value="Moneragala">Moneragala</option>
+                                    <option value="Mullaitivu">Mullaitivu</option>
+                                    <option value="Nuwara Eliya">Nuwara Eliya</option>
+                                    <option value="Polonnaruwa">Polonnaruwa</option>
+                                    <option value="Puttalam">Puttalam</option>
+                                    <option value="Ratnapura">Ratnapura</option>
+                                    <option value="Trincomalee">Trincomalee</option>
+                                    <option value="Vavuniya">Vavuniya</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="aboutUs" class="form-label fw-semibold">About Us *</label>
+                            <textarea class="form-control" id="aboutUs" rows="4" required placeholder="Describe your hotel and services..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="amenities" class="form-label fw-semibold">Amenities</label>
+                            <input type="text" class="form-control" id="amenities" placeholder="e.g. Free Wi-Fi, Pool, Spa, Ocean View (Comma separated)">
+                        </div>
+
+                        <h4 class="section-title">Contact & Social Links</h4>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="contactEmail" class="form-label fw-semibold">Contact Email *</label>
+                                <input type="email" class="form-control" id="contactEmail" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="contactPhone" class="form-label fw-semibold">Contact Phone Number *</label>
+                                <input type="tel" class="form-control" id="contactPhone" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="whatsappNumber" class="form-label fw-semibold">Business WhatsApp Number *</label>
+                                <input type="tel" class="form-control" id="whatsappNumber" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="websiteLink" class="form-label fw-semibold">Website Link</label>
+                                <input type="url" class="form-control" id="websiteLink" placeholder="https://">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label for="instagramLink" class="form-label fw-semibold">Instagram Link</label>
+                                <input type="url" class="form-control" id="instagramLink" placeholder="https://instagram.com/...">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="facebookLink" class="form-label fw-semibold">Facebook Link</label>
+                                <input type="url" class="form-control" id="facebookLink" placeholder="https://facebook.com/...">
+                            </div>
+                        </div>
+
+                        <h4 class="section-title">Hotel Arrangements (Halls/Venues)</h4>
+                        
+                        <div id="hallsContainer">
+                            <!-- Hall 1 -->
+                            <div class="card mb-3 p-3 bg-light border-0">
+                                <h6 class="fw-bold">Hall/Venue 1</h6>
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control hall-name" placeholder="Hall Name (e.g. Grand Ballroom)">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control hall-capacity" placeholder="Seating Capacity (e.g. 500)">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control hall-price" placeholder="Price Per Plate (e.g. Rs. 3,500)">
+                                    </div>
+                                    <div class="col-12">
+                                        <textarea class="form-control hall-desc" rows="2" placeholder="Hall Description & Features"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Hall 2 -->
+                            <div class="card mb-3 p-3 bg-light border-0">
+                                <h6 class="fw-bold">Hall/Venue 2</h6>
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control hall-name" placeholder="Hall Name (e.g. Crystal Hall)">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control hall-capacity" placeholder="Seating Capacity (e.g. 200)">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control hall-price" placeholder="Price Per Plate (e.g. Rs. 2,500)">
+                                    </div>
+                                    <div class="col-12">
+                                        <textarea class="form-control hall-desc" rows="2" placeholder="Hall Description & Features"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="section-title">Rooms & Pricing (Up to 3 room types)</h4>
+                        
+                        <div id="roomsContainer">
+                            <!-- Room 1 -->
+                            <div class="card mb-3 p-3 bg-light border-0">
+                                <h6 class="fw-bold">Room Type 1</h6>
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control rm-type" placeholder="Type (e.g. Deluxe Room)">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control rm-price" placeholder="Price per night (e.g. Rs. 15,000)">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control rm-capacity" placeholder="Capacity (e.g. 2 Adults)">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Room 2 -->
+                            <div class="card mb-3 p-3 bg-light border-0">
+                                <h6 class="fw-bold">Room Type 2</h6>
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control rm-type" placeholder="Type (e.g. Ocean View Suite)">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control rm-price" placeholder="Price per night (e.g. Rs. 30,000)">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control rm-capacity" placeholder="Capacity (e.g. 2 Adults, 2 Kids)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="section-title">Gallery (3 Photos)</h4>
+                        <div class="mb-4 text-muted small">Please select 3 images of your hotel</div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Photo 1 (Main View)</label>
+                            <input type="file" class="form-control gallery-file" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Photo 2 (Room/Interior)</label>
+                            <input type="file" class="form-control gallery-file" accept="image/*">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Photo 3 (Amenities/Dining)</label>
+                            <input type="file" class="form-control gallery-file" accept="image/*">
+                        </div>
+                        
+                        <button class="btn btn-custom w-100 py-3 mb-4 d-flex align-items-center justify-content-center" type="submit" id="submitBtn">
+                            <div class="spinner-border text-light" role="status" id="submitSpinner"></div>
+                            <span id="btnText">Save & Continue to Dashboard</span>
+                        </button>
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const setupForm = document.getElementById('setupForm');
+        const messageBox = document.getElementById('messageBox');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitSpinner = document.getElementById('submitSpinner');
+        const btnText = document.getElementById('btnText');
+
+        // Check if user is logged in
+        const userStr = sessionStorage.getItem('dreamWeddingUser');
+        if (!userStr) {
+            window.location.href = 'login.html';
+        }
+        const user = JSON.parse(userStr);
+        if (user.role !== 'HOTEL') {
+            window.location.href = 'login.html';
+        }
+
+        // Helper to convert file to Base64
+        const fileToBase64 = (file) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+        // Show Notification
+        function showMessage(msg, type) {
+            messageBox.textContent = msg;
+            messageBox.style.display = 'block';
+            messageBox.className = type === 'success' ? 'alert alert-success' : 'alert alert-danger';
+            messageBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        setupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            messageBox.style.display = 'none';
+            
+            const hotelName = document.getElementById('hotelName').value.trim();
+            const location = document.getElementById('location').value;
+            const aboutUs = document.getElementById('aboutUs').value.trim();
+            const contactEmail = document.getElementById('contactEmail').value.trim();
+            const contactPhone = document.getElementById('contactPhone').value.trim();
+            const whatsappNumber = document.getElementById('whatsappNumber').value.trim();
+            
+            if (!hotelName || !location || !aboutUs || !contactEmail || !contactPhone || !whatsappNumber) {
+                showMessage('Please fill in all required fields marked with *.', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitSpinner.style.display = 'inline-block';
+            btnText.textContent = 'Saving Profile...';
+
+            try {
+                // Collect halls
+                const hallArrangements = [];
+                const hallNames = document.querySelectorAll('.hall-name');
+                const hallCapacities = document.querySelectorAll('.hall-capacity');
+                const hallPrices = document.querySelectorAll('.hall-price');
+                const hallDescs = document.querySelectorAll('.hall-desc');
+                
+                for(let i = 0; i < hallNames.length; i++) {
+                    if(hallNames[i].value.trim() !== '') {
+                        hallArrangements.push({
+                            hallName: hallNames[i].value.trim(),
+                            seatingCapacity: hallCapacities[i].value.trim(),
+                            pricePerPlate: hallPrices[i].value.trim(),
+                            description: hallDescs[i].value.trim()
+                        });
+                    }
+                }
+
+                // Collect rooms
+                const rooms = [];
+                const rmTypes = document.querySelectorAll('.rm-type');
+                const rmPrices = document.querySelectorAll('.rm-price');
+                const rmCapacities = document.querySelectorAll('.rm-capacity');
+                
+                for(let i = 0; i < rmTypes.length; i++) {
+                    if(rmTypes[i].value.trim() !== '') {
+                        rooms.push({
+                            type: rmTypes[i].value.trim(),
+                            priceRange: rmPrices[i].value.trim(),
+                            capacity: rmCapacities[i].value.trim()
+                        });
+                    }
+                }
+
+                // Collect images
+                const galleryPhotos = [];
+                const files = document.querySelectorAll('.gallery-file');
+                for (let i = 0; i < files.length; i++) {
+                    if (files[i].files.length > 0) {
+                        const base64 = await fileToBase64(files[i].files[0]);
+                        galleryPhotos.push(base64);
+                    }
+                }
+
+                const amenities = document.getElementById('amenities').value.trim() ? document.getElementById('amenities').value.trim().split(',').map(s => s.trim()) : [];
+
+                const payload = {
+                    hotelName,
+                    location,
+                    aboutUs,
+                    contactEmail,
+                    contactPhone,
+                    whatsappNumber,
+                    websiteLink: document.getElementById('websiteLink').value.trim(),
+                    instagramLink: document.getElementById('instagramLink').value.trim(),
+                    facebookLink: document.getElementById('facebookLink').value.trim(),
+                    amenities,
+                    rooms,
+                    hallArrangements,
+                    galleryPhotos
+                };
+
+                const response = await fetch(`/api/hotels/${user.id}/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    showMessage('Profile updated successfully!', 'success');
+                    
+                    // Update session state
+                    user.profileCompleted = true;
+                    sessionStorage.setItem('dreamWeddingUser', JSON.stringify(user));
+                    
+                    setTimeout(() => {
+                        window.location.href = 'hotel-dashboard.html';
+                    }, 1500);
+                } else {
+                    showMessage('Failed to update profile. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showMessage('Connection error. Please try again later.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitSpinner.style.display = 'none';
+                btnText.textContent = 'Save & Continue to Dashboard';
+            }
+        });
+    </script>
+</body>
+</html>

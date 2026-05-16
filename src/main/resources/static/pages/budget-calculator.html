@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Calculator - DreamWedding</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root { --primary-gold: #b8963e; --text-main: #1a1a1a; --text-muted: #666666; }
+    body { font-family: 'Outfit', sans-serif; background-color: #fcfcfc; color: var(--text-main); }
+    .navbar { background: white; border-bottom: 1px solid #f0f0f0; }
+    .navbar-brand { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--text-main); }
+    .main-content { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    .page-title h1 { font-family: 'Playfair Display', serif; font-size: 42px; margin-bottom: 10px; text-align: center; }
+    .page-title p { color: var(--text-muted); font-size: 18px; text-align: center; margin-bottom: 40px;}
+    .premium-card { background: #ffffff; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; margin-bottom: 30px; }
+    .form-label { font-weight: 600; color: var(--text-muted); text-transform: none; font-size: 13px; letter-spacing: 1px; }
+    .input-group-text { background: #f8f8f8; border-right: none; }
+    .form-control { border-left: none; background: #ffffff; }
+    .form-control:focus { box-shadow: none; border-color: #dee2e6; }
+    .category-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #f9f9f9; }
+    .category-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .category-name { font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+    .category-icon { width: 35px; height: 35px; background: #ffe8d1; color: var(--primary-gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .btn-save { background: var(--primary-gold); color: white; border: none; padding: 15px 30px; border-radius: 30px; font-weight: 600; font-size: 16px; width: 100%; margin-top: 20px; transition: all 0.3s; }
+    .btn-save:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(184, 150, 62, 0.2); color: white; }
+    .summary-bar { background: #1a1a1a; color: white; border-radius: 15px; padding: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;}
+    .summary-bar h4 { margin: 0; font-family: 'Playfair Display', serif; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg px-4 py-3">
+    <a class="navbar-brand" href="../index.html">DreamWedding</a>
+    <div class="ms-auto">
+      <a href="customer-dashboard.html" class="btn btn-outline-dark rounded-pill px-4">Back to dashboard</a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="page-title">
+      <h1>Budget calculator</h1>
+      <p>Set your total budget and customize allocations for each category.</p>
+    </div>
+
+    <div class="summary-bar">
+      <div>
+        <span style="font-size: 13px; color: #a0a0a0; text-transform: none; letter-spacing: 1px;">Remaining to allocate</span>
+        <h4 id="remainingText">Rs. 0</h4>
+      </div>
+      <div class="text-end">
+        <span style="font-size: 13px; color: #a0a0a0; text-transform: none; letter-spacing: 1px;">Total budget</span>
+        <h4 id="displayTotalBudget">Rs. 0</h4>
+      </div>
+    </div>
+
+    <div class="premium-card">
+      <div class="mb-4">
+        <label class="form-label">Set total wedding budget</label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text"><i class="fa-solid fa-money-bill-1-wave"></i></span>
+          <input type="number" class="form-control" id="calcTotalBudget" placeholder="e.g., 30000" oninput="calculateRemaining()">
+        </div>
+      </div>
+
+      <h5 class="mb-4" style="font-family: 'Playfair Display', serif;">Customize category limits</h5>
+      
+      <div id="categoriesContainer">
+        <!-- Categories injected by JS -->
+      </div>
+
+      <button class="btn-save" onclick="saveBudgetPlan()">Save & view summary</button>
+    </div>
+  </div>
+
+  <script>
+    const categories = [
+      { id: 'cat-venue', name: 'Venue & catering', icon: 'fa-castle' },
+      { id: 'cat-photo', name: 'Photography & video', icon: 'fa-camera' },
+      { id: 'cat-attire', name: 'Attire & beauty', icon: 'fa-person-dress' },
+      { id: 'cat-music', name: 'Music & entertainment', icon: 'fa-music' },
+      { id: 'cat-flowers', name: 'Flowers & decor', icon: 'fa-spa' },
+      { id: 'cat-misc', name: 'Logistics & misc', icon: 'fa-box' }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('categoriesContainer');
+      container.innerHTML = categories.map(c => `
+        <div class="category-row">
+          <div class="category-name">
+            <div class="category-icon"><i class="fa-solid ${c.icon}"></i></div>
+            ${c.name}
+          </div>
+          <div style="width: 200px;">
+            <div class="input-group">
+              <span class="input-group-text py-1"><i class="fa-solid fa-money-bill-1-wave small"></i></span>
+              <input type="number" class="form-control py-1 cat-input" id="${c.id}" value="0" oninput="calculateRemaining()">
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Load existing data if available
+      const storedPlan = localStorage.getItem('dreamWedding_budgetPlan');
+      if (storedPlan) {
+        const plan = JSON.parse(storedPlan);
+        document.getElementById('calcTotalBudget').value = plan.total || 0;
+        categories.forEach(c => {
+          if(plan.categories && plan.categories[c.name]) {
+            document.getElementById(c.id).value = plan.categories[c.name];
+          }
+        });
+      }
+      calculateRemaining();
+    });
+
+    function calculateRemaining() {
+      const total = parseFloat(document.getElementById('calcTotalBudget').value) || 0;
+      let allocated = 0;
+      document.querySelectorAll('.cat-input').forEach(inp => {
+        allocated += parseFloat(inp.value) || 0;
+      });
+      
+      const remaining = total - allocated;
+      document.getElementById('displayTotalBudget').textContent = `Rs. ${total.toLocaleString()}`;
+      
+      const remText = document.getElementById('remainingText');
+      remText.textContent = `Rs. ${remaining.toLocaleString()}`;
+      if(remaining < 0) {
+        remText.style.color = '#ff4d4d';
+      } else {
+        remText.style.color = 'white';
+      }
+    }
+
+    function saveBudgetPlan() {
+      const total = parseFloat(document.getElementById('calcTotalBudget').value) || 0;
+      if (total <= 0) {
+        alert("Please enter a valid total budget.");
+        return;
+      }
+      const plan = { total: total, categories: {} };
+      categories.forEach(c => {
+        plan.categories[c.name] = parseFloat(document.getElementById(c.id).value) || 0;
+      });
+
+      localStorage.setItem('dreamWedding_budgetPlan', JSON.stringify(plan));
+      // Replace the old expenses structure to match the new total budget
+      localStorage.setItem('dreamWedding_totalBudget', total.toString());
+      
+      // Redirect to dashboard
+      window.location.href = 'customer-dashboard.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Dashboard - DreamWedding</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f8f5f0; }
+    .sidebar { background: #fff; border-radius: 16px; padding: 1.5rem 1rem; box-shadow: 0 2px 15px rgba(0,0,0,0.08); }
+    .sidebar .nav-link { border-radius: 10px; color: #555; font-weight: 500; padding: 0.75rem 1rem; margin-bottom: 4px; }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #fdf4e7; color: #b8963e; }
+    .badge-pending { background: #fff3cd; color: #856404; }
+    .badge-confirmed { background: #d1e7dd; color: #0f5132; }
+    .badge-rejected { background: #f8d7da; color: #842029; }
+    .card { border-radius: 14px; border: none; box-shadow: 0 2px 15px rgba(0,0,0,0.07); }
+    .navbar-brand { font-family: 'Playfair Display', serif; color: #b8963e !important; font-size: 1.4rem; }
+    .flatpickr-calendar { box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-radius: 12px; border: none; width: 100% !important; }
+    .flatpickr-day.confirmed-booking { background: #d1e7dd !important; border-color: #d1e7dd !important; color: #0f5132 !important; border-radius: 50%; }
+    .flatpickr-day.pending-booking { background: #fff3cd !important; border-color: #fff3cd !important; color: #856404 !important; border-radius: 50%; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg bg-white sticky-top shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">DreamWedding Hotels</a>
+    <div class="d-flex align-items-center gap-2">
+      <span class="text-muted small d-none d-md-inline" id="navName">Loading...</span>
+      <img id="navAvatar" src="https://ui-avatars.com/api/?name=H&background=b8963e&color=fff" class="rounded-circle" width="38" height="38" alt="Avatar">
+    </div>
+  </div>
+</nav>
+
+<div class="container my-4">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 mb-4">
+      <div class="sidebar">
+        <ul class="nav flex-column">
+          <li class="nav-item"><a class="nav-link active" onclick="showTab('overview')" href="#"><i class="fa-solid fa-chart-line me-2"></i>Overview</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="showTab('bookings')" href="#"><i class="fa-solid fa-bed me-2"></i>Reservations</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="showTab('calendar')" href="#"><i class="fa-solid fa-calendar-days me-2"></i>Hall Calendar</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="showTab('profile')" href="#"><i class="fa-solid fa-hotel me-2"></i>Hotel Profile</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="showTab('reviews')" href="#"><i class="fa-solid fa-star me-2"></i>Reviews</a></li>
+          <li class="nav-item mt-3 border-top pt-2"><a class="nav-link text-danger" href="#" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9">
+
+      <!-- Overview -->
+      <div id="tab-overview">
+        <h3 class="fw-bold mb-4">Hotel Dashboard</h3>
+        <div class="row g-3 mb-4">
+          <div class="col-4">
+            <div class="card text-center p-3">
+              <i class="fa-solid fa-bell-concierge fs-3 text-warning mb-1"></i>
+              <div class="fw-bold fs-4" id="stat-pending">0</div>
+              <small class="text-muted">Pending</small>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card text-center p-3">
+              <i class="fa-solid fa-key fs-3 text-success mb-1"></i>
+              <div class="fw-bold fs-4" id="stat-confirmed">0</div>
+              <small class="text-muted">Confirmed</small>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card text-center p-3">
+              <i class="fa-solid fa-calendar-check fs-3 text-primary mb-1"></i>
+              <div class="fw-bold fs-4" id="stat-total">0</div>
+              <small class="text-muted">Total</small>
+            </div>
+          </div>
+        </div>
+        <div class="card p-4">
+          <h5 class="fw-bold mb-2">Your Hotel Profile</h5>
+          <p class="text-muted mb-3">Manage your rooms, amenities, and hall arrangements for couples to find you.</p>
+          <button class="btn btn-outline-primary" onclick="showTab('profile')"><i class="fa-solid fa-pen me-1"></i>Edit Hotel Details</button>
+        </div>
+      </div>
+
+      <!-- Reservations -->
+      <div id="tab-bookings" style="display:none;">
+        <h3 class="fw-bold mb-4">Reservations</h3>
+        <div id="hotelBookingsContainer">
+          <div class="text-center py-5 text-muted"><i class="fa-solid fa-spinner fa-spin fs-3"></i><p class="mt-2">Loading...</p></div>
+        </div>
+      </div>
+
+      <!-- Hall Calendar -->
+      <div id="tab-calendar" style="display:none;">
+        <h3 class="fw-bold mb-4">Hall Availability Calendar</h3>
+        <div class="card p-4">
+          <p class="text-muted mb-3">Confirmed and pending event dates are highlighted below.</p>
+          <input type="text" id="hotelCalendar" class="d-none">
+          <div class="legend d-flex gap-3 mt-3">
+            <span><i class="fa-solid fa-circle text-success me-1"></i>Confirmed</span>
+            <span><i class="fa-solid fa-circle text-warning me-1"></i>Pending</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hotel Profile -->
+      <div id="tab-profile" style="display:none;">
+        <h3 class="fw-bold mb-4">Hotel Profile</h3>
+        <div class="card p-4">
+          <p class="text-muted mb-3">Update your hotel profile, room types, amenities, and hall arrangements using the profile editor.</p>
+          <a href="hotel-setup.html" class="btn btn-custom"><i class="fa-solid fa-arrow-up-right-from-square me-2"></i>Open Profile Editor</a>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div id="tab-reviews" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="fw-bold mb-0">Reviews</h3>
+          <a href="add-site-review.html" class="btn btn-custom btn-sm rounded-pill px-3">Review Our Site</a>
+        </div>
+        
+        <h5 class="fw-bold mb-3">Guest Reviews Received</h5>
+        <div id="receivedReviewsContainer" class="mb-5">
+           <div class="card p-4 text-center text-muted">Loading reviews...</div>
+        </div>
+        
+        <h5 class="fw-bold mb-3">My Site Reviews</h5>
+        <div class="card p-0 overflow-hidden mb-4">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th>Category</th>
+                  <th>Rating</th>
+                  <th>Review</th>
+                  <th>Date</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="mySiteReviewsContainer">
+                <tr><td colspan="5" class="text-center py-4 text-muted">Loading reviews...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Note Modal -->
+<div class="modal fade" id="respondModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold">Add Note to Guest</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="respondBookingId">
+        <label class="form-label fw-bold small">Your Message</label>
+        <textarea class="form-control" id="hotelNoteText" rows="4" placeholder="e.g. Confirmation details, parking info, check-in time..."></textarea>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-custom" onclick="sendHotelNote()">Send Note</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review Reply Modal -->
+<div class="modal fade" id="replyReviewModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold">Reply to Review</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="replyReviewId">
+        <label class="form-label fw-bold small">Your Message to Guest</label>
+        <textarea class="form-control" id="reviewReplyText" rows="4" placeholder="Write your reply here..."></textarea>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-custom" onclick="submitReviewReply()">Post Reply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  let user = null;
+  let hotelBookings = [];
+  let calPicker = null;
+
+  async function logoutUser() {
+    const userStr = sessionStorage.getItem('dreamWeddingUser');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: user.id, email: user.email, role: user.role })
+        });
+      } catch(e) {}
+    }
+    sessionStorage.removeItem('dreamWeddingUser');
+    window.location.href = 'login.html';
+  }
+
+  function showTab(name) {
+    ['overview','bookings','calendar','profile','reviews'].forEach(t => {
+      const el = document.getElementById('tab-' + t);
+      if (el) el.style.display = 'none';
+    });
+    const targetEl = document.getElementById('tab-' + name);
+    if (targetEl) targetEl.style.display = 'block';
+
+    document.querySelectorAll('.sidebar .nav-link').forEach(l => {
+      l.classList.remove('active');
+      if(l.getAttribute('onclick') && l.getAttribute('onclick').includes(name)) {
+         l.classList.add('active');
+      }
+    });
+
+    if (name === 'bookings') loadHotelBookings();
+    if (name === 'calendar') loadCalendar();
+    if (name === 'reviews') loadHotelReviews();
+  }
+
+  function badgeHtml(status) {
+    const map = { PENDING:'badge-pending', CONFIRMED:'badge-confirmed', REJECTED:'badge-rejected', COMPLETED:'badge-completed' };
+    return `<span class="badge ${map[status]||'bg-secondary'}">${status}</span>`;
+  }
+
+  async function loadHotelBookings() {
+    const el = document.getElementById('hotelBookingsContainer');
+    try {
+      const res = await fetch(`/api/bookings/vendor/${user.id}`);
+      hotelBookings = await res.json();
+      document.getElementById('stat-total').textContent = hotelBookings.length;
+      document.getElementById('stat-pending').textContent = hotelBookings.filter(b=>b.status==='PENDING').length;
+      document.getElementById('stat-confirmed').textContent = hotelBookings.filter(b=>b.status==='CONFIRMED').length;
+
+      if (!hotelBookings.length) {
+        el.innerHTML = `<div class="card p-5 text-center text-muted"><i class="fa-solid fa-inbox fs-1 mb-3"></i><h5>No reservations yet</h5></div>`;
+        return;
+      }
+      el.innerHTML = hotelBookings.map(b => `
+        <div class="card p-3 mb-3">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="fw-bold mb-0">Guest #${b.customerId?.slice(-6)}</h5>
+            ${badgeHtml(b.status)}
+          </div>
+          <p class="text-muted small mb-1"><i class="fa-regular fa-calendar me-1"></i>${b.eventDate} &nbsp;|&nbsp; <i class="fa-solid fa-bed me-1"></i>${b.packageName} — ${b.packagePrice}</p>
+          <p class="text-muted small mb-1"><i class="fa-solid fa-users me-1"></i>${b.guestCount} guests</p>
+          ${b.specialRequests ? `<p class="text-muted small mb-2"><i class="fa-solid fa-comment me-1"></i>${b.specialRequests}</p>` : ''}
+          ${b.vendorNote ? `<div class="alert alert-secondary py-1 px-2 mt-1 small"><strong>Your note:</strong> ${b.vendorNote}</div>` : ''}
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            ${b.status==='PENDING' ? `
+              <button class="btn btn-sm btn-success" onclick="updateStatus('${b.id}','CONFIRMED')"><i class="fa-solid fa-check me-1"></i>Confirm</button>
+              <button class="btn btn-sm btn-danger" onclick="updateStatus('${b.id}','REJECTED')"><i class="fa-solid fa-x me-1"></i>Reject</button>` : ''}
+            <button class="btn btn-sm btn-outline-secondary" onclick="openNoteModal('${b.id}')"><i class="fa-solid fa-message me-1"></i>Note</button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteReservation('${b.id}')"><i class="fa-solid fa-trash me-1"></i>Remove</button>
+          </div>
+        </div>`).join('');
+    } catch(e) { el.innerHTML = `<div class="alert alert-danger">Failed to load reservations</div>`; }
+  }
+
+  async function updateStatus(id, status) {
+    await fetch(`/api/bookings/${id}/status`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({status}) });
+    loadHotelBookings();
+  }
+
+  function openNoteModal(id) {
+    document.getElementById('respondBookingId').value = id;
+    const b = hotelBookings.find(b=>b.id===id);
+    document.getElementById('hotelNoteText').value = b?.vendorNote || '';
+    new bootstrap.Modal(document.getElementById('respondModal')).show();
+  }
+
+  async function sendHotelNote() {
+    const id = document.getElementById('respondBookingId').value;
+    const vendorNote = document.getElementById('hotelNoteText').value;
+    await fetch(`/api/bookings/${id}/status`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({vendorNote}) });
+    bootstrap.Modal.getInstance(document.getElementById('respondModal')).hide();
+    loadHotelBookings();
+  }
+
+  async function deleteReservation(id) {
+    if (!confirm('Remove this reservation?')) return;
+    await fetch(`/api/bookings/${id}`, { method:'DELETE' });
+    loadHotelBookings();
+  }
+
+  async function loadCalendar() {
+    if (calPicker) return;
+    try {
+      const res = await fetch(`/api/bookings/vendor/${user.id}`);
+      const bookings = await res.json();
+      const confirmedDates = bookings.filter(b=>b.status==='CONFIRMED').map(b=>b.eventDate);
+      const pendingDates = bookings.filter(b=>b.status==='PENDING').map(b=>b.eventDate);
+      calPicker = flatpickr('#hotelCalendar', {
+        inline: true,
+        onDayCreate(dObj, dStr, fp, dayElem) {
+          const d = dayElem.dateObj;
+          const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+          if (confirmedDates.includes(ds)) dayElem.classList.add('confirmed-booking');
+          if (pendingDates.includes(ds)) dayElem.classList.add('pending-booking');
+        }
+      });
+    } catch(e){}
+  }
+
+  async function loadHotelReviews() {
+    // 1. Received Reviews
+    const recEl = document.getElementById('receivedReviewsContainer');
+    try {
+      const res = await fetch(`/api/reviews/vendor/${user.id}`);
+      const received = await res.json();
+      if(!received.length) {
+         recEl.innerHTML = '<div class="card p-4 text-center text-muted">No reviews received yet.</div>';
+      } else {
+         recEl.innerHTML = received.map(r => {
+            let stars = '';
+            for(let i=1; i<=5; i++) stars += `<i class="${i<=r.rating ? 'fa-solid text-warning' : 'far text-muted'} fa-star"></i>`;
+            return `
+              <div class="card p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-start">
+                  <h6 class="fw-bold mb-1">${r.reviewerName} ${r.verified ? '<i class="fa-solid fa-circle-check text-primary ms-1"></i>' : ''}</h6>
+                  <small class="text-muted">${new Date(r.reviewDate).toLocaleDateString()}</small>
+                </div>
+                <div class="small mb-2">${stars}</div>
+                <h6 class="fw-bold mb-1">${r.reviewTitle}</h6>
+                <p class="text-muted small mb-2">${r.reviewMessage}</p>
+                ${r.vendorReply ? `
+                  <div class="bg-light p-2 rounded-2 small text-muted border-start border-primary border-4 mt-2">
+                    <strong>Your Reply:</strong> ${r.vendorReply}
+                  </div>
+                ` : `
+                  <button class="btn btn-sm btn-outline-primary mt-2" onclick="openReplyModal('${r.id}')"><i class="fa-solid fa-reply me-1"></i>Reply</button>
+                `}
+              </div>
+            `;
+         }).join('');
+      }
+    } catch(e) { recEl.innerHTML = '<div class="alert alert-danger">Error loading received reviews.</div>'; }
+
+    // 2. My Site Reviews
+    const siteEl = document.getElementById('mySiteReviewsContainer');
+    try {
+      const res = await fetch(`/api/reviews/user/${user.id}`);
+      const myReviews = await res.json();
+      const siteReviews = myReviews.filter(r => r.type === 'SITE');
+      if(!siteReviews.length) {
+         siteEl.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No site reviews written yet.</td></tr>';
+      } else {
+         siteEl.innerHTML = siteReviews.map(r => {
+            let stars = '';
+            for(let i=1; i<=5; i++) stars += `<i class="${i<=r.rating ? 'fa-solid text-warning' : 'far text-muted'} fa-star"></i>`;
+            return `
+              <tr>
+                <td class="fw-bold">${r.experienceCategory}</td>
+                <td><div class="small">${stars}</div></td>
+                <td class="text-truncate" style="max-width: 250px;" title="${r.reviewMessage}">${r.reviewMessage}</td>
+                <td class="small text-muted">${new Date(r.reviewDate).toLocaleDateString()}</td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-danger" onclick="deleteReview('${r.id}')"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+            `;
+         }).join('');
+      }
+    } catch(e) { siteEl.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Error loading site reviews.</td></tr>'; }
+  }
+
+  function openReplyModal(id) {
+    document.getElementById('replyReviewId').value = id;
+    document.getElementById('reviewReplyText').value = '';
+    new bootstrap.Modal(document.getElementById('replyReviewModal')).show();
+  }
+
+  async function submitReviewReply() {
+    const id = document.getElementById('replyReviewId').value;
+    const msg = document.getElementById('reviewReplyText').value;
+    if(!msg) return;
+    try {
+      await fetch(`/api/reviews/${id}/reply`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({vendorId: user.id, replyMessage: msg})
+      });
+      bootstrap.Modal.getInstance(document.getElementById('replyReviewModal')).hide();
+      loadHotelReviews();
+    } catch(e) { alert('Failed to post reply'); }
+  }
+
+  async function deleteReview(id) {
+    if(!confirm('Are you sure you want to delete this review?')) return;
+    try {
+      await fetch(`/api/reviews/${id}`, { method: 'DELETE' });
+      loadHotelReviews();
+    } catch(e) { alert('Failed to delete review'); }
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const userStr = sessionStorage.getItem('dreamWeddingUser');
+    if (!userStr) { window.location.href = 'login.html'; return; }
+    user = JSON.parse(userStr);
+    if (user.role !== 'HOTEL') { window.location.href = 'login.html'; return; }
+
+    document.getElementById('navName').textContent = user.hotelName || user.firstName || 'Hotel';
+    if (user.profilePicture) {
+      document.getElementById('navAvatar').src = user.profilePicture;
+    } else {
+      const initial = (user.hotelName || user.firstName || 'H').charAt(0).toUpperCase();
+      document.getElementById('navAvatar').src = `https://ui-avatars.com/api/?name=${initial}&background=b8963e&color=fff`;
+    }
+
+    try {
+      const res = await fetch(`/api/bookings/vendor/${user.id}`);
+      const bk = await res.json();
+      document.getElementById('stat-total').textContent = bk.length;
+      document.getElementById('stat-pending').textContent = bk.filter(b=>b.status==='PENDING').length;
+      document.getElementById('stat-confirmed').textContent = bk.filter(b=>b.status==='CONFIRMED').length;
+    } catch(e){}
+  });
+</script>
+  <script src="../js/script.js"></script>
+</body>
+</html>
