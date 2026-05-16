@@ -43,4 +43,7 @@ public class RegisterRequest {
     /** Role — must be CUSTOMER, VENDOR, ADMIN, or HOTEL */
     @NotNull(message = "Role is required")
     private Role role;
+
+    /** Optional profile picture (URL or Base64 data URL) */
+    private String profilePicture;
 }

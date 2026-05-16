@@ -19,5 +19,6 @@ public class Promotion {
     private String startDate;
     private String endDate;
     private String submittedBy;   // vendorId or hotelId
+    private String submitterName; // display name of vendor/hotel/admin
     private String status = "PENDING"; // PENDING, APPROVED
 }
