@@ -25,16 +25,7 @@
 
   <div id="navbar-placeholder"></div>
 
-  <!-- Loading Spinner -->
-  <div id="pageLoader" class="container my-5 py-5 text-center">
-    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <p class="text-muted mt-3 fs-5">Loading vendor details...</p>
-  </div>
-
-  <!-- Main Content (Hidden until loaded) -->
-  <div id="mainContent" style="display: none;">
+  <div id="mainContent">
   <!-- Vendor Header Image Gallery -->
   <div class="container-fluid px-0">
     <div id="vendorGalleryCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000">
@@ -171,8 +162,6 @@
         }
 
         document.getElementById('bookVendorBtn').onclick = () => handleBooking('', '');
-        document.getElementById('pageLoader').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'block';
 
         // Availability Calendar
         const bookingsRes = await fetch(`/api/bookings/vendor/${vendorId}`);

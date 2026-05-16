@@ -34,27 +34,17 @@
         <div class="collapse d-md-block" id="filterCollapse">
           <div class="card border-0 p-3 premium-card">
             <h5 class="fw-bold mb-3">Filters</h5>
-            <form>
+            <form id="vendorFilterForm">
               <div class="mb-3">
                 <label class="form-label fw-bold small text-muted">Category</label>
-                <select class="form-select form-select-sm" id="categoryFilter">
-                  <option selected>All categories</option>
-                  <option value="Venues">Venues</option>
-                  <option value="Photographers">Photographers</option>
-                  <option value="Caterers">Caterers</option>
-                  <option value="Decorators">Decorators</option>
-                  <option value="Entertainment">Entertainment</option>
-                  <option value="Beauty">Beauty & Makeup</option>
+                <select class="form-select form-select-sm" id="categoryFilter" name="category">
+                  <option value="">All categories</option>
                 </select>
               </div>
               <div class="mb-3">
-                <label class="form-label fw-bold small text-muted">Location</label>
-                <select class="form-select form-select-sm" id="locationFilter">
-                  <option selected>All locations</option>
-                  <option value="Colombo">Colombo</option>
-                  <option value="Kandy">Kandy</option>
-                  <option value="Galle">Galle</option>
-                  <option value="Negombo">Negombo</option>
+                <label class="form-label fw-bold small text-muted">District</label>
+                <select class="form-select form-select-sm" id="locationFilter" name="location">
+                  <option value="">All districts</option>
                 </select>
               </div>
               <div class="mb-3">
@@ -114,37 +104,56 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/vendor-filters.js"></script>
   <script src="../js/script.js"></script>
   <script src="../js/wishlist-utils.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const vendorGrid = document.getElementById('vendorGrid');
       const resultsCount = document.getElementById('resultsCount');
+      const categoryFilter = document.getElementById('categoryFilter');
+      const locationFilter = document.getElementById('locationFilter');
+      const filterForm = document.getElementById('vendorFilterForm');
       const userStr = sessionStorage.getItem('dreamWeddingUser');
       const user = userStr ? JSON.parse(userStr) : null;
 
-      // Read URL Params
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlCategory = urlParams.get('category');
-      const urlLocation = urlParams.get('location');
+      populateCategorySelect(categoryFilter);
+      populateDistrictSelect(locationFilter);
+
+      let allVendors = [];
+      let activeFilters = getVendorFilterParams();
+
+      categoryFilter.value = activeFilters.category;
+      locationFilter.value = activeFilters.location;
+
+      filterForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        activeFilters = {
+          category: categoryFilter.value,
+          location: locationFilter.value
+        };
+        const query = buildVendorFilterQuery(activeFilters);
+        window.history.replaceState(null, '', query || window.location.pathname);
+        renderVendors(applyFilters(allVendors, activeFilters));
+      });
 
       try {
         const response = await fetch('/api/vendors');
         if (!response.ok) throw new Error('Failed to fetch vendors');
-        
-        let vendors = await response.json();
+        allVendors = await response.json();
+        renderVendors(applyFilters(allVendors, activeFilters));
+      } catch (e) {
+        console.error(e);
+        vendorGrid.innerHTML = `<div class="alert alert-danger">Failed to load vendors: ${e.message}</div>`;
+      }
 
-        // Apply URL Filtering
-        if (urlCategory && urlCategory !== 'All Categories') {
-          vendors = vendors.filter(v => v.category && v.category.toLowerCase().includes(urlCategory.toLowerCase()));
-        }
-        if (urlLocation && urlLocation !== 'All Locations') {
-          vendors = vendors.filter(v => v.location && v.location.toLowerCase().includes(urlLocation.toLowerCase()));
-        }
+      function applyFilters(vendors, filters) {
+        return vendors.filter(v => matchesVendorFilters(v, filters));
+      }
 
+      function renderVendors(vendors) {
         resultsCount.textContent = `Showing ${vendors.length} results`;
-        
-        // Remove spinner
+
         const spinner = document.getElementById('loadingSpinner');
         if (spinner) spinner.remove();
 
@@ -204,10 +213,6 @@
             const vendorIds = vendors.map(v => v.id);
             window.Wishlist.checkStatus(vendorIds, user.id);
         }
-
-      } catch(e) { 
-          console.error(e);
-          vendorGrid.innerHTML = `<div class="alert alert-danger">Failed to load vendors: ${e.message}</div>`; 
       }
     });
 

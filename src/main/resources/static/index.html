@@ -24,6 +24,7 @@
   <!-- Navbar loader (before Bootstrap JS) -->
   <script src="js/navbar-loader.js" defer></script>
   <script src="js/wishlist-utils.js" defer></script>
+  <script src="js/vendor-filters.js"></script>
 </head>
 
 <body>
@@ -40,95 +41,14 @@
       <div class="search-box mt-4 p-3 bg-white rounded shadow-lg mx-auto" style="max-width: 800px;">
         <form action="pages/vendor-list.html" method="GET" class="row g-2 align-items-center">
           <div class="col-md-4">
-            <select class="form-select form-control" aria-label="Vendor category" name="category">
-              <option selected>All categories</option>
-
-              <optgroup label="Venues">
-                <option value="ceremony-venues">Ceremony Venues</option>
-                <option value="reception-venues">Reception Venues</option>
-                <option value="rehearsal-dinner">Rehearsal Dinner Venues</option>
-              </optgroup>
-
-              <optgroup label="Food & Beverage">
-                <option value="caterers">Caterers</option>
-                <option value="bakers">Wedding Cake Bakers</option>
-                <option value="bartenders">Bartenders & Beverages</option>
-              </optgroup>
-
-              <optgroup label="Photo & Video">
-                <option value="photographers">Wedding Photographers</option>
-                <option value="videographers">Wedding Videographers</option>
-                <option value="photo-booths">Photo Booth Rentals</option>
-              </optgroup>
-
-              <optgroup label="Decor & Rentals">
-                <option value="florists">Florists</option>
-                <option value="decorators">Decorators & Event Stylists</option>
-                <option value="rentals">Furniture & Equipment Rentals</option>
-              </optgroup>
-
-              <optgroup label="Entertainment">
-                <option value="djs">Wedding DJs</option>
-                <option value="live-bands">Live Bands</option>
-                <option value="musicians">Ceremony Musicians</option>
-              </optgroup>
-
-              <optgroup label="Beauty & Hair">
-                <option value="makeup-artists">Bridal Makeup Artists</option>
-                <option value="hair-stylists">Hair Stylists</option>
-                <option value="spa-wellness">Spa & Wellness</option>
-              </optgroup>
-
-              <optgroup label="Attire & Jewelry">
-                <option value="bridal-salons">Bridal Salons & Boutiques</option>
-                <option value="mens-attire">Tuxedos & Men's Attire</option>
-                <option value="jewelry">Jewelry & Accessories</option>
-              </optgroup>
-
-              <optgroup label="Planners & Management">
-                <option value="planners">Full-Service Planners</option>
-                <option value="coordinators">Day-Of Coordinators</option>
-              </optgroup>
-
-              <optgroup label="Other Services">
-                <option value="invitations">Invitations & Stationery</option>
-                <option value="transportation">Transportation</option>
-                <option value="officiants">Wedding Officiants</option>
-                <option value="favors">Favors & Gifts</option>
-              </optgroup>
+            <select class="form-select form-control" aria-label="Vendor category" name="category" id="heroCategorySelect">
+              <option value="">All categories</option>
             </select>
           </div>
           <div class="col-md-5">
-            <input class="form-control" list="srilanka-cities" name="location" id="location"
-              placeholder="City or District (e.g. Colombo)">
-            <datalist id="srilanka-cities">
-              <option value="Ampara">
-              <option value="Anuradhapura">
-              <option value="Badulla">
-              <option value="Batticaloa">
-              <option value="Colombo">
-              <option value="Galle">
-              <option value="Gampaha">
-              <option value="Hambantota">
-              <option value="Jaffna">
-              <option value="Kalutara">
-              <option value="Kandy">
-              <option value="Kegalle">
-              <option value="Kilinochchi">
-              <option value="Kurunegala">
-              <option value="Mannar">
-              <option value="Matale">
-              <option value="Matara">
-              <option value="Monaragala">
-              <option value="Mullaitivu">
-              <option value="Negombo">
-              <option value="Nuwara Eliya">
-              <option value="Polonnaruwa">
-              <option value="Puttalam">
-              <option value="Ratnapura">
-              <option value="Trincomalee">
-              <option value="Vavuniya">
-            </datalist>
+            <select class="form-select form-control" aria-label="District" name="location" id="heroLocationSelect">
+              <option value="">All districts</option>
+            </select>
           </div>
           <div class="col-md-3">
             <button type="submit" class="btn btn-custom w-100">Search</button>
@@ -1011,6 +931,12 @@
 
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      populateCategorySelect(document.getElementById('heroCategorySelect'));
+      populateDistrictSelect(document.getElementById('heroLocationSelect'));
+    });
+  </script>
   <!-- Custom JS -->
   <script src="js/script.js"></script>
   <script src="js/scroll-reveal.js"></script>
