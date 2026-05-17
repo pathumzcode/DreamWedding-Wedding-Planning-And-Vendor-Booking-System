@@ -17,7 +17,8 @@ public class BookingController {
     private final BookingRepository bookingRepository;
     private final com.wedding.dreamwedding.repository.VendorRepository vendorRepository;
     private final com.wedding.dreamwedding.repository.HotelRepository hotelRepository;
-    private final com.wedding.dreamwedding.service.FileService fileService; // Injecting FileService
+    private final com.wedding.dreamwedding.service.FileService fileService;
+    private final BudgetController budgetController;
     
     // Create booking
     @PostMapping
@@ -91,9 +92,28 @@ public class BookingController {
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable String id, @RequestBody Map<String, String> body) {
         return bookingRepository.findById(id).map(b -> {
+            String oldStatus = b.getStatus();
             if (body.containsKey("status")) b.setStatus(body.get("status"));
             if (body.containsKey("vendorNote")) b.setVendorNote(body.get("vendorNote"));
             bookingRepository.save(b);
+
+            // ── BUDGET SYNC ──────────────────────────────────────
+            String newStatus = b.getStatus();
+            try {
+                if ("CONFIRMED".equals(newStatus) && !"CONFIRMED".equals(oldStatus)) {
+                    // Booking just confirmed → auto-add to budget expense log
+                    budgetController.syncFromBooking(b);
+                } else if (("REJECTED".equals(newStatus) || "CANCELLED".equals(newStatus))
+                        && "CONFIRMED".equals(oldStatus)) {
+                    // Confirmed booking now rejected/cancelled → remove from budget
+                    budgetController.removeBookingExpense(b.getCustomerId(), b.getId());
+                }
+            } catch (Exception e) {
+                // Budget sync failure must never break the booking update
+                System.err.println("Budget sync warning: " + e.getMessage());
+            }
+            // ─────────────────────────────────────────────────────
+
             return ResponseEntity.ok(Map.of("message", "Booking updated"));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -115,6 +135,15 @@ public class BookingController {
     // Delete a booking
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBooking(@PathVariable String id) {
+        // ── BUDGET SYNC: remove expense linked to this booking ───
+        bookingRepository.findById(id).ifPresent(b -> {
+            try {
+                budgetController.removeBookingExpense(b.getCustomerId(), id);
+            } catch (Exception e) {
+                System.err.println("Budget sync on delete warning: " + e.getMessage());
+            }
+        });
+        // ─────────────────────────────────────────────────────────
         bookingRepository.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Booking deleted"));
     }
