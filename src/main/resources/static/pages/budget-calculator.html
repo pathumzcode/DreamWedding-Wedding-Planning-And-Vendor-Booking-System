@@ -3,154 +3,385 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Budget Calculator - DreamWedding</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <title>Budget Setup - DreamWedding</title>
+  <meta name="description" content="Set your total wedding budget and customize category allocations on DreamWedding.">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    :root { --primary-gold: #b8963e; --text-main: #1a1a1a; --text-muted: #666666; }
-    body { font-family: 'Outfit', sans-serif; background-color: #fcfcfc; color: var(--text-main); }
-    .navbar { background: white; border-bottom: 1px solid #f0f0f0; }
-    .navbar-brand { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--text-main); }
-    .main-content { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    .page-title h1 { font-family: 'Playfair Display', serif; font-size: 42px; margin-bottom: 10px; text-align: center; }
-    .page-title p { color: var(--text-muted); font-size: 18px; text-align: center; margin-bottom: 40px;}
-    .premium-card { background: #ffffff; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; margin-bottom: 30px; }
-    .form-label { font-weight: 600; color: var(--text-muted); text-transform: none; font-size: 13px; letter-spacing: 1px; }
-    .input-group-text { background: #f8f8f8; border-right: none; }
-    .form-control { border-left: none; background: #ffffff; }
-    .form-control:focus { box-shadow: none; border-color: #dee2e6; }
-    .category-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #f9f9f9; }
-    .category-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .category-name { font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 10px; }
-    .category-icon { width: 35px; height: 35px; background: #ffe8d1; color: var(--primary-gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-    .btn-save { background: var(--primary-gold); color: white; border: none; padding: 15px 30px; border-radius: 30px; font-weight: 600; font-size: 16px; width: 100%; margin-top: 20px; transition: all 0.3s; }
-    .btn-save:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(184, 150, 62, 0.2); color: white; }
-    .summary-bar { background: #1a1a1a; color: white; border-radius: 15px; padding: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;}
-    .summary-bar h4 { margin: 0; font-family: 'Playfair Display', serif; }
+    :root {
+      --gold: #b8963e;
+      --gold-light: #fdf4e7;
+      --gold-dark: #9a7a2e;
+      --text: #1a1a1a;
+      --muted: #777;
+      --danger: #e53935;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Outfit', sans-serif; background: #f7f5f1; color: var(--text); margin: 0; }
+
+    /* NAV */
+    .top-nav { background: white; border-bottom: 1px solid #f0f0f0; padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .top-nav .brand { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--text); text-decoration: none; }
+    .top-nav .back-btn { background: none; border: 1.5px solid #ddd; color: var(--text); padding: 8px 20px; border-radius: 30px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .top-nav .back-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* LAYOUT */
+    .page-wrap { max-width: 860px; margin: 48px auto; padding: 0 20px 80px; }
+    .page-title { text-align: center; margin-bottom: 40px; }
+    .page-title h1 { font-family: 'Playfair Display', serif; font-size: 44px; margin-bottom: 8px; }
+    .page-title p { color: var(--muted); font-size: 16px; }
+
+    /* SUMMARY BAR */
+    .summary-bar {
+      background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+      color: white; border-radius: 20px; padding: 24px 30px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 32px; gap: 16px; flex-wrap: wrap;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    .summary-bar .label { font-size: 12px; color: #aaa; letter-spacing: 1px; margin-bottom: 4px; }
+    .summary-bar .value { font-family: 'Playfair Display', serif; font-size: 26px; }
+    .summary-bar .value.over { color: #ff6b6b; }
+    .summary-bar .value.ok { color: #69e09a; }
+
+    /* CARD */
+    .card-panel {
+      background: white; border-radius: 20px; padding: 30px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;
+      margin-bottom: 28px;
+    }
+    .card-panel h5 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 20px; }
+
+    /* TOTAL BUDGET INPUT */
+    .budget-input-wrap .input-group-text { background: #fafafa; border-right: none; color: var(--gold); }
+    .budget-input-wrap input { border-left: none; font-size: 18px; font-weight: 700; }
+    .budget-input-wrap input:focus { box-shadow: none; border-color: var(--gold); }
+
+    /* ALLOCATION WARNING */
+    .alloc-warning {
+      background: #fff3cd; border: 1px solid #ffc107; border-radius: 12px;
+      padding: 12px 18px; font-size: 13px; color: #856404;
+      margin-top: 16px; display: none;
+    }
+    .alloc-warning i { margin-right: 6px; }
+
+    /* CATEGORY ROWS */
+    .cat-row {
+      display: grid; grid-template-columns: 1fr auto auto auto;
+      align-items: center; gap: 12px;
+      padding: 14px 0; border-bottom: 1px solid #f5f5f5;
+    }
+    .cat-row:last-child { border-bottom: none; }
+    .cat-name { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 500; }
+    .cat-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--gold-light); color: var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .pct-input, .amt-input {
+      width: 100px; border: 1px solid #e8e8e8; border-radius: 10px;
+      padding: 7px 10px; font-size: 14px; text-align: right; transition: border 0.2s;
+      font-family: 'Outfit', sans-serif;
+    }
+    .pct-input:focus, .amt-input:focus { outline: none; border-color: var(--gold); }
+    .pct-suffix { font-size: 12px; color: var(--muted); min-width: 30px; }
+
+    /* SAVE BUTTON */
+    .btn-save {
+      background: var(--gold); color: white; border: none;
+      padding: 16px; border-radius: 40px; font-weight: 700;
+      font-size: 16px; width: 100%; margin-top: 24px;
+      cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px;
+    }
+    .btn-save:hover { background: var(--gold-dark); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(184,150,62,0.25); }
+    .btn-save:disabled { background: #ccc; transform: none; box-shadow: none; cursor: not-allowed; }
+
+    /* TOAST */
+    .toast-wrap { position: fixed; bottom: 30px; right: 30px; z-index: 9999; }
+    .toast-msg {
+      background: #1a1a1a; color: white; padding: 14px 22px; border-radius: 14px;
+      font-size: 14px; font-weight: 500; opacity: 0; transform: translateY(20px);
+      transition: all 0.35s; pointer-events: none;
+    }
+    .toast-msg.show { opacity: 1; transform: translateY(0); }
+    .toast-msg.success { border-left: 4px solid #69e09a; }
+    .toast-msg.error   { border-left: 4px solid #ff6b6b; }
+
+    /* LOADING */
+    .loading-overlay {
+      position: fixed; inset: 0; background: rgba(255,255,255,0.75);
+      display: flex; align-items: center; justify-content: center; z-index: 1000; display: none;
+    }
+    .spinner { width: 44px; height: 44px; border: 4px solid #f0ece4; border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 600px) {
+      .cat-row { grid-template-columns: 1fr; }
+      .summary-bar { flex-direction: column; text-align: center; }
+    }
   </style>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg px-4 py-3">
-    <a class="navbar-brand" href="../index.html">DreamWedding</a>
-    <div class="ms-auto">
-      <a href="customer-dashboard.html" class="btn btn-outline-dark rounded-pill px-4">Back to dashboard</a>
-    </div>
+
+  <!-- Loading -->
+  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+
+  <!-- Nav -->
+  <nav class="top-nav">
+    <a class="brand" href="../index.html">DreamWedding</a>
+    <a href="customer-dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left me-2"></i>Back to dashboard</a>
   </nav>
 
-  <div class="main-content">
+  <div class="page-wrap">
     <div class="page-title">
-      <h1>Budget calculator</h1>
-      <p>Set your total budget and customize allocations for each category.</p>
+      <h1>Budget Setup</h1>
+      <p>Set your total wedding budget and customize each category's allocation.</p>
     </div>
 
+    <!-- Summary Bar -->
     <div class="summary-bar">
       <div>
-        <span style="font-size: 13px; color: #a0a0a0; text-transform: none; letter-spacing: 1px;">Remaining to allocate</span>
-        <h4 id="remainingText">Rs. 0</h4>
+        <div class="label">TOTAL BUDGET</div>
+        <div class="value" id="sbTotal">Rs. 0</div>
       </div>
-      <div class="text-end">
-        <span style="font-size: 13px; color: #a0a0a0; text-transform: none; letter-spacing: 1px;">Total budget</span>
-        <h4 id="displayTotalBudget">Rs. 0</h4>
+      <div>
+        <div class="label">TOTAL ALLOCATED</div>
+        <div class="value" id="sbAllocated">Rs. 0</div>
+      </div>
+      <div>
+        <div class="label">REMAINING TO ALLOCATE</div>
+        <div class="value" id="sbRemaining">Rs. 0</div>
       </div>
     </div>
 
-    <div class="premium-card">
-      <div class="mb-4">
-        <label class="form-label">Set total wedding budget</label>
+    <!-- Step 1: Total Budget -->
+    <div class="card-panel">
+      <h5><i class="fa-solid fa-wallet me-2" style="color:var(--gold)"></i>Total Wedding Budget</h5>
+      <div class="budget-input-wrap">
         <div class="input-group input-group-lg">
           <span class="input-group-text"><i class="fa-solid fa-money-bill-1-wave"></i></span>
-          <input type="number" class="form-control" id="calcTotalBudget" placeholder="e.g., 30000" oninput="calculateRemaining()">
+          <input type="number" id="totalBudgetInput" class="form-control" placeholder="e.g. 500000" min="0" step="1000" oninput="recalcAll()">
         </div>
       </div>
-
-      <h5 class="mb-4" style="font-family: 'Playfair Display', serif;">Customize category limits</h5>
-      
-      <div id="categoriesContainer">
-        <!-- Categories injected by JS -->
-      </div>
-
-      <button class="btn-save" onclick="saveBudgetPlan()">Save & view summary</button>
     </div>
+
+    <!-- Step 2: Category Allocations -->
+    <div class="card-panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+        <h5 style="margin:0"><i class="fa-solid fa-chart-pie me-2" style="color:var(--gold)"></i>Category Allocations</h5>
+        <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="autoDistribute()">
+          <i class="fa-solid fa-wand-magic-sparkles me-1"></i>Auto distribute
+        </button>
+      </div>
+      <p style="color:var(--muted); font-size:13px; margin-bottom:20px;">Enter percentage <em>or</em> fixed amount — the other will auto-calculate. Sum must not exceed your total budget.</p>
+
+      <div id="categoriesContainer"></div>
+
+      <div class="alloc-warning" id="allocWarning">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span id="allocWarningText">Total allocated exceeds your budget!</span>
+      </div>
+    </div>
+
+    <button class="btn-save" id="saveBtn" onclick="savePlan()">
+      <i class="fa-solid fa-floppy-disk me-2"></i>Save budget plan
+    </button>
   </div>
 
+  <!-- Toast -->
+  <div class="toast-wrap"><div class="toast-msg" id="toastMsg"></div></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const categories = [
-      { id: 'cat-venue', name: 'Venue & catering', icon: 'fa-castle' },
-      { id: 'cat-photo', name: 'Photography & video', icon: 'fa-camera' },
-      { id: 'cat-attire', name: 'Attire & beauty', icon: 'fa-person-dress' },
-      { id: 'cat-music', name: 'Music & entertainment', icon: 'fa-music' },
-      { id: 'cat-flowers', name: 'Flowers & decor', icon: 'fa-spa' },
-      { id: 'cat-misc', name: 'Logistics & misc', icon: 'fa-box' }
+    // ─── CONFIG ───────────────────────────────────────────────────────────────
+    const CATEGORIES = [
+      { id: 'catering',  name: 'Food and catering',          icon: 'fa-utensils',  defaultPct: 40, color: '#f5c518', colorBg: '#fffbea' },
+      { id: 'photo',     name: 'Photography',                 icon: 'fa-camera',    defaultPct: 15, color: '#3b82f6', colorBg: '#eff6ff' },
+      { id: 'attire',    name: 'Jewellery and Attire',        icon: 'fa-gem',       defaultPct: 10, color: '#ef4444', colorBg: '#fef2f2' },
+      { id: 'music',     name: 'Wedding music and dancing',   icon: 'fa-music',     defaultPct: 10, color: '#8b5cf6', colorBg: '#f5f3ff' },
+      { id: 'florist',   name: 'Florist',                     icon: 'fa-spa',       defaultPct: 15, color: '#ec4899', colorBg: '#fdf2f8' },
+      { id: 'gifts',     name: 'Gifts',                       icon: 'fa-gift',      defaultPct: 10, color: '#22c55e', colorBg: '#f0fdf4' },
     ];
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const container = document.getElementById('categoriesContainer');
-      container.innerHTML = categories.map(c => `
-        <div class="category-row">
-          <div class="category-name">
-            <div class="category-icon"><i class="fa-solid ${c.icon}"></i></div>
-            ${c.name}
-          </div>
-          <div style="width: 200px;">
-            <div class="input-group">
-              <span class="input-group-text py-1"><i class="fa-solid fa-money-bill-1-wave small"></i></span>
-              <input type="number" class="form-control py-1 cat-input" id="${c.id}" value="0" oninput="calculateRemaining()">
-            </div>
-          </div>
-        </div>
-      `).join('');
+    let customerId = null;
+    let currentPlan = null;
 
-      // Load existing data if available
-      const storedPlan = localStorage.getItem('dreamWedding_budgetPlan');
-      if (storedPlan) {
-        const plan = JSON.parse(storedPlan);
-        document.getElementById('calcTotalBudget').value = plan.total || 0;
-        categories.forEach(c => {
-          if(plan.categories && plan.categories[c.name]) {
-            document.getElementById(c.id).value = plan.categories[c.name];
-          }
-        });
-      }
-      calculateRemaining();
+    // ─── INIT ─────────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', async () => {
+      const userStr = sessionStorage.getItem('dreamWeddingUser');
+      if (!userStr) { showToast('Please sign in first.', 'error'); setTimeout(() => window.location.href = 'login.html', 1500); return; }
+      const user = JSON.parse(userStr);
+      if (user.role !== 'CUSTOMER') { showToast('Only customers can use the budget planner.', 'error'); return; }
+      customerId = user.id;
+
+      buildCategoryRows();
+      await loadPlan();
     });
 
-    function calculateRemaining() {
-      const total = parseFloat(document.getElementById('calcTotalBudget').value) || 0;
-      let allocated = 0;
-      document.querySelectorAll('.cat-input').forEach(inp => {
-        allocated += parseFloat(inp.value) || 0;
-      });
-      
-      const remaining = total - allocated;
-      document.getElementById('displayTotalBudget').textContent = `Rs. ${total.toLocaleString()}`;
-      
-      const remText = document.getElementById('remainingText');
-      remText.textContent = `Rs. ${remaining.toLocaleString()}`;
-      if(remaining < 0) {
-        remText.style.color = '#ff4d4d';
-      } else {
-        remText.style.color = 'white';
-      }
+    // ─── BUILD ROWS ───────────────────────────────────────────────────────────
+    function buildCategoryRows() {
+      const container = document.getElementById('categoriesContainer');
+      container.innerHTML = CATEGORIES.map(cat => `
+        <div class="cat-row">
+          <div class="cat-name">
+            <div class="cat-icon" style="background:${cat.colorBg}; color:${cat.color};"><i class="fa-solid ${cat.icon}"></i></div>
+            ${cat.name}
+          </div>
+          <input type="number" class="pct-input" id="pct_${cat.id}" placeholder="%" min="0" max="100" step="0.1"
+                 oninput="onPctChange('${cat.id}')">
+          <input type="number" class="amt-input" id="amt_${cat.id}" placeholder="Rs." min="0" step="100"
+                 oninput="onAmtChange('${cat.id}')">
+          <span class="pct-suffix" id="sfx_${cat.id}">—</span>
+        </div>
+      `).join('');
     }
 
-    function saveBudgetPlan() {
-      const total = parseFloat(document.getElementById('calcTotalBudget').value) || 0;
-      if (total <= 0) {
-        alert("Please enter a valid total budget.");
-        return;
+    // ─── LOAD PLAN FROM API ───────────────────────────────────────────────────
+    async function loadPlan() {
+      showLoading(true);
+      try {
+        const res = await fetch(`/api/budget/${customerId}`);
+        currentPlan = await res.json();
+        if (currentPlan.totalBudget > 0) {
+          document.getElementById('totalBudgetInput').value = currentPlan.totalBudget;
+          // Restore category values
+          (currentPlan.categories || []).forEach(cat => {
+            const match = CATEGORIES.find(c => c.name === cat.categoryName);
+            if (match) {
+              const pctEl = document.getElementById(`pct_${match.id}`);
+              const amtEl = document.getElementById(`amt_${match.id}`);
+              if (pctEl) pctEl.value = cat.percentage || '';
+              if (amtEl) amtEl.value = cat.allocatedAmount || '';
+            }
+          });
+        }
+        recalcAll();
+      } catch(e) { console.error(e); }
+      showLoading(false);
+    }
+
+    // ─── PCT ↔ AMT SYNC ──────────────────────────────────────────────────────
+    function onPctChange(id) {
+      const total = parseFloat(document.getElementById('totalBudgetInput').value) || 0;
+      const pct   = parseFloat(document.getElementById(`pct_${id}`).value) || 0;
+      const amtEl = document.getElementById(`amt_${id}`);
+      if (total > 0) amtEl.value = Math.round(total * pct / 100);
+      recalcAll();
+    }
+    function onAmtChange(id) {
+      const total = parseFloat(document.getElementById('totalBudgetInput').value) || 0;
+      const amt   = parseFloat(document.getElementById(`amt_${id}`).value) || 0;
+      const pctEl = document.getElementById(`pct_${id}`);
+      if (total > 0) pctEl.value = (amt / total * 100).toFixed(1);
+      recalcAll();
+    }
+    function recalcAll() {
+      const total = parseFloat(document.getElementById('totalBudgetInput').value) || 0;
+      // Re-sync amounts for all categories (in case total changed)
+      CATEGORIES.forEach(cat => {
+        const pctEl = document.getElementById(`pct_${cat.id}`);
+        const amtEl = document.getElementById(`amt_${cat.id}`);
+        if (!pctEl || !amtEl) return;
+        const pct = parseFloat(pctEl.value) || 0;
+        // Only auto-fill amount if percent field was the last one changed & amount is empty
+        if (pct > 0 && total > 0 && (amtEl.value === '' || amtEl.value === '0')) {
+          amtEl.value = Math.round(total * pct / 100);
+        }
+        // Compute remaining suffix label
+        const amt = parseFloat(amtEl.value) || 0;
+        const sfx = document.getElementById(`sfx_${cat.id}`);
+        if (sfx) sfx.textContent = total > 0 && amt > 0 ? `${(amt/total*100).toFixed(0)}%` : '—';
+      });
+      updateSummaryBar(total);
+      validateAllocations(total);
+    }
+    function updateSummaryBar(total) {
+      let allocated = 0;
+      CATEGORIES.forEach(cat => {
+        allocated += parseFloat(document.getElementById(`amt_${cat.id}`)?.value) || 0;
+      });
+      const remaining = total - allocated;
+      document.getElementById('sbTotal').textContent = `Rs. ${total.toLocaleString()}`;
+      document.getElementById('sbAllocated').textContent = `Rs. ${allocated.toLocaleString()}`;
+      const remEl = document.getElementById('sbRemaining');
+      remEl.textContent = `Rs. ${Math.abs(remaining).toLocaleString()}${remaining < 0 ? ' over' : ''}`;
+      remEl.className = `value ${remaining < 0 ? 'over' : 'ok'}`;
+    }
+    function validateAllocations(total) {
+      let allocated = 0;
+      CATEGORIES.forEach(cat => {
+        allocated += parseFloat(document.getElementById(`amt_${cat.id}`)?.value) || 0;
+      });
+      const warning = document.getElementById('allocWarning');
+      const warningText = document.getElementById('allocWarningText');
+      if (allocated > total && total > 0) {
+        warning.style.display = 'block';
+        warningText.textContent = `Total allocated (Rs. ${allocated.toLocaleString()}) exceeds your budget (Rs. ${total.toLocaleString()}) by Rs. ${(allocated - total).toLocaleString()}!`;
+      } else {
+        warning.style.display = 'none';
       }
-      const plan = { total: total, categories: {} };
-      categories.forEach(c => {
-        plan.categories[c.name] = parseFloat(document.getElementById(c.id).value) || 0;
+    }
+    function autoDistribute() {
+      const total = parseFloat(document.getElementById('totalBudgetInput').value) || 0;
+      if (total <= 0) { showToast('Set a total budget first.', 'error'); return; }
+      CATEGORIES.forEach(cat => {
+        const pctEl = document.getElementById(`pct_${cat.id}`);
+        const amtEl = document.getElementById(`amt_${cat.id}`);
+        pctEl.value = cat.defaultPct;
+        amtEl.value = Math.round(total * cat.defaultPct / 100);
+      });
+      recalcAll();
+      showToast('Budget distributed by default percentages!', 'success');
+    }
+
+    // ─── SAVE PLAN ────────────────────────────────────────────────────────────
+    async function savePlan() {
+      const total = parseFloat(document.getElementById('totalBudgetInput').value) || 0;
+      if (total <= 0) { showToast('Please enter a valid total budget.', 'error'); return; }
+
+      let allocated = 0;
+      const categories = CATEGORIES.map(cat => {
+        const pct = parseFloat(document.getElementById(`pct_${cat.id}`).value) || 0;
+        const amt = parseFloat(document.getElementById(`amt_${cat.id}`).value) || 0;
+        allocated += amt;
+        return { categoryName: cat.name, percentage: pct, allocatedAmount: amt };
       });
 
-      localStorage.setItem('dreamWedding_budgetPlan', JSON.stringify(plan));
-      // Replace the old expenses structure to match the new total budget
-      localStorage.setItem('dreamWedding_totalBudget', total.toString());
-      
-      // Redirect to dashboard
-      window.location.href = 'customer-dashboard.html';
+      if (allocated > total) {
+        showToast('Fix allocations: total exceeds budget!', 'error');
+        return;
+      }
+
+      showLoading(true);
+      document.getElementById('saveBtn').disabled = true;
+      try {
+        const res = await fetch(`/api/budget/${customerId}/setup`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ totalBudget: total, categories })
+        });
+        if (!res.ok) throw new Error('Failed to save');
+        currentPlan = await res.json();
+        showToast('Budget plan saved!', 'success');
+        setTimeout(() => window.location.href = 'budget-tracker.html', 1200);
+      } catch(e) {
+        showToast('Error saving plan. Try again.', 'error');
+      }
+      showLoading(false);
+      document.getElementById('saveBtn').disabled = false;
+    }
+
+    // ─── HELPERS ─────────────────────────────────────────────────────────────
+    function showToast(msg, type = 'success') {
+      const el = document.getElementById('toastMsg');
+      el.textContent = msg;
+      el.className = `toast-msg ${type} show`;
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    function showLoading(on) {
+      document.getElementById('loadingOverlay').style.display = on ? 'flex' : 'none';
     }
   </script>
 </body>

@@ -162,29 +162,45 @@
         }
 
         if (hotelData.hallArrangements && hotelData.hallArrangements.length > 0) {
-            document.getElementById('hallsContainer').innerHTML = hotelData.hallArrangements.map(h => `
+            document.getElementById('hallsContainer').innerHTML = hotelData.hallArrangements.map(h => {
+                // Extract first number from price string e.g. "Rs. 500 - Rs. 1000" → 500
+                const numericPrice = parseFloat((h.pricePerPlate || '').replace(/,/g,'').match(/\d+(\.\d+)?/)?.[0] || '0') || 0;
+                const displayPrice = numericPrice > 0 ? `Rs. ${numericPrice.toLocaleString()} per plate` : (h.pricePerPlate || 'N/A');
+                return `
                 <div class="col-md-6">
                     <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
                         <h5 class="fw-bold">${h.hallName || 'Unnamed Hall'}</h5>
-                        <p class="text-primary fw-bold mb-2">Price Per Plate: ${h.pricePerPlate || 'N/A'}</p>
+                        <p class="text-primary fw-bold mb-2">${displayPrice}</p>
                         <p class="text-muted small">Capacity: ${h.seatingCapacity || 'N/A'}</p>
-                        <button class="btn btn-outline-dark rounded-pill w-100 mt-auto" onclick="handleBooking('${(h.hallName || '').replace(/'/g, "\\'")}')">Select Hall</button>
+                        <button class="btn btn-outline-dark rounded-pill w-100 mt-2" onclick="handleBooking('${(h.hallName || '').replace(/'/g, "\'")}')" >Select Hall</button>
+                        <button class="btn btn-outline-warning rounded-pill w-100 mt-2" onclick="addToBudget('${hotelData.hotelName.replace(/'/g,"\'")}','${(h.hallName||'Hall').replace(/'/g,"\'")}','Food and catering',${numericPrice},'hotel')">
+                          <i class="fa-solid fa-wallet me-1"></i>Add to Budget
+                        </button>
                     </div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
         } else {
             document.getElementById('hallsContainer').innerHTML = '<div class="col-12 text-muted">No hall arrangements available.</div>';
         }
 
         if (hotelData.rooms && hotelData.rooms.length > 0) {
-            document.getElementById('roomsContainer').innerHTML = hotelData.rooms.map(r => `
+            document.getElementById('roomsContainer').innerHTML = hotelData.rooms.map(r => {
+                // Extract first number from price string e.g. "Rs. 5,000 - Rs. 10,000" → 5000
+                const numericPrice = parseFloat((r.priceRange || '').replace(/,/g,'').match(/\d+(\.\d+)?/)?.[0] || '0') || 0;
+                const displayPrice = numericPrice > 0 ? `Rs. ${numericPrice.toLocaleString()}` : (r.priceRange || 'N/A');
+                return `
                 <div class="col-md-6">
                     <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
                         <h5 class="fw-bold">${r.type || 'Unnamed Room'}</h5>
-                        <p class="text-primary fw-bold mb-2">${r.priceRange || 'N/A'}</p>
+                        <p class="text-primary fw-bold mb-2">${displayPrice}</p>
                         <p class="text-muted small">Capacity: ${r.capacity || 'N/A'}</p>
-                        <button class="btn btn-outline-dark rounded-pill w-100 mt-auto" onclick="handleBooking('${(r.type || '').replace(/'/g, "\\'")}')">Select Room</button>
+                        <button class="btn btn-outline-dark rounded-pill w-100 mt-2" onclick="handleBooking('${(r.type || '').replace(/'/g, "\'")}')" >Select Room</button>
+                        <button class="btn btn-outline-warning rounded-pill w-100 mt-2" onclick="addToBudget('${hotelData.hotelName.replace(/'/g,"\'")}','${(r.type||'Room').replace(/'/g,"\'")}','Gifts',${numericPrice},'hotel')">
+                          <i class="fa-solid fa-wallet me-1"></i>Add to Budget
+                        </button>
                     </div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
         } else {
             document.getElementById('roomsContainer').innerHTML = '<div class="col-12 text-muted">No accommodation details available.</div>';
         }
@@ -300,6 +316,46 @@
         if (user.role !== 'CUSTOMER') { alert('Only customers can book.'); return; }
         window.location.href = `hotel-booking.html?hotelId=${hotelId}&hallName=${encodeURIComponent(hall)}`;
     };
+
+    window.addToBudget = async function(vendorName, pkgName, category, amount, type) {
+        const u = sessionStorage.getItem('dreamWeddingUser');
+        if (!u) { alert('Please sign in first.'); return; }
+        const user = JSON.parse(u);
+        if (user.role !== 'CUSTOMER') { alert('Only customers can use the budget planner.'); return; }
+        if (amount <= 0) { alert('This item has no price set. Enter the amount manually in your budget planner.'); return; }
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const res = await fetch(`/api/budget/${user.id}/expenses`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    categoryName: category,
+                    description: `${vendorName} — ${pkgName}`,
+                    amount: amount,
+                    date: today,
+                    estimateId: null
+                })
+            });
+            if (res.ok) {
+                showBudgetToast(`✅ "${pkgName}" at ${vendorName} added to expense log as Rs. ${amount.toLocaleString()}`);
+            } else { showBudgetToast('Failed to add to budget.', true); }
+        } catch(e) { showBudgetToast('Error adding to budget.', true); }
+    };
+
+    function showBudgetToast(msg, isError = false) {
+        let t = document.getElementById('budgetToast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'budgetToast';
+            t.style.cssText = 'position:fixed;bottom:30px;right:30px;z-index:9999;background:#1a1a1a;color:white;padding:14px 22px;border-radius:14px;font-size:14px;font-weight:500;border-left:4px solid #b8963e;transition:all .35s;opacity:0;transform:translateY(20px);max-width:360px;';
+            document.body.appendChild(t);
+        }
+        if (isError) t.style.borderLeftColor = '#ff6b6b';
+        else t.style.borderLeftColor = '#69e09a';
+        t.textContent = msg;
+        t.style.opacity = '1'; t.style.transform = 'translateY(0)';
+        setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(20px)'; }, 4000);
+    }
   </script>
 </body>
 </html>

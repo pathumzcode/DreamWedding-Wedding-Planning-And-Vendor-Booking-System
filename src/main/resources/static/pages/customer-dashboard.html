@@ -72,7 +72,7 @@
           <li class="nav-item"><a class="nav-link active" onclick="showTab('overview')" href="#"><i class="fa-solid fa-house me-2"></i>Overview</a></li>
           <li class="nav-item"><a class="nav-link" onclick="showTab('bookings')" href="#"><i class="fa-solid fa-calendar-check me-2"></i>My Bookings</a></li>
           <li class="nav-item"><a class="nav-link" onclick="showTab('wishlist')" href="#"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
-
+          <li class="nav-item"><a class="nav-link" onclick="showTab('budget')" href="#"><i class="fa-solid fa-wallet me-2"></i>Budget Planner</a></li>
           <li class="nav-item"><a class="nav-link" onclick="showTab('reviews')" href="#"><i class="fa-solid fa-star me-2"></i>My Reviews</a></li>
           <li class="nav-item"><a class="nav-link" onclick="showTab('profile')" href="#"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
           <li class="nav-item mt-3 border-top pt-2"><a class="nav-link text-danger" href="#" onclick="logoutUser()"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
@@ -239,9 +239,62 @@
           </div>
         </div>
       </div>
+
+      <!-- ── BUDGET PLANNER TAB ── -->
+      <div id="tab-budget" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-4" style="flex-wrap:wrap; gap:10px;">
+          <h3 class="fw-bold mb-0"><i class="fa-solid fa-wallet me-2" style="color:#b8963e"></i>Budget Planner</h3>
+          <div class="d-flex gap-2">
+            <a href="budget-calculator.html" class="btn btn-sm btn-outline-secondary rounded-pill"><i class="fa-solid fa-sliders me-1"></i>Edit Setup</a>
+            <a href="budget-tracker.html" class="btn btn-sm btn-custom rounded-pill"><i class="fa-solid fa-chart-line me-1"></i>Full Tracker</a>
+          </div>
+        </div>
+        <div id="budgetNotSet" style="display:none;">
+          <div class="card p-5 text-center border-0 shadow-sm">
+            <i class="fa-solid fa-wallet fs-1 mb-3" style="color:#b8963e"></i>
+            <h5 class="fw-bold mb-2">No Budget Set Yet</h5>
+            <p class="text-muted mb-4">Set up your wedding budget to start tracking expenses and category allocations.</p>
+            <a href="budget-calculator.html" class="btn btn-custom rounded-pill px-5"><i class="fa-solid fa-calculator me-2"></i>Set Up Budget</a>
+          </div>
+        </div>
+        <div id="budgetContent" style="display:none;">
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3"><div class="card p-3 border-0 shadow-sm text-center"><div class="small text-muted mb-1">Total Budget</div><div class="fw-bold fs-5" id="db-total" style="color:#1a1a1a">Rs. 0</div></div></div>
+            <div class="col-6 col-md-3"><div class="card p-3 border-0 shadow-sm text-center"><div class="small text-muted mb-1">Total Spent</div><div class="fw-bold fs-5" id="db-spent" style="color:#b8963e">Rs. 0</div></div></div>
+            <div class="col-6 col-md-3"><div class="card p-3 border-0 shadow-sm text-center"><div class="small text-muted mb-1">Remaining</div><div class="fw-bold fs-5" id="db-remaining" style="color:#27ae60">Rs. 0</div></div></div>
+            <div class="col-6 col-md-3"><div class="card p-3 border-0 shadow-sm text-center"><div class="small text-muted mb-1">% Used</div><div class="fw-bold fs-5" id="db-pct" style="color:#b8963e">0%</div></div></div>
+          </div>
+          <div id="db-overAlert" class="alert alert-danger d-flex align-items-center gap-2 mb-4 d-none" style="border-radius:12px;">
+            <i class="fa-solid fa-triangle-exclamation"></i><span id="db-overMsg">You are over budget!</span>
+          </div>
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <div class="card p-4 border-0 shadow-sm h-100">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie me-2" style="color:#b8963e"></i>Category Breakdown</h6>
+                <div id="db-categories"></div>
+                <a href="budget-calculator.html" class="btn btn-sm btn-outline-secondary rounded-pill mt-3" style="font-size:12px;"><i class="fa-solid fa-pen me-1"></i>Edit Allocations</a>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="card p-4 border-0 shadow-sm h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h6 class="fw-bold mb-0"><i class="fa-solid fa-receipt me-2" style="color:#b8963e"></i>Recent Expenses</h6>
+                  <a href="budget-tracker.html" class="btn btn-sm btn-custom rounded-pill" style="font-size:12px;">View All</a>
+                </div>
+                <div id="db-expenses" style="max-height:280px; overflow-y:auto;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="budgetLoading" class="text-center py-5 text-muted">
+          <i class="fa-solid fa-spinner fa-spin fs-3"></i><p class="mt-2">Loading budget...</p>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
+
 
 <!-- Edit Booking Modal -->
 <div class="modal fade" id="editBookingModal" tabindex="-1">
@@ -358,14 +411,13 @@
   }
 
   function showTab(tabName) {
-    ['overview','bookings','wishlist','profile','reviews'].forEach(t => {
+    ['overview','bookings','wishlist','profile','reviews','budget'].forEach(t => {
       const el = document.getElementById('tab-' + t);
       if (el) el.style.display = 'none';
     });
     const el = document.getElementById('tab-' + tabName);
     if (el) el.style.display = 'block';
     
-    // Add active class handling for sidebar menu
     document.querySelectorAll('.sidebar .nav-link').forEach(l => {
       l.classList.remove('active');
       if(l.getAttribute('onclick') && l.getAttribute('onclick').includes(tabName)) {
@@ -376,6 +428,7 @@
     if (tabName === 'bookings') loadBookings();
     if (tabName === 'wishlist') loadWishlist();
     if (tabName === 'reviews') loadMyReviews();
+    if (tabName === 'budget') loadBudgetTab();
   }
 
   function badgeHtml(status) {
@@ -461,14 +514,25 @@
                  <strong>Special Requests:</strong> ${b.specialRequests || 'None'}<br>
                  <strong>Vendor Note:</strong> ${b.vendorNote || 'None'}
               </div>
+              ${b.status === 'CONFIRMED' ? `
+              <div class="mt-2 d-flex align-items-center gap-2" style="font-size:12px;">
+                <span style="background:#d1fae5; color:#065f46; padding:4px 12px; border-radius:20px; font-weight:600;">
+                  <i class="fa-solid fa-wallet me-1"></i>Added to Budget
+                </span>
+                <span class="text-muted">Cost auto-tracked in your budget planner.</span>
+              </div>` : ''}
             </div>
           </div>
-          <div class="d-flex gap-2 mt-3 pt-3 border-top">
+          <div class="d-flex gap-2 mt-3 pt-3 border-top flex-wrap">
             <button class="btn btn-sm btn-outline-success" onclick="openChatModal('${(b.vendorName || 'Vendor').replace(/'/g,"\\'")}', '${b.id}')"><i class="fa-solid fa-comments me-1"></i>Message Vendor</button>
             ${b.status==='PENDING' ? `<button class="btn btn-sm btn-outline-primary" onclick="openEditBooking('${b.id}')"><i class="fa-solid fa-pen me-1"></i>Edit Details</button>` : ''}
             ${b.status !== 'REJECTED' ? `
               <a href="add-review.html?vendorId=${b.vendorId}&bookingId=${b.id}" class="btn btn-sm btn-custom px-3 shadow-sm">
                 <i class="fa-solid fa-star me-2"></i>Review Vendor
+              </a>` : ''}
+            ${b.status === 'CONFIRMED' ? `
+              <a href="customer-dashboard.html?tab=budget" class="btn btn-sm" style="background:#d1fae5; color:#065f46; border:none; font-weight:600;">
+                <i class="fa-solid fa-wallet me-1"></i>View in Budget
               </a>` : ''}
             ${(b.status==='PENDING' || b.status==='CONFIRMED') ? `<button class="btn btn-sm btn-outline-danger ms-auto" onclick="deleteBooking('${b.id}')"><i class="fa-solid fa-trash me-1"></i>Cancel</button>` : ''}
           </div>
@@ -726,39 +790,112 @@
       }
     });
 
-    // Dashboard Financial Overview Initializer
-    function loadMiniBudgetOverview() {
-        const storedPlan = localStorage.getItem('dreamWedding_budgetPlan');
-        if (storedPlan) {
-            const plan = JSON.parse(storedPlan);
-            const total = plan.total || 0;
-            let allocated = 0;
-            
-            let catHtml = '';
-            if (plan.categories) {
-                for (const [catName, amt] of Object.entries(plan.categories)) {
-                    if (amt > 0) {
-                        allocated += amt;
-                        catHtml += `<div class="p-2 border rounded bg-white"><small class="text-muted d-block">${catName}</small><strong>Rs. ${amt.toLocaleString()}</strong></div>`;
-                    }
-                }
-            }
-            
+    // Dashboard Financial Overview — fetches from API
+    async function loadMiniBudgetOverview() {
+        try {
+            const res = await fetch(`/api/budget/${user.id}`);
+            if (!res.ok) return;
+            const plan = await res.json();
+            const total = plan.totalBudget || 0;
+            const spent = plan.totalSpent || 0;
+            const pct = total > 0 ? Math.min(100, Math.round((spent / total) * 100)) : 0;
+
             document.getElementById('summaryTotalBudget').textContent = `Rs. ${total.toLocaleString()}`;
-            document.getElementById('summaryAllocatedBudget').textContent = `Rs. ${allocated.toLocaleString()}`;
-            
-            const pct = total > 0 ? Math.min(100, Math.round((allocated / total) * 100)) : 0;
+            document.getElementById('summaryAllocatedBudget').textContent = `Rs. ${spent.toLocaleString()} spent`;
             document.getElementById('dashboardBudgetProgress').style.width = pct + '%';
-            
-            if(catHtml) {
-               document.getElementById('summaryCategoriesList').innerHTML = catHtml;
-            } else {
-               document.getElementById('summaryCategoriesList').innerHTML = '<div class="text-muted small" style="grid-column: span 2;">No categories allocated yet.</div>';
+
+            const cats = plan.categories || [];
+            const catHtml = cats.filter(c => c.allocatedAmount > 0).map(c =>
+                `<div class="p-2 border rounded bg-white"><small class="text-muted d-block" style="font-size:11px;">${c.categoryName}</small><strong style="font-size:13px;">Rs. ${(c.allocatedAmount||0).toLocaleString()}</strong></div>`
+            ).join('');
+            document.getElementById('summaryCategoriesList').innerHTML = catHtml ||
+                '<div class="text-muted small" style="grid-column:span 2;">No plan yet. <a href="budget-calculator.html">Set up budget</a></div>';
+        } catch(e) { console.error('Mini budget load error:', e); }
+    }
+    loadMiniBudgetOverview();
+
+    // Full budget tab loader
+    let budgetTabLoaded = false;
+    window.loadBudgetTab = async function() {
+        document.getElementById('budgetLoading').style.display = 'block';
+        document.getElementById('budgetNotSet').style.display = 'none';
+        document.getElementById('budgetContent').style.display = 'none';
+        try {
+            const res = await fetch(`/api/budget/${user.id}`);
+            const plan = await res.json();
+            document.getElementById('budgetLoading').style.display = 'none';
+
+            if (!plan.totalBudget || plan.totalBudget === 0) {
+                document.getElementById('budgetNotSet').style.display = 'block';
+                return;
             }
+            document.getElementById('budgetContent').style.display = 'block';
+
+            // Stats
+            const total = plan.totalBudget || 0;
+            const spent = plan.totalSpent || 0;
+            const rem   = plan.totalRemaining || 0;
+            const pct   = total > 0 ? Math.round(spent / total * 100) : 0;
+            document.getElementById('db-total').textContent    = `Rs. ${total.toLocaleString()}`;
+            document.getElementById('db-spent').textContent    = `Rs. ${spent.toLocaleString()}`;
+            document.getElementById('db-remaining').textContent = `Rs. ${Math.abs(rem).toLocaleString()}${rem < 0 ? ' OVER' : ''}`;
+            document.getElementById('db-remaining').style.color = rem < 0 ? '#e53935' : '#27ae60';
+            document.getElementById('db-pct').textContent      = `${pct}%`;
+
+            // Over budget alert — toggle using Bootstrap d-none class
+            const overAlert = document.getElementById('db-overAlert');
+            if (plan.isOverBudget) {
+                overAlert.classList.remove('d-none');
+                const overCats = (plan.categories||[]).filter(c=>c.isOverBudget).map(c=>c.categoryName).join(', ');
+                document.getElementById('db-overMsg').textContent = overCats
+                    ? `Over budget in: ${overCats}`
+                    : 'Total spending exceeds your master budget!';
+            } else {
+                overAlert.classList.add('d-none');
+            }
+
+            // Categories
+            const catIcons = { 'Food and catering':'fa-utensils','Photography':'fa-camera','Jewellery and Attire':'fa-gem','Wedding music and dancing':'fa-music','Florist':'fa-spa','Gifts':'fa-gift' };
+            const cats = plan.categories || [];
+            document.getElementById('db-categories').innerHTML = cats.length === 0
+                ? '<p class="text-muted small">No categories. <a href="budget-calculator.html">Set up budget</a></p>'
+                : cats.map(c => {
+                    const icon = catIcons[c.categoryName] || 'fa-tag';
+                    const catPct = Math.min(100, c.percentUsed || 0);
+                    const isOver = c.isOverBudget;
+                    return `<div class="mb-3">
+                      <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="fw-600" style="font-size:13px;"><i class="fa-solid ${icon} me-1" style="color:#b8963e"></i>${c.categoryName}</small>
+                        <small class="${isOver ? 'text-danger fw-bold' : 'text-muted'}">${isOver ? '⚠ OVER' : catPct + '% used'}</small>
+                      </div>
+                      <div class="progress mb-1" style="height:6px; border-radius:10px;">
+                        <div class="progress-bar" style="width:${catPct}%; background:${isOver ? '#e53935' : '#b8963e'}; border-radius:10px;"></div>
+                      </div>
+                      <div class="d-flex justify-content-between" style="font-size:11px; color:#999;">
+                        <span>Spent: Rs. ${(c.spentAmount||0).toLocaleString()}</span>
+                        <span>of Rs. ${(c.allocatedAmount||0).toLocaleString()}</span>
+                      </div>
+                    </div>`;
+                }).join('');
+
+            // Recent expenses (last 5)
+            const exps = (plan.expenses || []).slice().sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0,5);
+            document.getElementById('db-expenses').innerHTML = exps.length === 0
+                ? '<p class="text-muted small text-center py-3">No expenses logged yet.<br><a href="budget-tracker.html">Go to tracker to add expenses</a></p>'
+                : exps.map(e => `
+                    <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                      <div style="flex:1; min-width:0;">
+                        <div style="font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${e.description}</div>
+                        <div style="font-size:11px; color:#999;">${e.categoryName} • ${e.date||''}</div>
+                      </div>
+                      <div style="font-size:14px; font-weight:700; color:#b8963e; white-space:nowrap; margin-left:12px;">Rs. ${e.amount.toLocaleString()}</div>
+                    </div>`).join('');
+
+            budgetTabLoaded = true;
+        } catch(e) {
+            document.getElementById('budgetLoading').innerHTML = '<div class="alert alert-danger">Failed to load budget.</div>';
         }
     }
-    
-    loadMiniBudgetOverview();
 
     // Confirm Profile Deletion
     document.getElementById('confirmDeleteProfileBtn').addEventListener('click', async () => {
