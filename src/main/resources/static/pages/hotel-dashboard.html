@@ -112,9 +112,14 @@
       <!-- Hotel Profile -->
       <div id="tab-profile" style="display:none;">
         <h3 class="fw-bold mb-4">Hotel Profile</h3>
-        <div class="card p-4">
+        <div class="card p-4 mb-4">
           <p class="text-muted mb-3">Update your hotel profile, room types, amenities, and hall arrangements using the profile editor.</p>
           <a href="hotel-setup.html" class="btn btn-custom"><i class="fa-solid fa-arrow-up-right-from-square me-2"></i>Open Profile Editor</a>
+        </div>
+        <div class="card p-4 border border-danger-subtle bg-danger-subtle bg-opacity-10">
+          <h5 class="fw-bold text-danger">Danger Zone</h5>
+          <p class="text-muted small">Once you delete your hotel profile, all reservations, reviews, hall arrangements, and accommodation data will be permanently removed.</p>
+          <button type="button" class="btn btn-outline-danger px-4" data-bs-toggle="modal" data-bs-target="#deleteProfileModal">Delete Hotel Profile</button>
         </div>
       </div>
 
@@ -436,8 +441,69 @@
       document.getElementById('stat-pending').textContent = bk.filter(b=>b.status==='PENDING').length;
       document.getElementById('stat-confirmed').textContent = bk.filter(b=>b.status==='CONFIRMED').length;
     } catch(e){}
+
+    // Confirm Profile Deletion
+    document.getElementById('confirmDeleteProfileBtn').addEventListener('click', async () => {
+      const password = document.getElementById('deleteProfilePassword').value;
+      const msgEl = document.getElementById('deleteProfileMsg');
+      
+      if (!password) {
+        msgEl.innerHTML = '<div class="text-danger small"><i class="fa-solid fa-circle-exclamation me-1"></i>Password is required.</div>';
+        return;
+      }
+      
+      const btn = document.getElementById('confirmDeleteProfileBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Deleting...';
+      
+      try {
+        const response = await fetch(`/api/auth/delete/${user.id}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: password })
+        });
+        
+        if (response.ok) {
+          sessionStorage.removeItem('dreamWeddingUser');
+          window.location.href = '../index.html';
+        } else {
+          const errText = await response.text();
+          msgEl.innerHTML = `<div class="text-danger small"><i class="fa-solid fa-circle-exclamation me-1"></i>${errText || 'Incorrect password or failed to delete.'}</div>`;
+        }
+      } catch (e) {
+        msgEl.innerHTML = '<div class="text-danger small"><i class="fa-solid fa-circle-exclamation me-1"></i>Connection error.</div>';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Delete My Account';
+      }
+    });
   });
 </script>
+
+<!-- Delete Profile Modal -->
+<div class="modal fade" id="deleteProfileModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-danger">Delete Account</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>To confirm deletion of your hotel profile, please enter your password. <strong>This action cannot be undone.</strong></p>
+        <div class="mb-3">
+          <label class="form-label fw-bold small">Password</label>
+          <input type="password" class="form-control" id="deleteProfilePassword" placeholder="Enter your password" required>
+        </div>
+        <div id="deleteProfileMsg" class="mt-2"></div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger rounded-pill px-4" id="confirmDeleteProfileBtn">Delete My Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
   <script src="../js/script.js"></script>
 </body>
 </html>

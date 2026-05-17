@@ -324,6 +324,97 @@
             window.location.href = 'login.html';
         }
 
+        // Fetch and load existing vendor profile details
+        async function loadVendorProfile() {
+            try {
+                const response = await fetch(`/api/vendors/${user.id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data) {
+                        if (data.businessName) {
+                            document.getElementById('businessName').value = data.businessName;
+                            // If businessName is already set, they can't change it!
+                            document.getElementById('businessName').readOnly = true;
+                            document.getElementById('businessName').classList.add('bg-light');
+                            
+                            // Add a visual hint
+                            const helper = document.createElement('div');
+                            helper.className = 'form-text text-muted small mt-1';
+                            helper.innerHTML = '<i class="fa-solid fa-lock me-1"></i>Business name cannot be changed once established.';
+                            document.getElementById('businessName').parentNode.appendChild(helper);
+                        }
+                        if (data.category) {
+                            document.getElementById('category').value = data.category;
+                            // If category is already set, they can't change it!
+                            document.getElementById('category').disabled = true;
+                            document.getElementById('category').classList.add('bg-light');
+                            
+                            // Add a visual hint
+                            const helper = document.createElement('div');
+                            helper.className = 'form-text text-muted small mt-1';
+                            helper.innerHTML = '<i class="fa-solid fa-lock me-1"></i>Business category cannot be changed once established.';
+                            document.getElementById('category').parentNode.appendChild(helper);
+                        }
+                        if (data.aboutUs) {
+                            document.getElementById('aboutUs').value = data.aboutUs;
+                        }
+                        if (data.location) {
+                            document.getElementById('location').value = data.location;
+                        }
+                        if (data.businessContact) {
+                            document.getElementById('businessEmail').value = data.businessContact.email || data.email || '';
+                            document.getElementById('businessPhone').value = data.businessContact.phone || data.phoneNumber || '';
+                            document.getElementById('businessWhatsapp').value = data.businessContact.whatsapp || data.phoneNumber || '';
+                            document.getElementById('websiteLink').value = data.businessContact.website || '';
+                        } else {
+                            document.getElementById('businessEmail').value = data.email || '';
+                            document.getElementById('businessPhone').value = data.phoneNumber || '';
+                            document.getElementById('businessWhatsapp').value = data.phoneNumber || '';
+                        }
+                        if (data.instagramLink) {
+                            document.getElementById('instagramLink').value = data.instagramLink;
+                        }
+                        if (data.facebookLink) {
+                            document.getElementById('facebookLink').value = data.facebookLink;
+                        }
+                        
+                        // Populate packages
+                        if (data.packages && data.packages.length > 0) {
+                            const pkgNames = document.querySelectorAll('.pkg-name');
+                            const pkgPrices = document.querySelectorAll('.pkg-price');
+                            const pkgDescs = document.querySelectorAll('.pkg-desc');
+                            data.packages.forEach((pkg, index) => {
+                                if (index < pkgNames.length) {
+                                    pkgNames[index].value = pkg.name || '';
+                                    pkgPrices[index].value = pkg.priceRange || '';
+                                    pkgDescs[index].value = pkg.description || '';
+                                }
+                            });
+                        }
+
+                        // Populate gallery photo previews
+                        if (data.galleryPhotos && data.galleryPhotos.length > 0) {
+                            const files = document.querySelectorAll('.gallery-file');
+                            data.galleryPhotos.forEach((photo, index) => {
+                                if (index < files.length && photo) {
+                                    const previewContainer = document.createElement('div');
+                                    previewContainer.className = 'mt-2';
+                                    previewContainer.innerHTML = `
+                                        <div class="small text-muted mb-1">Current Photo:</div>
+                                        <img src="${photo}" class="rounded shadow-sm" style="max-height: 80px; object-fit: cover; border: 1px solid #ddd;" />
+                                    `;
+                                    files[index].parentNode.appendChild(previewContainer);
+                                }
+                            });
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('Error fetching vendor data:', err);
+            }
+        }
+        loadVendorProfile();
+
         // Helper to convert file to Base64
         const fileToBase64 = (file) => new Promise((resolve, reject) => {
             const reader = new FileReader();

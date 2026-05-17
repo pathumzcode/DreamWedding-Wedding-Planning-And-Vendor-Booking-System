@@ -52,4 +52,17 @@ public class AuthController {
         );
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteProfile(@PathVariable String id, @RequestBody java.util.Map<String, String> request) {
+        try {
+            String password = request.get("password");
+            authService.deleteProfile(id, password);
+            return ResponseEntity.ok().build();
+        } catch (org.springframework.security.authentication.BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }

@@ -132,6 +132,40 @@ public class AuthService {
         return hotelRepository.findByEmail(email);
     }
 
+    private Optional<? extends BaseUser> findById(String id) {
+        Optional<? extends BaseUser> user = customerRepository.findById(id);
+        if (user.isPresent()) return user;
+        user = vendorRepository.findById(id);
+        if (user.isPresent()) return user;
+        user = adminRepository.findById(id);
+        if (user.isPresent()) return user;
+        return hotelRepository.findById(id);
+    }
+
+    public void deleteProfile(String id, String password) {
+        BaseUser user = findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+                
+        if (!user.getPassword().equals(password)) {
+            throw new BadCredentialsException("Incorrect password");
+        }
+        
+        switch (user.getRole()) {
+            case CUSTOMER:
+                customerRepository.deleteById(id);
+                break;
+            case VENDOR:
+                vendorRepository.deleteById(id);
+                break;
+            case ADMIN:
+                adminRepository.deleteById(id);
+                break;
+            case HOTEL:
+                hotelRepository.deleteById(id);
+                break;
+        }
+    }
+
     private void populateBaseFields(BaseUser user, RegisterRequest request, String plainPassword) {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
