@@ -42,8 +42,14 @@ public class VendorController {
         Vendor vendor = vendorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
-        vendor.setBusinessName(request.getBusinessName());
-        vendor.setCategory(request.getCategory());
+        // Do not allow updating the business name if it is already set (non-empty)
+        if (vendor.getBusinessName() == null || vendor.getBusinessName().trim().isEmpty()) {
+            vendor.setBusinessName(request.getBusinessName());
+        }
+        // Do not allow updating the category if it is already set (non-empty)
+        if (vendor.getCategory() == null || vendor.getCategory().trim().isEmpty()) {
+            vendor.setCategory(request.getCategory());
+        }
         vendor.setAboutUs(request.getAboutUs());
         vendor.setLocation(request.getLocation());
         if (vendor.getBusinessContact() == null) {
@@ -56,7 +62,11 @@ public class VendorController {
         vendor.setInstagramLink(request.getInstagramLink());
         vendor.setFacebookLink(request.getFacebookLink());
         vendor.setPackages(request.getPackages());
-        vendor.setGalleryPhotos(request.getGalleryPhotos());
+        
+        // Only update gallery photos if new ones are uploaded
+        if (request.getGalleryPhotos() != null && !request.getGalleryPhotos().isEmpty()) {
+            vendor.setGalleryPhotos(request.getGalleryPhotos());
+        }
         vendor.setProfileCompleted(true);
 
         vendorRepository.save(vendor);
