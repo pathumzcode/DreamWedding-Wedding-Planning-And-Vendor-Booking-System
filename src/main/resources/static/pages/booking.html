@@ -124,13 +124,15 @@
 
         if (vendor.packages && vendor.packages.length > 0) {
           vendor.packages.forEach((pkg, index) => {
+            const numericPrice = typeof pkg.price === 'number' ? pkg.price : parseFloat((pkg.priceRange || '').toString().replace(/,/g,'').match(/\\d+(\\.\\d+)?/)?.[0] || '0') || 0;
+            const displayPrice = numericPrice > 0 ? `Rs. ${numericPrice.toLocaleString()}` : (pkg.priceRange || 'Price on request');
             const isChecked = preselectedPkgName === pkg.name ? 'checked' : (index === 0 && !preselectedPkgName ? 'checked' : '');
             packagesContainer.innerHTML += `
               <div class="form-check mb-2 p-3 border rounded-3 bg-white">
-                <input class="form-check-input ms-1" type="radio" name="package" id="pkg${index}" value="${pkg.name}|${pkg.priceRange}" ${isChecked}>
+                <input class="form-check-input ms-1" type="radio" name="package" id="pkg${index}" value="${pkg.name}|${displayPrice}" ${isChecked}>
                 <label class="form-check-label ms-2 d-flex justify-content-between w-100" for="pkg${index}">
-                  <span><strong>${pkg.name}</strong> <br><small class="text-muted">${pkg.description}</small></span>
-                  <span class="fw-bold text-success">${pkg.priceRange}</span>
+                  <span><strong>${pkg.name}</strong> <br><small class="text-muted">${pkg.description || ''}</small></span>
+                  <span class="fw-bold text-success">${displayPrice}</span>
                 </label>
               </div>
             `;
