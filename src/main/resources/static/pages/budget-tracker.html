@@ -64,7 +64,6 @@
     .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--gold),#d4af37); border-radius:20px; transition:width 1s ease; }
     .progress-bar-fill.over { background:linear-gradient(90deg,#e53935,#ff6b6b); }
     .cat-footer { display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:12px; color:var(--muted); }
-    .estimate-tag { background:#e8f4ff; color:#1565c0; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; }
     .over-tag { background:#ffebee; color:#c62828; border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; }
 
     /* EXPENSES TABLE */
@@ -79,13 +78,7 @@
     .btn-edit { background:none; border:none; color:#ccc; cursor:pointer; padding:4px 8px; border-radius:8px; transition:all .2s; }
     .btn-edit:hover { color:var(--gold); background:var(--gold-light); }
 
-    /* ESTIMATES TABLE */
-    .est-row { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid #f5f5f5; gap:12px; flex-wrap:wrap; }
-    .est-row:last-child { border-bottom:none; }
-    .est-info { flex:1; }
-    .est-name { font-weight:600; font-size:15px; }
-    .est-meta { font-size:12px; color:var(--muted); }
-    .est-amount { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); white-space:nowrap; }
+
 
     /* MODAL */
     .modal-content { border-radius:20px; border:none; }
@@ -160,11 +153,7 @@
       <div class="s-value green" id="sRemaining">Rs. 0</div>
       <div class="s-sub">Available balance</div>
     </div>
-    <div class="stat-card">
-      <div class="s-label">Committed (Estimates)</div>
-      <div class="s-value gold" id="sEstimates">Rs. 0</div>
-      <div class="s-sub">Vendor projections</div>
-    </div>
+
   </div>
 
   <!-- Two-column layout -->
@@ -220,11 +209,7 @@
         </div>
       </div>
 
-      <!-- Vendor estimates -->
-      <div class="card-panel">
-        <h5><i class="fa-solid fa-file-invoice-dollar" style="color:var(--gold)"></i>Vendor Estimates</h5>
-        <div id="estimatesList"></div>
-      </div>
+
     </div>
   </div>
 </div>
@@ -252,7 +237,6 @@
           <input type="number" id="expAmt" class="form-control" min="1" step="1" required>
         </div>
         <input type="hidden" id="expDate">
-        <input type="hidden" id="expEstimate">
       </div>
       <div class="modal-footer gap-2">
         <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancel</button>

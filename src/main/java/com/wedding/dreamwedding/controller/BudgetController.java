@@ -13,7 +13,7 @@ import java.util.*;
  * REST Controller for the Wedding Budget Planner.
  *
  * Design: One BudgetPlan document per customer (upsert pattern).
- * All budget data (categories, expenses, estimates) lives in one document.
+ * All budget data (categories and expenses) lives in one document.
  *
  * Endpoints:
  *  GET    /api/budget/{customerId}           — fetch full plan
@@ -21,8 +21,6 @@ import java.util.*;
  *  POST   /api/budget/{customerId}/expenses  — add an expense
  *  PUT    /api/budget/{customerId}/expenses/{expenseId} — update an expense
  *  DELETE /api/budget/{customerId}/expenses/{expenseId} — delete an expense
- *  POST   /api/budget/{customerId}/estimates  — add a vendor estimate
- *  DELETE /api/budget/{customerId}/estimates/{estimateId} — remove an estimate
  */
 @RestController
 @RequestMapping("/api/budget")
@@ -106,7 +104,6 @@ public class BudgetController {
             return ResponseEntity.badRequest().body(Map.of("error", "amount must be greater than 0"));
         }
         expense.setAmount(amountValue);
-        expense.setEstimateId((String) body.getOrDefault("estimateId", null));
         expense.setDate(body.getOrDefault("date", LocalDateTime.now().toLocalDate().toString()).toString());
 
         plan.getExpenses().add(expense);
@@ -130,7 +127,6 @@ public class BudgetController {
                     if (body.containsKey("categoryName")) expense.setCategoryName((String) body.get("categoryName"));
                     if (body.containsKey("description"))  expense.setDescription((String) body.get("description"));
                     if (body.containsKey("amount"))       expense.setAmount(((Number) body.get("amount")).doubleValue());
-                    if (body.containsKey("estimateId"))   expense.setEstimateId((String) body.get("estimateId"));
                 });
         plan.setUpdatedAt(LocalDateTime.now());
         budgetPlanRepository.save(plan);
@@ -149,44 +145,7 @@ public class BudgetController {
         return ResponseEntity.ok(Map.of("message", "Expense deleted", "plan", enrichedPlan(plan)));
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // POST add vendor estimate (from vendor-details / hotel-details)
-    // ─────────────────────────────────────────────────────────────
-    @PostMapping("/{customerId}/estimates")
-    public ResponseEntity<?> addEstimate(@PathVariable String customerId, @RequestBody Map<String, Object> body) {
-        BudgetPlan plan = getOrCreate(customerId);
 
-        BudgetPlan.VendorEstimate estimate = new BudgetPlan.VendorEstimate();
-        estimate.setId(UUID.randomUUID().toString());
-        estimate.setVendorId((String) body.getOrDefault("vendorId", ""));
-        estimate.setVendorName((String) body.getOrDefault("vendorName", ""));
-        estimate.setPackageName((String) body.getOrDefault("packageName", ""));
-        estimate.setCategoryName((String) body.getOrDefault("categoryName", ""));
-        estimate.setEstimatedAmount(((Number) body.getOrDefault("estimatedAmount", 0)).doubleValue());
-        estimate.setType((String) body.getOrDefault("type", "vendor"));
-        estimate.setAddedAt(LocalDateTime.now().toLocalDate().toString());
-
-        plan.getEstimates().add(estimate);
-        plan.setUpdatedAt(LocalDateTime.now());
-        budgetPlanRepository.save(plan);
-        return ResponseEntity.ok(Map.of("message", "Estimate added", "plan", enrichedPlan(plan)));
-    }
-
-    // ─────────────────────────────────────────────────────────────
-    // DELETE estimate (unlink from budget; does not delete the booking)
-    // ─────────────────────────────────────────────────────────────
-    @DeleteMapping("/{customerId}/estimates/{estimateId}")
-    public ResponseEntity<?> deleteEstimate(@PathVariable String customerId, @PathVariable String estimateId) {
-        BudgetPlan plan = getOrCreate(customerId);
-        // Also nullify the estimateId link in any expenses that referenced it
-        plan.getExpenses().stream()
-                .filter(e -> estimateId.equals(e.getEstimateId()))
-                .forEach(e -> e.setEstimateId(null));
-        plan.getEstimates().removeIf(e -> estimateId.equals(e.getId()));
-        plan.setUpdatedAt(LocalDateTime.now());
-        budgetPlanRepository.save(plan);
-        return ResponseEntity.ok(Map.of("message", "Estimate removed", "plan", enrichedPlan(plan)));
-    }
 
     // ─────────────────────────────────────────────────────────────
     // BOOKING SYNC: called internally from BookingController
@@ -276,10 +235,6 @@ public class BudgetController {
                     .mapToDouble(BudgetPlan.BudgetExpense::getAmount)
                     .sum();
             double catRemaining = cat.getAllocatedAmount() - catSpent;
-            double catEstimated = plan.getEstimates().stream()
-                    .filter(e -> cat.getCategoryName().equals(e.getCategoryName()))
-                    .mapToDouble(BudgetPlan.VendorEstimate::getEstimatedAmount)
-                    .sum();
             boolean catOver = cat.getAllocatedAmount() > 0 && catSpent > cat.getAllocatedAmount();
 
             Map<String, Object> c = new LinkedHashMap<>();
@@ -288,7 +243,6 @@ public class BudgetController {
             c.put("allocatedAmount", cat.getAllocatedAmount());
             c.put("spentAmount", catSpent);
             c.put("remainingAmount", catRemaining);
-            c.put("estimatedAmount", catEstimated);
             c.put("isOverBudget", catOver);
             c.put("percentUsed", cat.getAllocatedAmount() > 0 ? Math.round((catSpent / cat.getAllocatedAmount()) * 1000.0) / 10.0 : 0);
             return c;
@@ -300,7 +254,6 @@ public class BudgetController {
 
         result.put("categories", enrichedCats);
         result.put("expenses", plan.getExpenses());
-        result.put("estimates", plan.getEstimates());
         return result;
     }
 }

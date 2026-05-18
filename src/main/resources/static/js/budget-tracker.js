@@ -67,7 +67,6 @@ function renderAll() {
   renderDonut();
   renderCategories();
   renderExpenses();
-  renderEstimates();
   renderOverBudgetAlert();
 }
 
@@ -75,7 +74,6 @@ function renderStats() {
   const totalBudget = plan.totalBudget || 0;
   const totalSpent  = plan.totalSpent  || 0;
   const totalRem    = plan.totalRemaining || 0;
-  const totalEst    = (plan.estimates || []).reduce((s, e) => s + e.estimatedAmount, 0);
   const pct = totalBudget > 0 ? Math.round(totalSpent / totalBudget * 100) : 0;
 
   document.getElementById('sTotalBudget').textContent = `Rs. ${totalBudget.toLocaleString()}`;
@@ -84,7 +82,6 @@ function renderStats() {
   const remEl = document.getElementById('sRemaining');
   remEl.textContent = `Rs. ${Math.abs(totalRem).toLocaleString()}${totalRem < 0 ? ' OVER' : ''}`;
   remEl.className = `s-value ${totalRem < 0 ? 'red' : 'green'}`;
-  document.getElementById('sEstimates').textContent = `Rs. ${totalEst.toLocaleString()}`;
 }
 
 function renderOverBudgetAlert() {
@@ -189,8 +186,6 @@ function renderCategories() {
     const icon = catMeta?.icon || 'fa-tag';
     const iconColor = catMeta?.color || '#888';
     const iconBg = catMeta?.colorBg || '#f5f5f5';
-    const estimateForCat = (plan.estimates || []).filter(e => e.categoryName === cat.categoryName);
-    const totalEst = estimateForCat.reduce((s, e) => s + e.estimatedAmount, 0);
     const notAllocated = (cat.allocatedAmount || 0) === 0;
     return `
       <div class="cat-card ${overClass}">
@@ -221,7 +216,6 @@ function renderCategories() {
           <span>${pct}% used</span>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             ${cat.isOverBudget ? '<span class="over-tag"><i class="fa-solid fa-triangle-exclamation me-1"></i>Over budget</span>' : ''}
-            ${totalEst > 0 ? `<span class="estimate-tag"><i class="fa-solid fa-file-invoice-dollar me-1"></i>Est: Rs. ${totalEst.toLocaleString()}</span>` : ''}
             ${notAllocated ? '<span style="font-size:10px;color:#b8963e;"><i class="fa-solid fa-circle-info me-1"></i>Not allocated — <a href="budget-calculator.html" style="color:#b8963e;">Edit Setup</a></span>' : ''}
           </div>
         </div>
@@ -249,32 +243,7 @@ function renderExpenses() {
     </tr>`).join('');
 }
 
-function renderEstimates() {
-  const container = document.getElementById('estimatesList');
-  const ests = plan.estimates || [];
-  if (ests.length === 0) {
-    container.innerHTML = '<p class="text-muted text-center small py-2">No vendor estimates added yet.<br>Select a package from a vendor or hotel page.</p>';
-    return;
-  }
-  container.innerHTML = ests.map(est => {
-    const paidSoFar = (plan.expenses || [])
-      .filter(e => e.estimateId === est.id)
-      .reduce((s, e) => s + e.amount, 0);
-    const leftOnEst = Math.max(0, est.estimatedAmount - paidSoFar);
-    return `
-      <div class="est-row">
-        <div class="est-info">
-          <div class="est-name">${est.vendorName}</div>
-          <div class="est-meta">${est.packageName} • ${est.categoryName}</div>
-          ${paidSoFar > 0 ? `<div style="font-size:11px; color:#27ae60; margin-top:3px;"><i class="fa-solid fa-circle-check me-1"></i>Paid: Rs. ${paidSoFar.toLocaleString()} / Left: Rs. ${leftOnEst.toLocaleString()}</div>` : ''}
-        </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div class="est-amount">Rs. ${est.estimatedAmount.toLocaleString()}</div>
-          <button class="btn-del" onclick="removeEstimate('${est.id}')" title="Remove estimate"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-      </div>`;
-  }).join('');
-}
+
 
 // ─── EXPENSE MODAL ───────────────────────────────────────────────────────────
 function openAddExpense() {
@@ -304,12 +273,7 @@ function populateCategorySelect(selected) {
   sel.innerHTML = cats.map(c => `<option value="${c}" ${c === selected ? 'selected' : ''}>${c}</option>`).join('');
 }
 
-function populateEstimateSelect(selectedId) {
-  const sel = document.getElementById('expEstimate');
-  const ests = plan.estimates || [];
-  sel.innerHTML = '<option value="">None</option>' +
-    ests.map(e => `<option value="${e.id}" ${e.id === selectedId ? 'selected' : ''}>${e.vendorName} — ${e.packageName}</option>`).join('');
-}
+
 
 async function saveExpense() {
   const id       = document.getElementById('editExpenseId').value;
@@ -317,11 +281,10 @@ async function saveExpense() {
   const desc     = document.getElementById('expDesc').value.trim();
   const amount   = parseFloat(document.getElementById('expAmt').value);
   const date     = document.getElementById('expDate').value;
-  const estId    = document.getElementById('expEstimate').value || null;
 
   if (!desc || amount <= 0) { showToast('Fill in all required fields.', 'error'); return; }
 
-  const payload = { categoryName: category, description: desc, amount, date, estimateId: estId };
+  const payload = { categoryName: category, description: desc, amount, date };
   showLoading(true);
   try {
     const url = id
@@ -351,26 +314,13 @@ async function deleteExpense(id) {
   showLoading(false);
 }
 
-// ─── ESTIMATES ────────────────────────────────────────────────────────────────
-async function removeEstimate(id) {
-  if (!confirm('Remove this vendor estimate from your budget view?')) return;
-  showLoading(true);
-  try {
-    const res = await fetch(`/api/budget/${customerId}/estimates/${id}`, { method: 'DELETE' });
-    const data = await res.json();
-    plan = data.plan;
-    renderAll();
-    showToast('Estimate removed.', 'success');
-  } catch(e) { showToast('Error removing estimate.', 'error'); }
-  showLoading(false);
-}
+
 
 // ─── FULL SUMMARY MODAL ───────────────────────────────────────────────────────
 function showSummaryModal() {
   const body = document.getElementById('summaryBody');
   const totalBudget = plan.totalBudget || 0;
   const totalSpent  = plan.totalSpent  || 0;
-  const totalEst    = (plan.estimates || []).reduce((s, e) => s + e.estimatedAmount, 0);
 
   let html = `
     <div style="background:linear-gradient(135deg,#1a1a1a,#2d2d2d); color:white; border-radius:16px; padding:20px 24px; margin-bottom:20px;">
@@ -408,46 +358,13 @@ function showSummaryModal() {
       </div>`;
   });
 
-  if ((plan.estimates || []).length > 0) {
-    html += `<h6 style="font-weight:700; font-size:14px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin:20px 0 14px;">Vendor Estimates (Committed)</h6>`;
-    (plan.estimates || []).forEach(est => {
-      const paidSoFar = (plan.expenses || []).filter(e => e.estimateId === est.id).reduce((s, e) => s + e.amount, 0);
-      html += `
-        <div class="summary-item">
-          <div class="si-icon"><i class="fa-solid fa-handshake"></i></div>
-          <div class="si-info">
-            <div class="si-name">${est.vendorName}</div>
-            <div class="si-meta">${est.packageName} • ${est.categoryName} • Paid so far: Rs. ${paidSoFar.toLocaleString()}</div>
-          </div>
-          <div class="si-price">Rs. ${est.estimatedAmount.toLocaleString()}</div>
-        </div>`;
-    });
-    html += `<div style="text-align:right; margin-top:12px; font-weight:700; color:var(--gold);">Total Committed: Rs. ${totalEst.toLocaleString()}</div>`;
-  }
+
 
   body.innerHTML = html;
   new bootstrap.Modal(document.getElementById('summaryModal')).show();
 }
 
-// ─── GLOBAL: Add estimate from vendor/hotel page ──────────────────────────────
-window.BudgetPlanner = {
-  addEstimate: async function(vendorId, vendorName, packageName, categoryName, estimatedAmount, type) {
-    const userStr = sessionStorage.getItem('dreamWeddingUser');
-    if (!userStr) return;
-    const user = JSON.parse(userStr);
-    if (user.role !== 'CUSTOMER') return;
 
-    try {
-      const res = await fetch(`/api/budget/${user.id}/estimates`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vendorId, vendorName, packageName, categoryName, estimatedAmount, type })
-      });
-      if (res.ok) return true;
-    } catch(e) { console.error(e); }
-    return false;
-  }
-};
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 function showToast(msg, type = 'success') {

@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * OOP CONCEPT: ENCAPSULATION & DATA MODELING
  * BudgetPlan is the master document for a customer's wedding budget.
- * It holds the total budget, category allocations, expenses, and vendor estimates.
+ * It holds the total budget, category allocations, and expenses.
  */
 @Getter
 @Setter
@@ -40,8 +40,6 @@ public class BudgetPlan {
     /** All logged expense entries */
     private List<BudgetExpense> expenses = new ArrayList<>();
 
-    /** Vendor/hotel estimates added from booking pages (projections, not actual spend) */
-    private List<VendorEstimate> estimates = new ArrayList<>();
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
@@ -97,27 +95,7 @@ public class BudgetPlan {
         private String description;
         @Positive(message = "Expense amount must be greater than 0")
         private double amount;
-        private String estimateId;          // optional link to a VendorEstimate
         private String bookingId;           // link to a Booking (auto-synced)
         private String date;                // ISO date string
-    }
-
-    // ───────────────────────────────────────────────
-    // Nested: Vendor Estimate (projection / forecast)
-    // ───────────────────────────────────────────────
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class VendorEstimate {
-        private String id;
-        private String vendorId;
-        private String vendorName;
-        private String packageName;
-        private String categoryName;
-        private double estimatedAmount;
-        private String type;               // "vendor" or "hotel"
-        private String addedAt;
     }
 }
