@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - DreamWedding</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f8f5f0; }
+    .sidebar { background: #fff; border-radius: 16px; padding: 1.5rem 1rem; box-shadow: 0 2px 15px rgba(0,0,0,0.08); position: sticky; top: 80px; }
+    .sidebar .nav-link { border-radius: 10px; color: #555; font-weight: 500; padding: 0.75rem 1rem; margin-bottom: 4px; }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #fdf4e7; color: #b8963e; }
+    .card { border-radius: 14px; border: none; box-shadow: 0 2px 15px rgba(0,0,0,0.07); }
+    .stat-icon { font-size: 2rem; opacity: 0.8; }
+    .navbar-brand { font-family: 'Playfair Display', serif; color: #b8963e !important; font-size: 1.4rem; }
+    .table-sm td, .table-sm th { vertical-align: middle; }
+    .badge-pending { background: #fff3cd; color: #856404; }
+    .badge-confirmed { background: #d1e7dd; color: #0f5132; }
+    .badge-rejected { background: #f8d7da; color: #842029; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg bg-white sticky-top shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">DreamWedding Admin</a>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-danger">ADMIN</span>
+      <a href="#" onclick="logoutUser()" class="btn btn-sm btn-outline-danger ms-2"><i class="fa-solid fa-right-from-bracket me-1"></i>Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid my-4">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-2 mb-4">
+      <div class="sidebar">
+        <ul class="nav flex-column">
+          <li class="nav-item"><a class="nav-link active" onclick="showTab('overview')" href="#"><i class="fa-solid fa-gauge me-2"></i>Overview</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="showTab('vendors')" href="#"><i class="fa-solid fa-store me-2"></i>Vendors</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="showTab('hotels')" href="#"><i class="fa-solid fa-hotel me-2"></i>Hotels</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="showTab('customers')" href="#"><i class="fa-solid fa-users me-2"></i>Customers</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="showTab('bookings')" href="#"><i class="fa-solid fa-calendar-check me-2"></i>Bookings</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="showTab('promotions')" href="#"><i class="fa-solid fa-bullhorn me-2"></i>Promotions</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="showTab('reviews')" href="#"><i class="fa-solid fa-star me-2"></i>Reviews</a></li>
+          <li class="nav-item"><a class="nav-link" onclick="showTab('settings')" href="#"><i class="fa-solid fa-gear me-2"></i>Site Settings</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-10">
+
+      <!-- Overview -->
+      <div id="tab-overview">
+        <h3 class="fw-bold mb-4">Platform Overview</h3>
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <div class="card p-4 text-center">
+              <i class="stat-icon fa-solid fa-store text-primary mb-2"></i>
+              <div class="fw-bold fs-2" id="total-vendors">-</div>
+              <small class="text-muted">Total Vendors</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card p-4 text-center">
+              <i class="stat-icon fa-solid fa-hotel text-success mb-2"></i>
+              <div class="fw-bold fs-2" id="total-hotels">-</div>
+              <small class="text-muted">Total Hotels</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card p-4 text-center">
+              <i class="stat-icon fa-solid fa-users text-warning mb-2"></i>
+              <div class="fw-bold fs-2" id="total-customers">-</div>
+              <small class="text-muted">Customers</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card p-4 text-center">
+              <i class="stat-icon fa-solid fa-calendar-check text-danger mb-2"></i>
+              <div class="fw-bold fs-2" id="total-bookings">-</div>
+              <small class="text-muted">Total Bookings</small>
+            </div>
+          </div>
+        </div>
+        <div class="card p-4">
+          <h5 class="fw-bold mb-3">Global Booking Calendar</h5>
+          <input type="text" id="adminCalendar" class="d-none">
+          <div class="d-flex gap-3 mt-3">
+            <span><i class="fa-solid fa-circle text-success me-1"></i>Confirmed</span>
+            <span><i class="fa-solid fa-circle text-warning me-1"></i>Pending</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vendors Tab -->
+      <div id="tab-vendors" style="display:none;">
+        <h3 class="fw-bold mb-4">Registered Vendors</h3>
+        <div id="vendorsTable"><div class="text-center py-5"><i class="fa-solid fa-spinner fa-spin fs-3 text-muted"></i></div></div>
+      </div>
+
+      <!-- Hotels Tab -->
+      <div id="tab-hotels" style="display:none;">
+        <h3 class="fw-bold mb-4">Registered Hotels</h3>
+        <div id="hotelsTable"><div class="text-center py-5"><i class="fa-solid fa-spinner fa-spin fs-3 text-muted"></i></div></div>
+      </div>
+
+      <!-- Customers Tab -->
+      <div id="tab-customers" style="display:none;">
+        <h3 class="fw-bold mb-4">Registered Customers</h3>
+        <div id="customersTable"><div class="text-center py-5"><i class="fa-solid fa-spinner fa-spin fs-3 text-muted"></i></div></div>
+      </div>
+
+      <!-- Bookings Tab -->
+      <div id="tab-bookings" style="display:none;">
+        <h3 class="fw-bold mb-4">All Bookings</h3>
+        <div id="allBookingsContainer"><div class="text-center py-5"><i class="fa-solid fa-spinner fa-spin fs-3 text-muted"></i></div></div>
+      </div>
+
+      <!-- Promotions Tab -->
+      <div id="tab-promotions" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="fw-bold mb-0">Promotions Management</h3>
+          <button class="btn btn-custom" onclick="openPromoModal()"><i class="fa-solid fa-plus me-2"></i>Create New Promotion</button>
+        </div>
+        <div id="promotionsContainer"><div class="text-center py-5"><i class="fa-solid fa-spinner fa-spin fs-3 text-muted"></i></div></div>
+      </div>
+
+      <!-- Reviews Tab -->
+      <div id="tab-reviews" style="display:none;">
+        <h3 class="fw-bold mb-4">Reviews Moderation</h3>
+        <div id="adminReviewsContainer"><div class="text-center py-5"><i class="fa-solid fa-spinner fa-spin fs-3 text-muted"></i></div></div>
+      </div>
+
+      <!-- Site Settings Tab -->
+      <div id="tab-settings" style="display:none;">
+        <h3 class="fw-bold mb-4">Site Settings</h3>
+        <div class="card p-4">
+          <form id="settingsForm">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">Contact Phone</label>
+                <input type="text" class="form-control" id="s-phone">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">Contact Email</label>
+                <input type="email" class="form-control" id="s-email">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">Facebook URL</label>
+                <input type="url" class="form-control" id="s-facebook">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">Instagram URL</label>
+                <input type="url" class="form-control" id="s-instagram">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">WhatsApp Number</label>
+                <input type="text" class="form-control" id="s-whatsapp">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small">Business Address</label>
+                <input type="text" class="form-control" id="s-address">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-custom mt-4 px-4">Save Site Settings</button>
+            <div id="settingsMsg" class="mt-3"></div>
+          </form>
+          
+          <hr class="my-5">
+          <h5 class="fw-bold text-danger">Danger Zone</h5>
+          <p class="text-muted small">Delete your administrator account. This will completely remove your access to the platform administration. Please be extremely careful.</p>
+          <button type="button" class="btn btn-outline-danger px-4" data-bs-toggle="modal" data-bs-target="#deleteProfileModal">Delete Admin Account</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Promotion Modal -->
+<div class="modal fade" id="promoModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 rounded-4 shadow-lg">
+      <div class="modal-header bg-dark text-white rounded-top-4">
+        <h5 class="modal-title fw-bold" id="promoModalTitle">Create Promotion</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form id="promoForm">
+          <input type="hidden" id="p-id">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-bold small">Promotion Title</label>
+              <input type="text" class="form-control" id="p-title" placeholder="e.g. Early Bird Wedding Hall Offer" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small">Category</label>
+              <select class="form-select" id="p-category" required>
+                <option value="" selected disabled>Select Category</option>
+                <option value="Hotels">Hotels</option>
+                <option value="Photography">Photography</option>
+                <option value="Jewellery and Attire">Jewellery and Attire</option>
+                <option value="Florist">Florist</option>
+                <option value="Gifts">Gifts</option>
+                <option value="Wedding music and dancing">Wedding music and dancing</option>
+                <option value="Food and catering">Food and catering</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small">Discount / Offer Label</label>
+              <input type="text" class="form-control" id="p-discount" placeholder="e.g. 20% OFF or FREE BRIDAL BOUQUET" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small">Button Text</label>
+              <input type="text" class="form-control" id="p-btn-text" placeholder="e.g. Book Now, View Packages" required>
+            </div>
+            <div class="col-md-12 position-relative">
+              <label class="form-label fw-bold small">Vendor / Hotel Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="p-vendor" autocomplete="off"
+                     placeholder="Start typing to find a vendor or hotel..." required
+                     oninput="filterBusinessSuggestions(this.value)">
+              <input type="hidden" id="p-target-id">
+              <input type="hidden" id="p-target-type">
+              <div id="businessSuggestionsDropdown"
+                   style="display:none; position:absolute; z-index:1055; background:#fff;
+                          border:1px solid #dee2e6; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.1);
+                          max-height:200px; overflow-y:auto; width:calc(100% - 24px); top:68px; left:12px;">
+              </div>
+              <div id="p-vendor-error" class="text-danger small mt-1" style="display:none;">Please select a valid vendor or hotel from the list.</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-bold small">Short Description</label>
+              <textarea class="form-control" id="p-description" rows="2" placeholder="Describe the offer details..."></textarea>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small">Start Date</label>
+              <input type="date" class="form-control" id="p-start" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-bold small">End Date</label>
+              <input type="date" class="form-control" id="p-end" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-bold small">Banner Image (Optional)</label>
+              <input type="file" class="form-control" id="p-image" accept="image/*">
+              <div id="p-image-preview" class="mt-2" style="max-height: 100px; display: none;">
+                <img src="" class="img-fluid rounded border" style="max-height: 100px;">
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-custom flex-grow-1 py-3 fw-bold">Save Promotion</button>
+            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  async function logoutUser() {
+    const userStr = sessionStorage.getItem('dreamWeddingUser');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: user.id, email: user.email, role: user.role })
+        });
+      } catch(e) {}
+    }
+    sessionStorage.removeItem('dreamWeddingUser');
+    window.location.href = 'login.html';
+  }
+
+  function showTab(name) {
+    ['overview','vendors','hotels','customers','bookings','promotions','reviews','settings'].forEach(t => {
+      document.getElementById('tab-' + t).style.display = 'none';
+    });
+    document.getElementById('tab-' + name).style.display = 'block';
+    
+    document.querySelectorAll('.sidebar .nav-link').forEach(l => {
+      l.classList.remove('active');
+      if(l.getAttribute('onclick') && l.getAttribute('onclick').includes(name)) {
+         l.classList.add('active');
+      }
+    });
+
+    if (name === 'vendors') loadVendors();
+    if (name === 'hotels') loadHotels();
+    if (name === 'customers') loadCustomers();
+    if (name === 'bookings') loadAllBookings();
+    if (name === 'promotions') loadPromotions();
+    if (name === 'reviews') loadAdminReviews();
+    if (name === 'settings') loadSettings();
+  }
+
+  function badgeHtml(status) {
+    const map = { PENDING:'badge-pending', CONFIRMED:'badge-confirmed', REJECTED:'badge-rejected', COMPLETED:'badge-completed' };
+    return `<span class="badge ${map[status]||'bg-secondary'}">${status}</span>`;
+  }
+
+  async function loadVendors() {
+    const el = document.getElementById('vendorsTable');
+    const data = await fetch('/api/admin/vendors').then(r=>r.json());
+    if (!data.length) { el.innerHTML = '<p class="text-muted">No vendors registered yet.</p>'; return; }
+    el.innerHTML = `<div class="card"><div class="table-responsive"><table class="table table-sm table-hover mb-0">
+      <thead class="table-light"><tr><th>Name</th><th>Email</th><th>Category</th><th>Location</th><th>Profile</th><th></th></tr></thead>
+      <tbody>${data.map(v=>`<tr>
+        <td class="fw-bold">${v.businessName||'-'}</td>
+        <td>${v.email||'-'}</td>
+        <td>${v.category||'-'}</td>
+        <td>${v.location||'-'}</td>
+        <td><span class="badge ${v.profileCompleted?'bg-success':'bg-secondary'}">${v.profileCompleted?'Complete':'Pending'}</span></td>
+        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteVendor('${v.id}')"><i class="fa-solid fa-trash"></i></button></td>
+      </tr>`).join('')}</tbody>
+    </table></div></div>`;
+  }
+
+  async function loadHotels() {
+    const el = document.getElementById('hotelsTable');
+    const data = await fetch('/api/admin/hotels').then(r=>r.json());
+    if (!data.length) { el.innerHTML = '<p class="text-muted">No hotels registered yet.</p>'; return; }
+    el.innerHTML = `<div class="card"><div class="table-responsive"><table class="table table-sm table-hover mb-0">
+      <thead class="table-light"><tr><th>Hotel Name</th><th>Email</th><th>Location</th><th>Profile</th><th></th></tr></thead>
+      <tbody>${data.map(h=>`<tr>
+        <td class="fw-bold">${h.hotelName||'-'}</td>
+        <td>${h.email||'-'}</td>
+        <td>${h.location||'-'}</td>
+        <td><span class="badge ${h.profileCompleted?'bg-success':'bg-secondary'}">${h.profileCompleted?'Complete':'Pending'}</span></td>
+        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteHotel('${h.id}')"><i class="fa-solid fa-trash"></i></button></td>
+      </tr>`).join('')}</tbody>
+    </table></div></div>`;
+  }
+
+  async function loadCustomers() {
+    const el = document.getElementById('customersTable');
+    const data = await fetch('/api/admin/customers').then(r=>r.json());
+    if (!data.length) { el.innerHTML = '<p class="text-muted">No customers registered yet.</p>'; return; }
+    el.innerHTML = `<div class="card"><div class="table-responsive"><table class="table table-sm table-hover mb-0">
+      <thead class="table-light"><tr><th>Name</th><th>Email</th><th></th></tr></thead>
+      <tbody>${data.map(c=>`<tr>
+        <td class="fw-bold">${c.firstName||''} ${c.lastName||''}</td>
+        <td>${c.email||'-'}</td>
+        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteCustomer('${c.id}')"><i class="fa-solid fa-trash"></i></button></td>
+      </tr>`).join('')}</tbody>
+    </table></div></div>`;
+  }
+
+  async function loadAllBookings() {
+    const el = document.getElementById('allBookingsContainer');
+    const data = await fetch('/api/bookings').then(r=>r.json());
+    if (!data.length) { el.innerHTML = '<p class="text-muted">No bookings yet.</p>'; return; }
+    el.innerHTML = `<div class="card"><div class="table-responsive"><table class="table table-sm table-hover mb-0">
+      <thead class="table-light"><tr><th>Vendor</th><th>Date</th><th>Package</th><th>Guests</th><th>Status</th><th></th></tr></thead>
+      <tbody>${data.map(b=>`<tr>
+        <td>${b.vendorName||b.vendorId?.slice(-6)}</td>
+        <td>${b.eventDate||'-'}</td>
+        <td>${b.packageName||'-'}</td>
+        <td>${b.guestCount||'-'}</td>
+        <td>${badgeHtml(b.status)}</td>
+        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteBookingAdmin('${b.id}')"><i class="fa-solid fa-trash"></i></button></td>
+      </tr>`).join('')}</tbody>
+    </table></div></div>`;
+  }
+
+  async function loadPromotions() {
+    const el = document.getElementById('promotionsContainer');
+    const data = await fetch('/api/promotions').then(r=>r.json());
+    if (!data.length) { el.innerHTML = '<div class="card p-5 text-center text-muted"><i class="fa-solid fa-tag fs-1 mb-3"></i><h5>No promotions yet.</h5><p>Click "Create New Promotion" to start.</p></div>'; return; }
+    el.innerHTML = data.map(p => `
+      <div class="card p-3 mb-3 border-start border-4 ${p.status==='APPROVED'?'border-success':'border-warning'}">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="d-flex gap-3">
+            ${p.imageBase64 ? `<img src="${p.imageBase64}" style="width:80px; height:60px; object-fit:cover; border-radius:8px;">` : `<div style="width:80px; height:60px; background:#eee; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-image text-muted"></i></div>`}
+            <div>
+              <h5 class="fw-bold mb-1">${p.title}</h5>
+              <p class="text-muted small mb-1">${p.description || ''}</p>
+              <div class="d-flex gap-3 text-muted small">
+                <span><i class="fa-solid fa-tag me-1"></i>${p.discountDetails}</span>
+                <span><i class="fa-solid fa-calendar me-1"></i>${p.startDate} → ${p.endDate}</span>
+              </div>
+              <p class="text-muted small mb-0 mt-1">Linked: <span class="fw-bold">${p.submitterName || 'N/A'}</span>
+                ${ p.targetId && p.targetType ? `<a href="${p.targetType === 'HOTEL' ? 'hotel-details.html' : 'vendor-details.html'}?id=${p.targetId}" target="_blank" class="btn btn-sm btn-outline-primary ms-2 py-0 px-2" style="font-size:11px;"><i class="fa-solid fa-arrow-up-right-from-square me-1"></i>View</a>` : '' }
+              </p>
+            </div>
+          </div>
+          <div class="text-end">
+            <span class="badge ${p.status==='APPROVED'?'bg-success text-white':'bg-warning text-dark'} mb-2 d-block">${p.status}</span>
+            <div class="btn-group">
+              ${p.status==='PENDING' ? `<button class="btn btn-sm btn-success" onclick="approvePromotion('${p.id}')" title="Approve"><i class="fa-solid fa-check"></i></button>` : ''}
+              <button class="btn btn-sm btn-outline-primary" onclick="editPromo('${p.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="deletePromotion('${p.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  let promoList = [];
+  // Store all business entities loaded from backend
+  let businessEntities = [];
+
+  function openPromoModal(id = null) {
+    const form = document.getElementById('promoForm');
+    form.reset();
+    document.getElementById('p-id').value = '';
+    document.getElementById('p-target-id').value = '';
+    document.getElementById('p-target-type').value = '';
+    document.getElementById('p-image-preview').style.display = 'none';
+    document.getElementById('promoModalTitle').textContent = id ? 'Edit Promotion' : 'Create Promotion';
+    document.getElementById('p-vendor-error').style.display = 'none';
+    document.getElementById('businessSuggestionsDropdown').style.display = 'none';
+    
+    if(id) {
+      fetch('/api/promotions').then(r=>r.json()).then(data => {
+        const p = data.find(x => x.id === id);
+        if(p) {
+          document.getElementById('p-id').value = p.id;
+          document.getElementById('p-title').value = p.title;
+          document.getElementById('p-discount').value = p.discountDetails;
+          document.getElementById('p-category').value = p.category || '';
+          document.getElementById('p-btn-text').value = p.buttonText || '';
+          document.getElementById('p-vendor').value = p.submitterName || '';
+          document.getElementById('p-target-id').value = p.targetId || '';
+          document.getElementById('p-target-type').value = p.targetType || '';
+          document.getElementById('p-description').value = p.description || '';
+          document.getElementById('p-start').value = p.startDate;
+          document.getElementById('p-end').value = p.endDate;
+          if(p.imageBase64) {
+            document.getElementById('p-image-preview').style.display = 'block';
+            document.getElementById('p-image-preview').querySelector('img').src = p.imageBase64;
+          }
+        }
+      });
+    }
+    new bootstrap.Modal(document.getElementById('promoModal')).show();
+  }
+
+  // Handle image preview
+  document.getElementById('p-image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('p-image-preview').style.display = 'block';
+        document.getElementById('p-image-preview').querySelector('img').src = e.target.result;
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+
+  async function editPromo(id) {
+    openPromoModal(id);
+  }
+
+  // ─── Autocomplete Logic ──────────────────────────────────────────
+  function filterBusinessSuggestions(query) {
+    const dropdown = document.getElementById('businessSuggestionsDropdown');
+    const errEl    = document.getElementById('p-vendor-error');
+
+    // Clear hidden fields — user is typing a new value
+    document.getElementById('p-target-id').value   = '';
+    document.getElementById('p-target-type').value = '';
+    errEl.style.display = 'none';
+
+    if (!query || query.trim().length < 1) { dropdown.style.display = 'none'; return; }
+    const q = query.toLowerCase();
+    const matches = businessEntities.filter(e => e.name.toLowerCase().includes(q));
+    if (!matches.length) { dropdown.style.display = 'none'; return; }
+
+    dropdown.innerHTML = matches.map(e => `
+      <div style="padding:10px 14px; cursor:pointer; border-bottom:1px solid #f0f0f0;
+                  display:flex; align-items:center; justify-content:space-between;"
+           onmousedown="selectBusinessEntity('${e.id}','${e.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${e.type}','${(e.category||'').replace(/'/g,"\\'")}')">
+        <span>${e.name}</span>
+        <div class="d-flex align-items-center gap-2">
+          ${e.category ? `<small class="text-muted" style="font-size:11px;">${e.category}</small>` : ''}
+          <span class="badge ${e.type === 'HOTEL' ? 'bg-primary' : 'bg-success'}" style="font-size:10px;">${e.type}</span>
+        </div>
+      </div>`).join('');
+    dropdown.style.display = 'block';
+  }
+
+  function selectBusinessEntity(id, name, type, category) {
+    document.getElementById('p-vendor').value       = name;
+    document.getElementById('p-target-id').value    = id;
+    document.getElementById('p-target-type').value  = type;
+    document.getElementById('businessSuggestionsDropdown').style.display = 'none';
+    document.getElementById('p-vendor-error').style.display = 'none';
+
+    // Auto-fill the category dropdown if the entity has a known category
+    if (category) {
+      const catSelect = document.getElementById('p-category');
+      // Check if the option exists in the select; if so, set it
+      const matchingOption = Array.from(catSelect.options).find(opt => opt.value === category);
+      if (matchingOption) {
+        catSelect.value = category;
+      }
+    }
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#p-vendor') && !e.target.closest('#businessSuggestionsDropdown')) {
+      document.getElementById('businessSuggestionsDropdown').style.display = 'none';
+    }
+  });
+
+  document.getElementById('promoForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Validate that the admin selected an entity from the list (not just typed a name)
+    const targetId   = document.getElementById('p-target-id').value;
+    const targetType = document.getElementById('p-target-type').value;
+    const startDate  = document.getElementById('p-start').value;
+    const endDate    = document.getElementById('p-end').value;
+    const errEl      = document.getElementById('p-vendor-error');
+
+    if (!targetId || !targetType) {
+      errEl.style.display = 'block';
+      document.getElementById('p-vendor').focus();
+      return;
+    }
+    if (startDate && endDate && endDate < startDate) {
+      alert('End date must be on or after the start date.');
+      return;
+    }
+
+    const id   = document.getElementById('p-id').value;
+    const file = document.getElementById('p-image').files[0];
+    let imageBase64 = null;
+    if(file) {
+      imageBase64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    } else if(id) {
+      const currentPreview = document.getElementById('p-image-preview').querySelector('img').src;
+      if(currentPreview.startsWith('data:image')) imageBase64 = currentPreview;
+    }
+
+    const payload = {
+      title:          document.getElementById('p-title').value.trim(),
+      discountDetails:document.getElementById('p-discount').value.trim(),
+      category:       document.getElementById('p-category').value,
+      buttonText:     document.getElementById('p-btn-text').value.trim(),
+      submitterName:  document.getElementById('p-vendor').value.trim(),
+      targetId:       targetId,
+      targetType:     targetType,
+      description:    document.getElementById('p-description').value.trim(),
+      startDate:      startDate,
+      endDate:        endDate,
+      imageBase64:    imageBase64,
+      status:         'APPROVED'
+    };
+
+    const url    = id ? `/api/promotions/${id}` : '/api/promotions/admin';
+    const method = id ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) { alert('Failed to save promotion. Please check all required fields.'); return; }
+
+    // Use Bootstrap's hidden event so list refreshes AFTER the modal fully closes
+    const modalEl = document.getElementById('promoModal');
+    modalEl.addEventListener('hidden.bs.modal', () => loadPromotions(), { once: true });
+    bootstrap.Modal.getInstance(modalEl).hide();
+  });
+
+  async function loadSettings() {
+    try {
+      const data = await fetch('/api/site-settings').then(r=>r.json());
+      document.getElementById('s-phone').value = data.phone||'';
+      document.getElementById('s-email').value = data.email||'';
+      document.getElementById('s-facebook').value = data.facebook||'';
+      document.getElementById('s-instagram').value = data.instagram||'';
+      document.getElementById('s-whatsapp').value = data.whatsapp||'';
+      document.getElementById('s-address').value = data.address||'';
+    } catch(e){}
+  }
+
+  async function loadAdminReviews() {
+    const el = document.getElementById('adminReviewsContainer');
+    try {
+      const data = await fetch('/api/reviews/all').then(r=>r.json());
+      if(!data.length) {
+         el.innerHTML = '<div class="card p-5 text-center text-muted"><i class="fa-solid fa-star fs-1 mb-3"></i><h5>No reviews found.</h5></div>';
+         return;
+      }
+      el.innerHTML = `<div class="card"><div class="table-responsive"><table class="table table-sm table-hover mb-0 align-middle">
+        <thead class="table-light"><tr><th>Type</th><th>Reviewer</th><th>Rating</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${data.map(r=>`<tr>
+          <td><span class="badge bg-secondary">${r.type}</span></td>
+          <td class="fw-bold">${r.reviewerName}</td>
+          <td>${r.rating} <i class="fa-solid fa-star text-warning small"></i></td>
+          <td class="text-truncate" style="max-width: 250px;" title="${r.reviewMessage}"><strong>${r.reviewTitle||r.experienceCategory||''}</strong><br>${r.reviewMessage}</td>
+          <td><span class="badge ${r.status==='APPROVED'?'bg-success':r.status==='PENDING'?'bg-warning text-dark':'bg-danger'}">${r.status}</span></td>
+          <td>
+            <div class="btn-group">
+              ${r.status!=='APPROVED' ? `<button class="btn btn-sm btn-success" onclick="updateReviewStatus('${r.id}', 'APPROVED')" title="Approve"><i class="fa-solid fa-check"></i></button>` : ''}
+              ${r.status!=='REJECTED' ? `<button class="btn btn-sm btn-danger" onclick="updateReviewStatus('${r.id}', 'REJECTED')" title="Reject"><i class="fa-solid fa-x"></i></button>` : ''}
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteReviewAdmin('${r.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>`).join('')}</tbody>
+      </table></div></div>`;
+    } catch(e) {
+      el.innerHTML = '<div class="alert alert-danger">Error loading reviews</div>';
+    }
+  }
+
+  async function updateReviewStatus(id, status) {
+    try {
+       await fetch(`/api/reviews/${id}/status`, {
+           method: 'PUT',
+           headers: {'Content-Type': 'application/json'},
+           body: JSON.stringify({status: status})
+       });
+       loadAdminReviews();
+    } catch(e) { alert('Error updating status'); }
+  }
+
+  async function deleteReviewAdmin(id) {
+    if(!confirm('Are you sure you want to permanently delete this review?')) return;
+    try {
+       await fetch(`/api/reviews/${id}`, { method: 'DELETE' });
+       loadAdminReviews();
+    } catch(e) { alert('Error deleting review'); }
+  }
+
+  async function deleteVendor(id) {
+    if(!confirm('Delete this vendor?')) return;
+    await fetch(`/api/admin/vendors/${id}`, {method:'DELETE'});
+    if(typeof logActivity === 'function') await logActivity('DELETE_VENDOR', 'ADMIN');
+    loadVendors();
+  }
+  async function deleteHotel(id) {
+    if(!confirm('Delete this hotel?')) return;
+    await fetch(`/api/admin/hotels/${id}`, {method:'DELETE'});
+    if(typeof logActivity === 'function') await logActivity('DELETE_HOTEL', 'ADMIN');
+    loadHotels();
+  }
+  async function deleteCustomer(id) {
+    if(!confirm('Delete this customer?')) return;
+    await fetch(`/api/admin/customers/${id}`, {method:'DELETE'});
+    if(typeof logActivity === 'function') await logActivity('DELETE_CUSTOMER', 'ADMIN');
+    loadCustomers();
+  }
+  async function deleteBookingAdmin(id) {
+    if(!confirm('Delete this booking?')) return;
+    await fetch(`/api/admin/bookings/${id}`, {method:'DELETE'});
+    loadAllBookings();
+  }
+  async function approvePromotion(id) {
+    await fetch(`/api/promotions/${id}/approve`, {method:'PUT'});
+    if(typeof logActivity === 'function') await logActivity('APPROVE_PROMOTION', 'ADMIN');
+    loadPromotions();
+  }
+  async function deletePromotion(id) {
+    if(!confirm('Delete this promotion?')) return;
+    await fetch(`/api/promotions/${id}`, {method:'DELETE'});
+    if(typeof logActivity === 'function') await logActivity('DELETE_PROMOTION', 'ADMIN');
+    loadPromotions();
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const userStr = sessionStorage.getItem('dreamWeddingUser');
+    if (!userStr) { window.location.href = 'login.html'; return; }
+    const user = JSON.parse(userStr);
+    if (user.role !== 'ADMIN') { window.location.href = 'login.html'; return; }
+
+    // Load stats
+    try {
+      const stats = await fetch('/api/admin/stats').then(r=>r.json());
+      document.getElementById('total-vendors').textContent = stats.totalVendors||0;
+      document.getElementById('total-hotels').textContent = stats.totalHotels||0;
+      document.getElementById('total-customers').textContent = stats.totalCustomers||0;
+      document.getElementById('total-bookings').textContent = stats.totalBookings||0;
+    } catch(e){}
+
+    // Global calendar
+    try {
+      const bookings = await fetch('/api/bookings').then(r=>r.json());
+      const confirmedDates = bookings.filter(b=>b.status==='CONFIRMED').map(b=>b.eventDate);
+      const pendingDates = bookings.filter(b=>b.status==='PENDING').map(b=>b.eventDate);
+      flatpickr('#adminCalendar', {
+        inline: true,
+        onDayCreate(dObj, dStr, fp, dayElem) {
+          const d = dayElem.dateObj;
+          const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+          if (confirmedDates.includes(ds)) dayElem.style.background = '#d1e7dd';
+          if (pendingDates.includes(ds)) dayElem.style.background = '#fff3cd';
+        }
+      });
+    } catch(e){}
+
+    // Settings form submit
+    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        phone: document.getElementById('s-phone').value,
+        email: document.getElementById('s-email').value,
+        facebook: document.getElementById('s-facebook').value,
+        instagram: document.getElementById('s-instagram').value,
+        whatsapp: document.getElementById('s-whatsapp').value,
+        address: document.getElementById('s-address').value
+      };
+      await fetch('/api/site-settings', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      document.getElementById('settingsMsg').innerHTML = '<div class="alert alert-success">Settings saved!</div>';
+    });
+
+    // Load business entities for autocomplete
+    try {
+      businessEntities = await fetch('/api/admin/business-entities').then(r => r.json());
+    } catch(e) { console.error('Failed to load business entities', e); }
+
+    // Confirm Profile Deletion
+    document.getElementById('confirmDeleteProfileBtn').addEventListener('click', async () => {
+      const password = document.getElementById('deleteProfilePassword').value;
+      const msgEl = document.getElementById('deleteProfileMsg');
+      
+      if (!password) {
+        msgEl.innerHTML = '<div class="text-danger small"><i class="fa-solid fa-circle-exclamation me-1"></i>Password is required.</div>';
+        return;
+      }
+      
+      const btn = document.getElementById('confirmDeleteProfileBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Deleting...';
+      
+      try {
+        const response = await fetch(`/api/auth/delete/${user.id}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: password })
+        });
+        
+        if (response.ok) {
+          sessionStorage.removeItem('dreamWeddingUser');
+          window.location.href = '../index.html';
+        } else {
+          const errText = await response.text();
+          msgEl.innerHTML = `<div class="text-danger small"><i class="fa-solid fa-circle-exclamation me-1"></i>${errText || 'Incorrect password or failed to delete.'}</div>`;
+        }
+      } catch (e) {
+        msgEl.innerHTML = '<div class="text-danger small"><i class="fa-solid fa-circle-exclamation me-1"></i>Connection error.</div>';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Delete My Account';
+      }
+    });
+  });
+</script>
+
+<!-- Delete Profile Modal -->
+<div class="modal fade" id="deleteProfileModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-danger">Delete Account</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>To confirm deletion of your administrator profile, please enter your password. <strong>This action cannot be undone.</strong></p>
+        <div class="mb-3">
+          <label class="form-label fw-bold small">Password</label>
+          <input type="password" class="form-control" id="deleteProfilePassword" placeholder="Enter your password" required>
+        </div>
+        <div id="deleteProfileMsg" class="mt-2"></div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger rounded-pill px-4" id="confirmDeleteProfileBtn">Delete My Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src="../js/script.js"></script>
+</body>
+</html>
