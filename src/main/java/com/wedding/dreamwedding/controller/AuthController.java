@@ -65,4 +65,13 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @GetMapping("/debug")
+    public ResponseEntity<?> debugAdmins() {
+        try {
+            return ResponseEntity.ok(authService.getDebugInfo());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
 }
