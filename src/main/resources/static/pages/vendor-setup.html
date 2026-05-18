@@ -199,14 +199,16 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="businessPhone" class="form-label fw-semibold">Business Phone Number *</label>
-                                <input type="tel" class="form-control" id="businessPhone" required>
+                                <input type="tel" class="form-control" id="businessPhone" required
+                                    pattern="^\+94\d{9}$" placeholder="+94771234567" title="Format: +94 followed by 9 digits">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6 mb-3 mb-md-0">
                                 <label for="businessWhatsapp" class="form-label fw-semibold">Business WhatsApp Number *</label>
-                                <input type="tel" class="form-control" id="businessWhatsapp" required>
+                                <input type="tel" class="form-control" id="businessWhatsapp" required
+                                    pattern="^\+94\d{9}$" placeholder="+94771234567" title="Format: +94 followed by 9 digits">
                             </div>
                             <div class="col-md-6">
                                 <label for="websiteLink" class="form-label fw-semibold">Website Link</label>
@@ -523,16 +525,17 @@
                     const name = pkgNames[i].value.trim();
                     const price = parseFloat(pkgPrices[i].value);
                     if(name !== '') {
-                        if (isNaN(price) || price < 0) {
+                        const priceVal = parseFloat(pkgPrices[i].value);
+                        if (isNaN(priceVal) || priceVal <= 0) {
                             pkgNames[i].closest('.package-entry').style.outline = '2px solid #dc3545';
-                            showMessage(`Package ${i + 1}: Please enter a valid price (Rs.) greater than or equal to 0.`, 'error');
+                            showMessage(`Package ${i + 1}: Price must be greater than 0.`, 'error');
                             pkgError = true;
                             break;
                         }
                         pkgNames[i].closest('.package-entry').style.outline = '';
                         packages.push({
                             name: name,
-                            price: price,
+                            price: priceVal,
                             description: pkgDescs[i].value.trim()
                         });
                     }
@@ -544,12 +547,20 @@
                     return;
                 }
 
-                // Collect images
+                // Collect images (with 2MB file size guard)
                 const galleryPhotos = [];
                 const files = document.querySelectorAll('.gallery-file');
                 for (let i = 0; i < files.length; i++) {
                     if (files[i].files.length > 0) {
-                        const base64 = await fileToBase64(files[i].files[0]);
+                        const file = files[i].files[0];
+                        if (file.size > 2 * 1024 * 1024) {
+                            showMessage(`Photo ${i + 1} exceeds 2MB. Please choose a smaller image.`, 'error');
+                            submitBtn.disabled = false;
+                            submitSpinner.style.display = 'none';
+                            btnText.textContent = 'Save & Continue to Dashboard';
+                            return;
+                        }
+                        const base64 = await fileToBase64(file);
                         galleryPhotos.push(base64);
                     }
                 }

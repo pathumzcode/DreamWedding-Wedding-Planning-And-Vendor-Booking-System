@@ -1,5 +1,6 @@
 package com.wedding.dreamwedding.entity;
 
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,6 +15,8 @@ public class Review {
     @Id
     private String id;
 
+    @NotBlank(message = "Review type is required")
+    @Pattern(regexp = "^(VENDOR|SITE)$", message = "Type must be VENDOR or SITE")
     private String type; // "VENDOR" or "SITE"
 
     // VENDOR review fields
@@ -26,8 +29,13 @@ public class Review {
     private String suggestion;
 
     // Common fields
+    @NotNull(message = "Rating is required")
+    @Min(value = 1, message = "Rating must be at least 1")
+    @Max(value = 5, message = "Rating must be at most 5")
     private Integer rating;
     private String reviewTitle;
+    @NotBlank(message = "Review message is required")
+    @Size(min = 10, message = "Review message must be at least 10 characters")
     private String reviewMessage;
     private List<String> photos = new ArrayList<>();
     
@@ -40,6 +48,7 @@ public class Review {
 
     private String reviewerId;
     private String reviewerName;
+    @Pattern(regexp = "^(CUSTOMER|VENDOR)$", message = "Reviewer role must be CUSTOMER or VENDOR")
     private String reviewerRole; // "CUSTOMER" or "VENDOR"
     private String reviewerProfilePic; // Added to show user profile in comment section
 
@@ -55,5 +64,6 @@ public class Review {
     private LocalDateTime replyDate;
 
     // Admin moderation
+    @Pattern(regexp = "^(PENDING|APPROVED|REJECTED)$", message = "Status must be PENDING, APPROVED, or REJECTED")
     private String status = "APPROVED"; // "PENDING", "APPROVED", "REJECTED"
 }

@@ -3,6 +3,7 @@ package com.wedding.dreamwedding.controller;
 import com.wedding.dreamwedding.dto.VendorProfileUpdateRequest;
 import com.wedding.dreamwedding.entity.Vendor;
 import com.wedding.dreamwedding.repository.VendorRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class VendorController {
     }
 
     @PutMapping("/{id}/profile")
-    public ResponseEntity<?> updateProfile(@PathVariable String id, @RequestBody VendorProfileUpdateRequest request) {
+    public ResponseEntity<?> updateProfile(@PathVariable String id, @Valid @RequestBody VendorProfileUpdateRequest request) {
         Vendor vendor = vendorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 

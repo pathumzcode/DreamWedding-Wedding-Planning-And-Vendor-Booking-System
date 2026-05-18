@@ -191,14 +191,16 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="contactPhone" class="form-label fw-semibold">Contact Phone Number *</label>
-                                <input type="tel" class="form-control" id="contactPhone" required>
+                                <input type="tel" class="form-control" id="contactPhone" required
+                                    pattern="^\+94\d{9}$" placeholder="+94771234567" title="Format: +94 followed by 9 digits">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6 mb-3 mb-md-0">
                                 <label for="whatsappNumber" class="form-label fw-semibold">Business WhatsApp Number *</label>
-                                <input type="tel" class="form-control" id="whatsappNumber" required>
+                                <input type="tel" class="form-control" id="whatsappNumber" required
+                                    pattern="^\+94\d{9}$" placeholder="+94771234567" title="Format: +94 followed by 9 digits">
                             </div>
                             <div class="col-md-6">
                                 <label for="websiteLink" class="form-label fw-semibold">Website Link</label>
@@ -483,6 +485,16 @@
                 return;
             }
 
+            const phonePattern = /^\+94\d{9}$/;
+            if (!phonePattern.test(contactPhone)) {
+                showMessage('Phone number must be in format +94 followed by 9 digits (e.g. +94771234567).', 'error');
+                return;
+            }
+            if (!phonePattern.test(whatsappNumber)) {
+                showMessage('WhatsApp number must be in format +94 followed by 9 digits (e.g. +94771234567).', 'error');
+                return;
+            }
+
             submitBtn.disabled = true;
             submitSpinner.style.display = 'inline-block';
             btnText.textContent = 'Saving Profile...';
@@ -522,12 +534,20 @@
                     }
                 }
 
-                // Collect images
+                // Collect images (with 2MB file size guard)
                 const galleryPhotos = [];
                 const files = document.querySelectorAll('.gallery-file');
                 for (let i = 0; i < files.length; i++) {
                     if (files[i].files.length > 0) {
-                        const base64 = await fileToBase64(files[i].files[0]);
+                        const file = files[i].files[0];
+                        if (file.size > 2 * 1024 * 1024) {
+                            showMessage(`Photo ${i + 1} exceeds 2MB. Please choose a smaller image.`, 'error');
+                            submitBtn.disabled = false;
+                            submitSpinner.style.display = 'none';
+                            btnText.textContent = 'Save & Continue to Dashboard';
+                            return;
+                        }
+                        const base64 = await fileToBase64(file);
                         galleryPhotos.push(base64);
                     }
                 }

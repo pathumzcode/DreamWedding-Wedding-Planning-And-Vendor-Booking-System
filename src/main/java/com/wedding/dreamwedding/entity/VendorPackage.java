@@ -15,7 +15,7 @@ public class VendorPackage {
     private String name;
     
     @NotNull(message = "Package price is required")
-    @Min(value = 0, message = "Price cannot be negative")
+    @Min(value = 1, message = "Price must be greater than 0")
     private Double price;
     
     private String description;

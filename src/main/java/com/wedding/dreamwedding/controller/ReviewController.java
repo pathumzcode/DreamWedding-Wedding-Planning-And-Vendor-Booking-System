@@ -3,6 +3,7 @@ package com.wedding.dreamwedding.controller;
 import com.wedding.dreamwedding.dto.ReviewDTO;
 import com.wedding.dreamwedding.entity.Review;
 import com.wedding.dreamwedding.service.ReviewService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping("/vendor")
-    public ResponseEntity<?> createVendorReview(@RequestBody ReviewDTO dto) {
+    public ResponseEntity<?> createVendorReview(@Valid @RequestBody ReviewDTO dto) {
         try {
             Review review = reviewService.createVendorReview(dto);
             return ResponseEntity.ok(review);
@@ -28,7 +29,11 @@ public class ReviewController {
     }
 
     @PostMapping("/site")
-    public ResponseEntity<?> createSiteReview(@RequestBody ReviewDTO dto, @RequestParam String role) {
+    public ResponseEntity<?> createSiteReview(@Valid @RequestBody ReviewDTO dto, @RequestParam String role) {
+        // Validate role parameter value
+        if (!"CUSTOMER".equals(role) && !"VENDOR".equals(role)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Role must be CUSTOMER or VENDOR"));
+        }
         try {
             Review review = reviewService.createSiteReview(dto, role);
             return ResponseEntity.ok(review);
@@ -67,6 +72,13 @@ public class ReviewController {
         try {
             String vendorId = body.get("vendorId");
             String replyMessage = body.get("replyMessage");
+            // Validate reply content
+            if (vendorId == null || vendorId.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "vendorId is required"));
+            }
+            if (replyMessage == null || replyMessage.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Reply message cannot be empty"));
+            }
             return ResponseEntity.ok(reviewService.addVendorReply(reviewId, vendorId, replyMessage));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
@@ -74,8 +86,12 @@ public class ReviewController {
     }
 
     @PutMapping("/{reviewId}/status")
-    public ResponseEntity<Review> updateStatus(@PathVariable String reviewId, @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> updateStatus(@PathVariable String reviewId, @RequestBody Map<String, String> body) {
         String status = body.get("status");
+        // Validate status value before passing to service
+        if (status == null || !status.matches("^(PENDING|APPROVED|REJECTED)$")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Status must be PENDING, APPROVED, or REJECTED"));
+        }
         return ResponseEntity.ok(reviewService.updateStatus(reviewId, status));
     }
 

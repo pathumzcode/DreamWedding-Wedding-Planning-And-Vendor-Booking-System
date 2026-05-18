@@ -46,7 +46,8 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label fw-bold small">Estimated Guest Count</label>
-                <input type="number" class="form-control" placeholder="e.g. 150" required>
+                <input type="number" class="form-control" id="guestCount" placeholder="e.g. 150" min="1" max="10000" required>
+                <div class="invalid-feedback">Please enter a valid guest count (at least 1).</div>
               </div>
             </div>
 
@@ -157,14 +158,25 @@
       const submitBtn = document.getElementById('submitBookingBtn');
       submitBtn.addEventListener('click', async () => {
         const eventDate = document.getElementById('eventDate').value;
-        const guestCount = document.querySelector('input[type="number"]').value;
+        const guestCount = document.getElementById('guestCount').value;
         const specialRequests = document.getElementById('specialRequests').value;
-        
         const selectedPkgRadio = document.querySelector('input[name="package"]:checked');
-        if (!eventDate || !guestCount || !selectedPkgRadio) {
-          const msg = document.getElementById('bookingMessage');
+        const msg = document.getElementById('bookingMessage');
+        msg.className = 'alert d-none';
+
+        if (!eventDate) {
           msg.className = 'alert alert-danger';
-          msg.textContent = 'Please fill out all required fields and select a package.';
+          msg.textContent = 'Please select an event date.';
+          return;
+        }
+        if (!guestCount || parseInt(guestCount) < 1) {
+          msg.className = 'alert alert-danger';
+          msg.textContent = 'Please enter a valid guest count (at least 1).';
+          return;
+        }
+        if (!selectedPkgRadio) {
+          msg.className = 'alert alert-danger';
+          msg.textContent = 'Please select a package.';
           return;
         }
 

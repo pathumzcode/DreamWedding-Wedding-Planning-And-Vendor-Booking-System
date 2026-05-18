@@ -334,11 +334,19 @@
 
             const selectedTags = Array.from(document.querySelectorAll('.tag-pill.selected')).map(t => t.dataset.tag);
 
+            // Validate review message
+            const reviewMessage = document.getElementById('reviewMessage').value.trim();
+            if (reviewMessage.length < 20) {
+                err.textContent = 'Please share your experience in at least 20 characters.';
+                err.classList.remove('d-none');
+                return;
+            }
+
             const payload = {
                 type: 'SITE',
                 rating: parseInt(rating),
                 experienceCategory: document.getElementById('experienceCategory').value,
-                reviewMessage: document.getElementById('reviewMessage').value,
+                reviewMessage: reviewMessage,
                 suggestion: document.getElementById('suggestion').value,
                 reviewTags: selectedTags,
                 reviewerId: user.id

@@ -569,6 +569,28 @@
                 return;
             }
 
+            // Validate event fields
+            const eventDate = document.getElementById('eventDate').value;
+            if (!eventDate) {
+                err.textContent = 'Please select the month of your event.';
+                err.classList.remove('d-none');
+                return;
+            }
+            const eventType = document.getElementById('eventType').value;
+            if (!eventType) {
+                err.textContent = 'Please select an event type.';
+                err.classList.remove('d-none');
+                return;
+            }
+
+            // Validate review message length
+            const reviewMsg = document.getElementById('reviewMessage').value.trim();
+            if (reviewMsg.length < 20) {
+                err.textContent = 'Review message must be at least 20 characters.';
+                err.classList.remove('d-none');
+                return;
+            }
+
             // Collect Service Ratings
             const serviceRatings = {};
             miniStarContainers.forEach(c => {
@@ -581,16 +603,15 @@
                 vendorId: vendorId,
                 bookingId: bookingId,
                 rating: parseInt(rating),
-                reviewTitle: document.getElementById('reviewTitle').value,
-                reviewMessage: document.getElementById('reviewMessage').value,
+                reviewTitle: document.getElementById('reviewTitle').value.trim(),
+                reviewMessage: reviewMsg,
                 photos: base64Photos,
-                eventDate: document.getElementById('eventDate').value,
-                eventType: document.getElementById('eventType').value,
+                eventDate: eventDate,
+                eventType: eventType,
                 bookedBy: bookedBy,
                 serviceRatings: serviceRatings,
                 reviewTags: Array.from(document.querySelectorAll('.tag-pill.selected')).map(t => t.dataset.tag),
-                reviewerId: user.id,
-                bookingId: bookingId
+                reviewerId: user.id
             };
 
             document.getElementById('loadingOverlay').style.display = 'flex';

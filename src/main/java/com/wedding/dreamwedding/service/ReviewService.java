@@ -37,12 +37,15 @@ public class ReviewService {
             throw new IllegalArgumentException("Type must be VENDOR");
         }
         
-        // Verify customer has booked this vendor
+        // Verify customer has a CONFIRMED or COMPLETED booking with this vendor
         List<Booking> customerBookings = bookingRepository.findByCustomerIdAndVendorId(
                 dto.getReviewerId(), dto.getVendorId());
-                
-        if (customerBookings == null || customerBookings.isEmpty()) {
-            throw new IllegalStateException("Only customers who have booked this vendor can submit a review.");
+
+        boolean hasEligibleBooking = customerBookings != null && customerBookings.stream()
+                .anyMatch(b -> "CONFIRMED".equals(b.getStatus()) || "COMPLETED".equals(b.getStatus()));
+
+        if (!hasEligibleBooking) {
+            throw new IllegalStateException("Only customers with a confirmed or completed booking can submit a review.");
         }
 
         Review review = new Review();
@@ -169,6 +172,10 @@ public class ReviewService {
     }
 
     public Review updateStatus(String reviewId, String status) {
+        // Validate status value
+        if (status == null || !status.matches("^(PENDING|APPROVED|REJECTED)$")) {
+            throw new IllegalArgumentException("Status must be PENDING, APPROVED, or REJECTED");
+        }
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found"));
         review.setStatus(status);

@@ -3,6 +3,7 @@ package com.wedding.dreamwedding.controller;
 import com.wedding.dreamwedding.dto.BookingRequest;
 import com.wedding.dreamwedding.entity.Booking;
 import com.wedding.dreamwedding.repository.BookingRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,14 @@ public class BookingController {
     private final com.wedding.dreamwedding.repository.HotelRepository hotelRepository;
     private final com.wedding.dreamwedding.service.FileService fileService;
     private final BudgetController budgetController;
+
+    /** Allowed booking status values */
+    private static final List<String> VALID_STATUSES =
+            List.of("PENDING", "CONFIRMED", "REJECTED", "COMPLETED", "CANCELLED");
     
     // Create booking
     @PostMapping
-    public ResponseEntity<?> createBooking(@RequestBody BookingRequest request) {
+    public ResponseEntity<?> createBooking(@Valid @RequestBody BookingRequest request) {
         Booking booking = new Booking();
         booking.setVendorId(request.getVendorId());
         booking.setCustomerId(request.getCustomerId());
@@ -88,10 +93,19 @@ public class BookingController {
         return ResponseEntity.ok(bookingRepository.findAll());
     }
 
-    // Update booking status (vendor: CONFIRMED / REJECTED / vendor: add note)
+    // Update booking status (vendor: CONFIRMED / REJECTED / add note)
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable String id, @RequestBody Map<String, String> body) {
         return bookingRepository.findById(id).map(b -> {
+            // Validate status value if provided
+            if (body.containsKey("status")) {
+                String newStatusValue = body.get("status");
+                if (newStatusValue == null || !VALID_STATUSES.contains(newStatusValue.toUpperCase())) {
+                    return ResponseEntity.badRequest()
+                            .body(Map.of("error", "Invalid status. Allowed: " + VALID_STATUSES));
+                }
+            }
+
             String oldStatus = b.getStatus();
             if (body.containsKey("status")) b.setStatus(body.get("status"));
             if (body.containsKey("vendorNote")) b.setVendorNote(body.get("vendorNote"));
@@ -118,10 +132,15 @@ public class BookingController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Customer edits their booking
+    // Customer edits their booking — only allowed if booking is still PENDING
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBooking(@PathVariable String id, @RequestBody BookingRequest request) {
+    public ResponseEntity<?> updateBooking(@PathVariable String id, @Valid @RequestBody BookingRequest request) {
         return bookingRepository.findById(id).map(b -> {
+            // Guard: prevent editing a booking that is already confirmed or completed
+            if ("CONFIRMED".equals(b.getStatus()) || "COMPLETED".equals(b.getStatus())) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Cannot edit a booking that is already " + b.getStatus() + "."));
+            }
             b.setEventDate(request.getEventDate());
             b.setGuestCount(request.getGuestCount());
             b.setSpecialRequests(request.getSpecialRequests());

@@ -3,6 +3,7 @@ package com.wedding.dreamwedding.controller;
 import com.wedding.dreamwedding.dto.HotelProfileUpdateRequest;
 import com.wedding.dreamwedding.entity.Hotel;
 import com.wedding.dreamwedding.repository.HotelRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class HotelController {
     private final HotelRepository hotelRepository;
 
     @PutMapping("/{id}/profile")
-    public ResponseEntity<?> updateProfile(@PathVariable String id, @RequestBody HotelProfileUpdateRequest request) {
+    public ResponseEntity<?> updateProfile(@PathVariable String id, @Valid @RequestBody HotelProfileUpdateRequest request) {
         Hotel hotel = hotelRepository.findById(id).orElse(null);
         if (hotel == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "Hotel not found"));

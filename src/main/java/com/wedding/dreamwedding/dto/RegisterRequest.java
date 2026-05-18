@@ -4,6 +4,7 @@ import com.wedding.dreamwedding.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,8 +27,9 @@ public class RegisterRequest {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
-    /** User's phone number — required */
+    /** User's phone number — required, must be +94 followed by 9 digits */
     @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^\\+94\\d{9}$", message = "Phone number must start with +94 followed by 9 digits (e.g. +94771234567)")
     private String phoneNumber;
 
     /** Email — must be valid format and is required */

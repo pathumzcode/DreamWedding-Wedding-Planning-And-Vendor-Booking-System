@@ -60,7 +60,11 @@ public class BudgetController {
         BudgetPlan plan = getOrCreate(customerId);
 
         if (body.containsKey("totalBudget")) {
-            plan.setTotalBudget(((Number) body.get("totalBudget")).doubleValue());
+            double newBudget = ((Number) body.get("totalBudget")).doubleValue();
+            if (newBudget <= 0) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Total budget must be greater than 0"));
+            }
+            plan.setTotalBudget(newBudget);
         }
 
         if (body.containsKey("categories")) {
@@ -92,7 +96,16 @@ public class BudgetController {
         expense.setId(UUID.randomUUID().toString());
         expense.setCategoryName((String) body.get("categoryName"));
         expense.setDescription((String) body.get("description"));
-        expense.setAmount(((Number) body.get("amount")).doubleValue());
+        // Guard: amount is required and must be positive
+        Object amountRaw = body.get("amount");
+        if (amountRaw == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "amount is required"));
+        }
+        double amountValue = ((Number) amountRaw).doubleValue();
+        if (amountValue <= 0) {
+            return ResponseEntity.badRequest().body(Map.of("error", "amount must be greater than 0"));
+        }
+        expense.setAmount(amountValue);
         expense.setEstimateId((String) body.getOrDefault("estimateId", null));
         expense.setDate(body.getOrDefault("date", LocalDateTime.now().toLocalDate().toString()).toString());
 

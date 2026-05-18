@@ -8,6 +8,7 @@ import com.wedding.dreamwedding.entity.*;
 import com.wedding.dreamwedding.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ public class AuthService {
     private final AdminRepository adminRepository;
     private final HotelRepository hotelRepository;
     private final UserActionRepository userActionRepository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public RegisterResponse register(RegisterRequest request) {
         if (emailExists(request.getEmail())) {
@@ -75,7 +77,7 @@ public class AuthService {
         BaseUser user = findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
 
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("Invalid email or password");
         }
 
@@ -146,7 +148,10 @@ public class AuthService {
         BaseUser user = findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
                 
-        if (!user.getPassword().equals(password)) {
+        if (password == null || password.isBlank()) {
+            throw new BadCredentialsException("Password is required");
+        }
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("Incorrect password");
         }
         
@@ -171,7 +176,7 @@ public class AuthService {
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
-        user.setPassword(plainPassword);
+        user.setPassword(passwordEncoder.encode(plainPassword));
         user.setRole(request.getRole());
         user.setCreatedAt(LocalDateTime.now());
         if (request.getProfilePicture() != null && !request.getProfilePicture().isEmpty()) {

@@ -1,5 +1,6 @@
 package com.wedding.dreamwedding.entity;
 
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -73,8 +74,11 @@ public class BudgetPlan {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CategoryAllocation {
+        @NotBlank(message = "Category name is required")
         private String categoryName;
+        @PositiveOrZero(message = "Percentage cannot be negative")
         private double percentage;       // e.g. 40.0
+        @PositiveOrZero(message = "Allocated amount cannot be negative")
         private double allocatedAmount;  // e.g. 12000.00
     }
 
@@ -88,8 +92,10 @@ public class BudgetPlan {
     @AllArgsConstructor
     public static class BudgetExpense {
         private String id;
+        @NotBlank(message = "Category name is required")
         private String categoryName;
         private String description;
+        @Positive(message = "Expense amount must be greater than 0")
         private double amount;
         private String estimateId;          // optional link to a VendorEstimate
         private String bookingId;           // link to a Booking (auto-synced)
