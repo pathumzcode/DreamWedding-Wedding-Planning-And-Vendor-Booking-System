@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Using dummy avatars if none provided
-            const avatarUrl = item.avatar || `https://i.pravatar.cc/150?u=${item.id || item.reviewerName}`;
+            const avatarUrl = item.reviewerProfilePic || item.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.reviewerName)}&background=random`;
             const role = item.reviewerRole === 'CUSTOMER' ? 'Happy Bride' : 'Wedding Vendor';
 
             card.innerHTML = `

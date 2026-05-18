@@ -40,6 +40,7 @@ public class Review {
 
     private String reviewerId;
     private String reviewerName;
+    private String reviewerProfilePic;
     private String reviewerRole; // "CUSTOMER" or "VENDOR"
 
     private LocalDateTime reviewDate = LocalDateTime.now();
