@@ -346,8 +346,13 @@
             return `
               <div class="card p-3 mb-3">
                 <div class="d-flex justify-content-between align-items-start">
-                  <h6 class="fw-bold mb-1">${r.reviewerName} ${r.verified ? '<i class="fa-solid fa-circle-check text-primary ms-1"></i>' : ''}</h6>
-                  <small class="text-muted">${new Date(r.reviewDate).toLocaleDateString()}</small>
+                  <div class="d-flex align-items-center mb-2">
+                    <img src="${r.reviewerProfilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.reviewerName)}&background=fdf4e7&color=b8963e`}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover;">
+                    <div>
+                      <h6 class="fw-bold mb-1">${r.reviewerName} ${r.verified ? '<i class="fa-solid fa-circle-check text-primary ms-1"></i>' : ''}</h6>
+                      <small class="text-muted">${new Date(r.reviewDate).toLocaleDateString()}</small>
+                    </div>
+                  </div>
                 </div>
                 <div class="small mb-2">${stars}</div>
                 <h6 class="fw-bold mb-1">${r.reviewTitle}</h6>

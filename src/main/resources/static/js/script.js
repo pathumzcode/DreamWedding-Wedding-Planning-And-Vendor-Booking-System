@@ -711,7 +711,7 @@ const initSiteReviews = async () => {
         stars += `<i class="${i <= r.rating ? 'fa-solid' : 'fa-regular'} fa-star"></i>`;
       }
       
-      const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(r.reviewerName)}&background=random&color=fff`;
+      const avatar = r.reviewerProfilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.reviewerName)}&background=random&color=fff`;
       
       let photosHtml = '';
       if (r.photos && r.photos.length > 0) {

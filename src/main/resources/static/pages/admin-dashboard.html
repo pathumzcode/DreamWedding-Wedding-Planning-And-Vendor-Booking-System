@@ -608,7 +608,12 @@
         <thead class="table-light"><tr><th>Type</th><th>Reviewer</th><th>Rating</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>${data.map(r=>`<tr>
           <td><span class="badge bg-secondary">${r.type}</span></td>
-          <td class="fw-bold">${r.reviewerName}</td>
+          <td class="fw-bold">
+            <div class="d-flex align-items-center">
+              <img src="${r.reviewerProfilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.reviewerName)}&background=fdf4e7&color=b8963e`}" class="rounded-circle me-2" width="30" height="30" style="object-fit: cover;">
+              ${r.reviewerName}
+            </div>
+          </td>
           <td>${r.rating} <i class="fa-solid fa-star text-warning small"></i></td>
           <td class="text-truncate" style="max-width: 250px;" title="${r.reviewMessage}"><strong>${r.reviewTitle||r.experienceCategory||''}</strong><br>${r.reviewMessage}</td>
           <td><span class="badge ${r.status==='APPROVED'?'bg-success':r.status==='PENDING'?'bg-warning text-dark':'bg-danger'}">${r.status}</span></td>

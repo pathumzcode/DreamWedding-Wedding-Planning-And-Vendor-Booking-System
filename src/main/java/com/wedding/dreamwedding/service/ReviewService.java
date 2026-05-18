@@ -76,6 +76,7 @@ public class ReviewService {
         review.setReviewerId(customer.getId());
         review.setReviewerName(customer.getFirstName() + " " + customer.getLastName());
         review.setReviewerRole("CUSTOMER");
+        review.setReviewerProfilePic(customer.getProfilePicture());
         
         review.setVerified(true);
         review.setStatus("APPROVED");
@@ -127,10 +128,12 @@ public class ReviewService {
             Customer customer = customerRepository.findById(dto.getReviewerId())
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
             review.setReviewerName(customer.getFirstName() + " " + customer.getLastName());
+            review.setReviewerProfilePic(customer.getProfilePicture());
         } else if ("VENDOR".equals(role)) {
             Vendor vendor = vendorRepository.findById(dto.getReviewerId())
                 .orElseThrow(() -> new IllegalArgumentException("Vendor not found"));
             review.setReviewerName(vendor.getBusinessName() != null ? vendor.getBusinessName() : vendor.getFirstName());
+            review.setReviewerProfilePic(vendor.getProfilePicture());
         } else {
             throw new IllegalArgumentException("Invalid role for site review");
         }

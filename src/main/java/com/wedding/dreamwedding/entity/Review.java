@@ -41,6 +41,7 @@ public class Review {
     private String reviewerId;
     private String reviewerName;
     private String reviewerRole; // "CUSTOMER" or "VENDOR"
+    private String reviewerProfilePic; // Added to show user profile in comment section
 
     private LocalDateTime reviewDate = LocalDateTime.now();
 
