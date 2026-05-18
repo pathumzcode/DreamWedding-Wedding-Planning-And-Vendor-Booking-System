@@ -8,7 +8,6 @@ public class BookingRequest {
     private String vendorName;
     private String vendorCategory;
     private String customerId;
-    private String customerName;
     private String eventDate;
     private Integer guestCount;
     private String packageName;

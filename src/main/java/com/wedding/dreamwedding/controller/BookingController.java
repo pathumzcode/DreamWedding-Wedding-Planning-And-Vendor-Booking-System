@@ -17,7 +17,6 @@ public class BookingController {
     private final BookingRepository bookingRepository;
     private final com.wedding.dreamwedding.repository.VendorRepository vendorRepository;
     private final com.wedding.dreamwedding.repository.HotelRepository hotelRepository;
-    private final com.wedding.dreamwedding.repository.CustomerRepository customerRepository;
     private final com.wedding.dreamwedding.service.FileService fileService;
     private final BudgetController budgetController;
     
@@ -32,11 +31,10 @@ public class BookingController {
         booking.setPackageName(request.getPackageName());
         booking.setPackagePrice(request.getPackagePrice());
         booking.setSpecialRequests(request.getSpecialRequests());
-        booking.setCustomerName(request.getCustomerName());
         booking.setVendorName(request.getVendorName());
         booking.setVendorCategory(request.getVendorCategory());
 
-        // Reliability: Fetch vendor name if missing or to verify
+        // Reliability: Fetch name if missing or to verify
         if (booking.getVendorName() == null || booking.getVendorName().isEmpty()) {
             vendorRepository.findById(request.getVendorId()).ifPresent(v -> {
                 booking.setVendorName(v.getBusinessName() != null ? v.getBusinessName() : v.getFirstName());
@@ -49,14 +47,6 @@ public class BookingController {
                 });
             }
         }
-        
-        // Reliability: Fetch customer name if missing or to verify
-        if (booking.getCustomerName() == null || booking.getCustomerName().isEmpty()) {
-            customerRepository.findById(request.getCustomerId()).ifPresent(c -> {
-                booking.setCustomerName(c.getFullName());
-            });
-        }
-        
         booking.setStatus("PENDING");
         Booking saved = bookingRepository.save(booking);
 

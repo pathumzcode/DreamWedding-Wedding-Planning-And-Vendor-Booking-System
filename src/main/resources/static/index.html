@@ -261,7 +261,7 @@
                       <div class="text-muted small">
                         <i class="fa-solid fa-comment-dots me-1"></i> ${v.reviewCount || 0} reviews
                       </div>
-                      ${v.packages && v.packages.length > 0 ? `<div class="fw-bold text-primary" style="font-size: 0.9rem;">From ${v.packages[0].priceRange}</div>` : '<div class="text-muted small">Price on request</div>'}
+                      ${(() => { if (v.packages && v.packages.length > 0) { const prices = v.packages.map(p => p.price).filter(p => typeof p === 'number'); if (prices.length) return `<div class="fw-bold text-primary" style="font-size: 0.9rem;">From Rs. ${Math.min(...prices).toLocaleString()}</div>`; } return '<div class="text-muted small">Price on request</div>'; })()}
                     </div>
                     <a href="pages/vendor-details.html?id=${v.id}" class="btn btn-outline-gold rounded-pill px-4 btn-sm fw-bold">View Details</a>
                   </div>
@@ -441,7 +441,7 @@
                   <p style="font-size: 1.1rem; opacity: 0.95; margin-bottom: 45px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.6;">${p.description || 'Exclusive deal for your perfect wedding day.'}</p>
                   
                   <div class="d-flex align-items-center gap-4">
-                    <a href="${p.category && p.category.toLowerCase().includes('hotel') ? 'pages/hotel-details.html' : 'pages/vendor-details.html'}?id=${p.submittedBy}" class="btn btn-lg px-5 py-3" style="background: white; color: #2c3e50; font-weight: 800; border-radius: 50px; font-size: 1.1rem; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <a href="${p.targetType === 'HOTEL' ? 'pages/hotel-details.html' : 'pages/vendor-details.html'}?id=${p.targetId || p.submittedBy || ''}" class="btn btn-lg px-5 py-3" style="background: white; color: #2c3e50; font-weight: 800; border-radius: 50px; font-size: 1.1rem; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                       ${p.buttonText || 'Book Now'}
                     </a>
                     <div class="d-flex flex-column text-white">
@@ -483,12 +483,11 @@
           handleGesture();
         });
 
-      } catch (e) {
+    } catch (e) {
         console.error('Promotion Load Error:', e);
       }
     })();
   </script>
-  t>
 
 
   <!-- Budget Planner CTA Section -->

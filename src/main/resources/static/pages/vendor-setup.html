@@ -225,50 +225,25 @@
                             </div>
                         </div>
 
-                        <h4 class="section-title">Packages (Up to 3 price ranges)</h4>
+                        <div class="d-flex justify-content-between align-items-center mb-3" style="margin-top: 30px;">
+                            <h4 class="section-title mb-0" style="margin-top: 0; border: none;">Packages (Up to 6)</h4>
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="addPackageBtn"><i class="fa-solid fa-plus me-1"></i>Add Package</button>
+                        </div>
+                        <div style="border-bottom: 2px solid #f0e6d2; margin-bottom: 20px; margin-top: -10px;"></div>
                         
                         <div id="packagesContainer">
                             <!-- Package 1 -->
-                            <div class="card mb-3 p-3 bg-light border-0">
-                                <h6 class="fw-bold">Package 1</h6>
+                            <div class="card mb-3 p-3 bg-light border-0 package-entry">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0 pkg-heading">Package 1</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-pkg-btn" style="display:none;"><i class="fa-solid fa-trash"></i></button>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-2">
                                         <input type="text" class="form-control pkg-name" placeholder="Package Name (e.g. Basic)">
                                     </div>
                                     <div class="col-md-6 mb-2">
-                                        <input type="text" class="form-control pkg-price" placeholder="Price Range (e.g. Rs. 50,000 - 150,000)">
-                                    </div>
-                                    <div class="col-12">
-                                        <textarea class="form-control pkg-desc" rows="2" placeholder="Package Description"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Package 2 -->
-                            <div class="card mb-3 p-3 bg-light border-0">
-                                <h6 class="fw-bold">Package 2</h6>
-                                <div class="row">
-                                    <div class="col-md-6 mb-2">
-                                        <input type="text" class="form-control pkg-name" placeholder="Package Name (e.g. Standard)">
-                                    </div>
-                                    <div class="col-md-6 mb-2">
-                                        <input type="text" class="form-control pkg-price" placeholder="Price Range (e.g. Rs. 150,000 - 500,000)">
-                                    </div>
-                                    <div class="col-12">
-                                        <textarea class="form-control pkg-desc" rows="2" placeholder="Package Description"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Package 3 -->
-                            <div class="card mb-3 p-3 bg-light border-0">
-                                <h6 class="fw-bold">Package 3</h6>
-                                <div class="row">
-                                    <div class="col-md-6 mb-2">
-                                        <input type="text" class="form-control pkg-name" placeholder="Package Name (e.g. Premium)">
-                                    </div>
-                                    <div class="col-md-6 mb-2">
-                                        <input type="text" class="form-control pkg-price" placeholder="Price Range (e.g. Rs. 500,000+)">
+                                        <input type="number" class="form-control pkg-price" placeholder="Package Price (Rs.)" min="0" required>
                                     </div>
                                     <div class="col-12">
                                         <textarea class="form-control pkg-desc" rows="2" placeholder="Package Description"></textarea>
@@ -380,16 +355,35 @@
                         
                         // Populate packages
                         if (data.packages && data.packages.length > 0) {
-                            const pkgNames = document.querySelectorAll('.pkg-name');
-                            const pkgPrices = document.querySelectorAll('.pkg-price');
-                            const pkgDescs = document.querySelectorAll('.pkg-desc');
+                            const packagesContainer = document.getElementById('packagesContainer');
+                            packagesContainer.innerHTML = '';
                             data.packages.forEach((pkg, index) => {
-                                if (index < pkgNames.length) {
-                                    pkgNames[index].value = pkg.name || '';
-                                    pkgPrices[index].value = pkg.priceRange || '';
-                                    pkgDescs[index].value = pkg.description || '';
-                                }
+                                const newEntry = document.createElement('div');
+                                newEntry.className = 'card mb-3 p-3 bg-light border-0 package-entry';
+                                newEntry.innerHTML = `
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold mb-0 pkg-heading">Package ${index + 1}</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-pkg-btn"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <input type="text" class="form-control pkg-name" placeholder="Package Name" value="${pkg.name || ''}">
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <input type="number" class="form-control pkg-price" placeholder="Package Price (Rs.)" value="${pkg.price || ''}" min="0" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <textarea class="form-control pkg-desc" rows="2" placeholder="Package Description">${pkg.description || ''}</textarea>
+                                        </div>
+                                    </div>
+                                `;
+                                newEntry.querySelector('.remove-pkg-btn').addEventListener('click', function() {
+                                    newEntry.remove();
+                                    updatePackageHeadings();
+                                });
+                                packagesContainer.appendChild(newEntry);
                             });
+                            updatePackageHeadings();
                         }
 
                         // Populate gallery photo previews
@@ -414,6 +408,71 @@
             }
         }
         loadVendorProfile();
+
+        // Dynamic Package Logic
+        const packagesContainer = document.getElementById('packagesContainer');
+        const addPackageBtn = document.getElementById('addPackageBtn');
+
+        function updatePackageHeadings() {
+            const entries = packagesContainer.querySelectorAll('.package-entry');
+            entries.forEach((entry, idx) => {
+                entry.querySelector('.pkg-heading').textContent = `Package ${idx + 1}`;
+                const removeBtn = entry.querySelector('.remove-pkg-btn');
+                if (entries.length > 1) {
+                    removeBtn.style.display = 'block';
+                } else {
+                    removeBtn.style.display = 'none';
+                }
+            });
+            if (entries.length >= 6) {
+                addPackageBtn.style.display = 'none';
+            } else {
+                addPackageBtn.style.display = 'inline-block';
+            }
+        }
+
+        addPackageBtn.addEventListener('click', () => {
+            const entries = packagesContainer.querySelectorAll('.package-entry');
+            if (entries.length >= 6) return;
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'card mb-3 p-3 bg-light border-0 package-entry';
+            newEntry.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0 pkg-heading">Package ${entries.length + 1}</h6>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-pkg-btn"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <input type="text" class="form-control pkg-name" placeholder="Package Name">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <input type="number" class="form-control pkg-price" placeholder="Package Price (Rs.)" min="0" required>
+                    </div>
+                    <div class="col-12">
+                        <textarea class="form-control pkg-desc" rows="2" placeholder="Package Description"></textarea>
+                    </div>
+                </div>
+            `;
+            
+            newEntry.querySelector('.remove-pkg-btn').addEventListener('click', function() {
+                newEntry.remove();
+                updatePackageHeadings();
+            });
+            
+            packagesContainer.appendChild(newEntry);
+            updatePackageHeadings();
+        });
+
+        // Initialize first package remove btn logic if not populated
+        const firstRemoveBtn = packagesContainer.querySelector('.remove-pkg-btn');
+        if (firstRemoveBtn) {
+            firstRemoveBtn.addEventListener('click', function() {
+                this.closest('.package-entry').remove();
+                updatePackageHeadings();
+            });
+        }
+        updatePackageHeadings();
 
         // Helper to convert file to Base64
         const fileToBase64 = (file) => new Promise((resolve, reject) => {
@@ -453,20 +512,36 @@
             btnText.textContent = 'Saving Profile...';
 
             try {
-                // Collect packages
+                // Collect & validate packages
                 const packages = [];
                 const pkgNames = document.querySelectorAll('.pkg-name');
                 const pkgPrices = document.querySelectorAll('.pkg-price');
                 const pkgDescs = document.querySelectorAll('.pkg-desc');
+                let pkgError = false;
                 
                 for(let i = 0; i < pkgNames.length; i++) {
-                    if(pkgNames[i].value.trim() !== '') {
+                    const name = pkgNames[i].value.trim();
+                    const price = parseFloat(pkgPrices[i].value);
+                    if(name !== '') {
+                        if (isNaN(price) || price < 0) {
+                            pkgNames[i].closest('.package-entry').style.outline = '2px solid #dc3545';
+                            showMessage(`Package ${i + 1}: Please enter a valid price (Rs.) greater than or equal to 0.`, 'error');
+                            pkgError = true;
+                            break;
+                        }
+                        pkgNames[i].closest('.package-entry').style.outline = '';
                         packages.push({
-                            name: pkgNames[i].value.trim(),
-                            priceRange: pkgPrices[i].value.trim(),
+                            name: name,
+                            price: price,
                             description: pkgDescs[i].value.trim()
                         });
                     }
+                }
+                if (pkgError) {
+                    submitBtn.disabled = false;
+                    submitSpinner.style.display = 'none';
+                    btnText.textContent = 'Save & Continue to Dashboard';
+                    return;
                 }
 
                 // Collect images

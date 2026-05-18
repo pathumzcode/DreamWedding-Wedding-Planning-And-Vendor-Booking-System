@@ -36,6 +36,13 @@
             <h5 class="fw-bold mb-3">Filters</h5>
             <form id="vendorFilterForm">
               <div class="mb-3">
+                <label class="form-label fw-bold small text-muted">Search by Name</label>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
+                  <input type="text" class="form-control border-start-0 ps-0" id="nameSearchFilter" placeholder="e.g. Studio Dream...">
+                </div>
+              </div>
+              <div class="mb-3">
                 <label class="form-label fw-bold small text-muted">Category</label>
                 <select class="form-select form-select-sm" id="categoryFilter" name="category">
                   <option value="">All categories</option>
@@ -129,6 +136,7 @@
       filterForm.addEventListener('submit', (e) => {
         e.preventDefault();
         activeFilters = {
+          name: document.getElementById('nameSearchFilter') ? document.getElementById('nameSearchFilter').value.trim() : '',
           category: categoryFilter.value,
           location: locationFilter.value
         };
@@ -148,7 +156,10 @@
       }
 
       function applyFilters(vendors, filters) {
-        return vendors.filter(v => matchesVendorFilters(v, filters));
+        return vendors.filter(v => {
+          const nameMatch = !filters.name || (v.businessName && v.businessName.toLowerCase().includes(filters.name.toLowerCase()));
+          return matchesVendorFilters(v, filters) && nameMatch;
+        });
       }
 
       function renderVendors(vendors) {
@@ -174,9 +185,14 @@
             mainImage = vendor.galleryPhotos[0];
           }
 
-          const priceHtml = (vendor.packages && vendor.packages.length > 0)
-            ? `<div class="fw-bold text-primary">From ${vendor.packages[0].priceRange}</div>`
-            : '<div class="text-muted small">Price on request</div>';
+          let priceHtml = '<div class="text-muted small">Price on request</div>';
+          if (vendor.packages && vendor.packages.length > 0) {
+              const prices = vendor.packages.map(p => p.price).filter(p => typeof p === 'number' && !isNaN(p));
+              if (prices.length > 0) {
+                  const minPrice = Math.min(...prices);
+                  priceHtml = `<div class="fw-bold text-primary">From LKR ${minPrice.toLocaleString()}</div>`;
+              }
+          }
 
           const sanitizedName = vName.replace(/'/g, "\\'");
 

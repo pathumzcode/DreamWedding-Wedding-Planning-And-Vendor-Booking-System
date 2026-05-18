@@ -32,6 +32,13 @@
           <h5 class="fw-bold mb-3">Filters</h5>
           <form id="hotelFilterForm">
             <div class="mb-3">
+              <label class="form-label fw-bold small text-muted">Search by Name</label>
+              <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0 ps-0" id="nameSearchFilter" placeholder="e.g. Grand Hotel...">
+              </div>
+            </div>
+            <div class="mb-3">
               <label class="form-label fw-bold small text-muted">Location</label>
               <select class="form-select form-select-sm" id="filterLocation">
                 <option selected value="">All districts</option>
@@ -115,18 +122,58 @@
       const userStr = sessionStorage.getItem('dreamWeddingUser');
       const user = userStr ? JSON.parse(userStr) : null;
 
+      const filterForm = document.getElementById('hotelFilterForm');
+      let allHotels = [];
+
       async function fetchHotels() {
         try {
           const response = await fetch('/api/hotels');
           if (!response.ok) throw new Error('Failed to fetch hotels');
           
-          const hotels = await response.json();
-          renderHotels(hotels);
+          allHotels = await response.json();
+          renderHotels(allHotels);
         } catch (error) {
           console.error(error);
           document.getElementById('loadingSpinner').innerHTML = '<p class="text-danger">Error loading hotels.</p>';
         }
       }
+
+      function applyFilters() {
+        const nameFilter = document.getElementById('nameSearchFilter') ? document.getElementById('nameSearchFilter').value.toLowerCase().trim() : '';
+        const locationFilter = document.getElementById('filterLocation').value;
+        // basic price filter logic
+        const priceCheckboxes = document.querySelectorAll('#hotelFilterForm input[type="checkbox"]:checked');
+        const selectedPrices = Array.from(priceCheckboxes).map(cb => cb.value);
+
+        const filtered = allHotels.filter(h => {
+           const matchName = !nameFilter || (h.hotelName && h.hotelName.toLowerCase().includes(nameFilter));
+           const matchLoc = !locationFilter || (h.location === locationFilter);
+           
+           let matchPrice = true;
+           if (selectedPrices.length > 0) {
+              matchPrice = false;
+              if (h.hallArrangements && h.hallArrangements.length > 0) {
+                 const minPrice = Math.min(...h.hallArrangements.map(a => parseFloat(a.pricePerPlate) || 0));
+                 for (const range of selectedPrices) {
+                    const [min, max] = range.split('-');
+                    if (minPrice >= parseFloat(min) && minPrice <= parseFloat(max)) {
+                       matchPrice = true;
+                       break;
+                    }
+                 }
+              }
+           }
+           
+           return matchName && matchLoc && matchPrice;
+        });
+
+        renderHotels(filtered);
+      }
+
+      filterForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        applyFilters();
+      });
 
       function renderHotels(hotels) {
         resultsCount.textContent = `Showing ${hotels.length} results`;

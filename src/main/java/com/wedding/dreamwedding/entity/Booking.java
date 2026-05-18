@@ -30,7 +30,6 @@ public class Booking {
     @NotBlank(message = "Customer ID is required")
     private String customerId;
 
-    private String customerName;
     private String vendorName;
     private String vendorCategory;
     

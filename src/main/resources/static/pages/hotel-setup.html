@@ -217,12 +217,19 @@
                             </div>
                         </div>
 
-                        <h4 class="section-title">Hotel Arrangements (Halls/Venues)</h4>
+                        <div class="d-flex justify-content-between align-items-center mb-3" style="margin-top: 30px;">
+                            <h4 class="section-title mb-0" style="margin-top: 0; border: none;">Hotel Arrangements (Halls/Venues) (Up to 6)</h4>
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="addHallBtn"><i class="fa-solid fa-plus me-1"></i>Add Hall</button>
+                        </div>
+                        <div style="border-bottom: 2px solid #f0e6d2; margin-bottom: 20px; margin-top: -10px;"></div>
                         
                         <div id="hallsContainer">
                             <!-- Hall 1 -->
-                            <div class="card mb-3 p-3 bg-light border-0">
-                                <h6 class="fw-bold">Hall/Venue 1</h6>
+                            <div class="card mb-3 p-3 bg-light border-0 hall-entry">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0 hall-heading">Hall/Venue 1</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-hall-btn" style="display:none;"><i class="fa-solid fa-trash"></i></button>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-4 mb-2">
                                         <input type="text" class="form-control hall-name" placeholder="Hall Name (e.g. Grand Ballroom)">
@@ -238,33 +245,21 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- Hall 2 -->
-                            <div class="card mb-3 p-3 bg-light border-0">
-                                <h6 class="fw-bold">Hall/Venue 2</h6>
-                                <div class="row">
-                                    <div class="col-md-4 mb-2">
-                                        <input type="text" class="form-control hall-name" placeholder="Hall Name (e.g. Crystal Hall)">
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <input type="text" class="form-control hall-capacity" placeholder="Seating Capacity (e.g. 200)">
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <input type="text" class="form-control hall-price" placeholder="Price Per Plate (e.g. Rs. 2,500)">
-                                    </div>
-                                    <div class="col-12">
-                                        <textarea class="form-control hall-desc" rows="2" placeholder="Hall Description & Features"></textarea>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
-                        <h4 class="section-title">Rooms & Pricing (Up to 3 room types)</h4>
+                        <div class="d-flex justify-content-between align-items-center mb-3" style="margin-top: 30px;">
+                            <h4 class="section-title mb-0" style="margin-top: 0; border: none;">Rooms & Pricing (Up to 6 room types)</h4>
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="addRoomBtn"><i class="fa-solid fa-plus me-1"></i>Add Room</button>
+                        </div>
+                        <div style="border-bottom: 2px solid #f0e6d2; margin-bottom: 20px; margin-top: -10px;"></div>
                         
                         <div id="roomsContainer">
                             <!-- Room 1 -->
-                            <div class="card mb-3 p-3 bg-light border-0">
-                                <h6 class="fw-bold">Room Type 1</h6>
+                            <div class="card mb-3 p-3 bg-light border-0 room-entry">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0 room-heading">Room Type 1</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-room-btn" style="display:none;"><i class="fa-solid fa-trash"></i></button>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-4 mb-2">
                                         <input type="text" class="form-control rm-type" placeholder="Type (e.g. Deluxe Room)">
@@ -274,22 +269,6 @@
                                     </div>
                                     <div class="col-md-4 mb-2">
                                         <input type="text" class="form-control rm-capacity" placeholder="Capacity (e.g. 2 Adults)">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Room 2 -->
-                            <div class="card mb-3 p-3 bg-light border-0">
-                                <h6 class="fw-bold">Room Type 2</h6>
-                                <div class="row">
-                                    <div class="col-md-4 mb-2">
-                                        <input type="text" class="form-control rm-type" placeholder="Type (e.g. Ocean View Suite)">
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <input type="text" class="form-control rm-price" placeholder="Price per night (e.g. Rs. 30,000)">
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <input type="text" class="form-control rm-capacity" placeholder="Capacity (e.g. 2 Adults, 2 Kids)">
                                     </div>
                                 </div>
                             </div>
@@ -349,6 +328,256 @@
             reader.onload = () => resolve(reader.result);
             reader.onerror = error => reject(error);
         });
+
+        // Dynamic Hall Logic
+        const hallsContainer = document.getElementById('hallsContainer');
+        const addHallBtn = document.getElementById('addHallBtn');
+
+        function updateHallHeadings() {
+            const entries = hallsContainer.querySelectorAll('.hall-entry');
+            entries.forEach((entry, idx) => {
+                entry.querySelector('.hall-heading').textContent = `Hall/Venue ${idx + 1}`;
+                const removeBtn = entry.querySelector('.remove-hall-btn');
+                if (entries.length > 1) {
+                    removeBtn.style.display = 'block';
+                } else {
+                    removeBtn.style.display = 'none';
+                }
+            });
+            if (entries.length >= 6) {
+                addHallBtn.style.display = 'none';
+            } else {
+                addHallBtn.style.display = 'inline-block';
+            }
+        }
+
+        addHallBtn.addEventListener('click', () => {
+            const entries = hallsContainer.querySelectorAll('.hall-entry');
+            if (entries.length >= 6) return;
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'card mb-3 p-3 bg-light border-0 hall-entry';
+            newEntry.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0 hall-heading">Hall/Venue ${entries.length + 1}</h6>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-hall-btn"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <input type="text" class="form-control hall-name" placeholder="Hall Name">
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <input type="text" class="form-control hall-capacity" placeholder="Seating Capacity">
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <input type="text" class="form-control hall-price" placeholder="Price Per Plate">
+                    </div>
+                    <div class="col-12">
+                        <textarea class="form-control hall-desc" rows="2" placeholder="Hall Description & Features"></textarea>
+                    </div>
+                </div>
+            `;
+            newEntry.querySelector('.remove-hall-btn').addEventListener('click', function() {
+                newEntry.remove();
+                updateHallHeadings();
+            });
+            hallsContainer.appendChild(newEntry);
+            updateHallHeadings();
+        });
+
+        // Dynamic Room Logic
+        const roomsContainer = document.getElementById('roomsContainer');
+        const addRoomBtn = document.getElementById('addRoomBtn');
+
+        function updateRoomHeadings() {
+            const entries = roomsContainer.querySelectorAll('.room-entry');
+            entries.forEach((entry, idx) => {
+                entry.querySelector('.room-heading').textContent = `Room Type ${idx + 1}`;
+                const removeBtn = entry.querySelector('.remove-room-btn');
+                if (entries.length > 1) {
+                    removeBtn.style.display = 'block';
+                } else {
+                    removeBtn.style.display = 'none';
+                }
+            });
+            if (entries.length >= 6) {
+                addRoomBtn.style.display = 'none';
+            } else {
+                addRoomBtn.style.display = 'inline-block';
+            }
+        }
+
+        addRoomBtn.addEventListener('click', () => {
+            const entries = roomsContainer.querySelectorAll('.room-entry');
+            if (entries.length >= 6) return;
+            
+            const newEntry = document.createElement('div');
+            newEntry.className = 'card mb-3 p-3 bg-light border-0 room-entry';
+            newEntry.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0 room-heading">Room Type ${entries.length + 1}</h6>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-room-btn"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <input type="text" class="form-control rm-type" placeholder="Type">
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <input type="text" class="form-control rm-price" placeholder="Price per night">
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <input type="text" class="form-control rm-capacity" placeholder="Capacity">
+                    </div>
+                </div>
+            `;
+            newEntry.querySelector('.remove-room-btn').addEventListener('click', function() {
+                newEntry.remove();
+                updateRoomHeadings();
+            });
+            roomsContainer.appendChild(newEntry);
+            updateRoomHeadings();
+        });
+
+        // Setup Initial remove btns
+        const firstHallRemoveBtn = hallsContainer.querySelector('.remove-hall-btn');
+        if (firstHallRemoveBtn) {
+            firstHallRemoveBtn.addEventListener('click', function() {
+                this.closest('.hall-entry').remove();
+                updateHallHeadings();
+            });
+        }
+        updateHallHeadings();
+
+        const firstRoomRemoveBtn = roomsContainer.querySelector('.remove-room-btn');
+        if (firstRoomRemoveBtn) {
+            firstRoomRemoveBtn.addEventListener('click', function() {
+                this.closest('.room-entry').remove();
+                updateRoomHeadings();
+            });
+        }
+        updateRoomHeadings();
+
+        // Fetch existing data (if any) to prepopulate
+        async function loadHotelProfile() {
+            try {
+                const response = await fetch(`/api/hotels/${user.id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data) {
+                        if (data.hotelName) {
+                            document.getElementById('hotelName').value = data.hotelName;
+                            document.getElementById('hotelName').readOnly = true;
+                            document.getElementById('hotelName').classList.add('bg-light');
+                            const helper = document.createElement('div');
+                            helper.className = 'form-text text-muted small mt-1';
+                            helper.innerHTML = '<i class="fa-solid fa-lock me-1"></i>Hotel name cannot be changed once established.';
+                            document.getElementById('hotelName').parentNode.appendChild(helper);
+                        }
+                        if (data.location) document.getElementById('location').value = data.location;
+                        if (data.aboutUs) document.getElementById('aboutUs').value = data.aboutUs;
+                        if (data.amenities && data.amenities.length > 0) document.getElementById('amenities').value = data.amenities.join(', ');
+                        
+                        if (data.contactInfo) {
+                            document.getElementById('contactEmail').value = data.contactInfo.email || data.email || '';
+                            document.getElementById('contactPhone').value = data.contactInfo.phone || data.phoneNumber || '';
+                            document.getElementById('whatsappNumber').value = data.contactInfo.whatsapp || data.phoneNumber || '';
+                            document.getElementById('websiteLink').value = data.contactInfo.website || '';
+                        } else {
+                            document.getElementById('contactEmail').value = data.email || '';
+                            document.getElementById('contactPhone').value = data.phoneNumber || '';
+                            document.getElementById('whatsappNumber').value = data.phoneNumber || '';
+                        }
+                        
+                        if (data.instagramLink) document.getElementById('instagramLink').value = data.instagramLink;
+                        if (data.facebookLink) document.getElementById('facebookLink').value = data.facebookLink;
+
+                        // Halls prepopulate
+                        if (data.hallArrangements && data.hallArrangements.length > 0) {
+                            hallsContainer.innerHTML = '';
+                            data.hallArrangements.forEach((hall, index) => {
+                                const newEntry = document.createElement('div');
+                                newEntry.className = 'card mb-3 p-3 bg-light border-0 hall-entry';
+                                newEntry.innerHTML = `
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold mb-0 hall-heading">Hall/Venue ${index + 1}</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-hall-btn"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <input type="text" class="form-control hall-name" placeholder="Hall Name" value="${hall.hallName || ''}">
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <input type="text" class="form-control hall-capacity" placeholder="Seating Capacity" value="${hall.seatingCapacity || ''}">
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <input type="text" class="form-control hall-price" placeholder="Price Per Plate" value="${hall.pricePerPlate || ''}">
+                                        </div>
+                                        <div class="col-12">
+                                            <textarea class="form-control hall-desc" rows="2" placeholder="Hall Description & Features">${hall.description || ''}</textarea>
+                                        </div>
+                                    </div>
+                                `;
+                                newEntry.querySelector('.remove-hall-btn').addEventListener('click', function() {
+                                    newEntry.remove();
+                                    updateHallHeadings();
+                                });
+                                hallsContainer.appendChild(newEntry);
+                            });
+                            updateHallHeadings();
+                        }
+
+                        // Rooms prepopulate
+                        if (data.rooms && data.rooms.length > 0) {
+                            roomsContainer.innerHTML = '';
+                            data.rooms.forEach((room, index) => {
+                                const newEntry = document.createElement('div');
+                                newEntry.className = 'card mb-3 p-3 bg-light border-0 room-entry';
+                                newEntry.innerHTML = `
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold mb-0 room-heading">Room Type ${index + 1}</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-room-btn"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <input type="text" class="form-control rm-type" placeholder="Type" value="${room.type || ''}">
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <input type="text" class="form-control rm-price" placeholder="Price per night" value="${room.priceRange || ''}">
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <input type="text" class="form-control rm-capacity" placeholder="Capacity" value="${room.capacity || ''}">
+                                        </div>
+                                    </div>
+                                `;
+                                newEntry.querySelector('.remove-room-btn').addEventListener('click', function() {
+                                    newEntry.remove();
+                                    updateRoomHeadings();
+                                });
+                                roomsContainer.appendChild(newEntry);
+                            });
+                            updateRoomHeadings();
+                        }
+                        
+                        // Populate gallery photo previews
+                        if (data.galleryPhotos && data.galleryPhotos.length > 0) {
+                            const files = document.querySelectorAll('.gallery-file');
+                            data.galleryPhotos.forEach((photo, index) => {
+                                if (index < files.length && photo) {
+                                    const previewContainer = document.createElement('div');
+                                    previewContainer.className = 'mt-2';
+                                    previewContainer.innerHTML = `
+                                        <div class="small text-muted mb-1">Current Photo:</div>
+                                        <img src="${photo}" class="rounded shadow-sm" style="max-height: 80px; object-fit: cover; border: 1px solid #ddd;" />
+                                    `;
+                                    files[index].parentNode.appendChild(previewContainer);
+                                }
+                            });
+                        }
+                    }
+                }
+            } catch (err) {}
+        }
+        loadHotelProfile();
 
         // Show Notification
         function showMessage(msg, type) {

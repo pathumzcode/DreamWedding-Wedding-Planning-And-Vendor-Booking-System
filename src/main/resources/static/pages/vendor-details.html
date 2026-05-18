@@ -150,18 +150,17 @@
         const packages = document.getElementById('packagesContainer');
         if (vendorData.packages && vendorData.packages.length > 0) {
           packages.innerHTML = vendorData.packages.map(p => {
-            // Extract first number from any price string e.g. "Rs. 30,000 - Rs. 50,000" → 30000
-            const numericPrice = parseFloat((p.priceRange || '').replace(/,/g,'').match(/\d+(\.\d+)?/)?.[0] || '0') || 0;
-            const displayPrice = numericPrice > 0 ? `Rs. ${numericPrice.toLocaleString()}` : (p.priceRange || 'N/A');
+            const numericPrice = typeof p.price === 'number' ? p.price : parseFloat((p.priceRange || '').replace(/,/g,'').match(/\d+(\.\d+)?/)?.[0] || '0') || 0;
+            const displayPrice = numericPrice > 0 ? `Rs. ${numericPrice.toLocaleString()}` : 'Price on request';
             const catGuess = guessBudgetCategory(vendorData.category);
             return `
             <div class="col-md-6">
               <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
                 <h5 class="fw-bold">${p.name}</h5>
                 <h3 class="fw-bold text-primary my-3">${displayPrice}</h3>
-                <p class="text-muted small">${p.description}</p>
-                <button class="btn btn-outline-dark rounded-pill w-100 mt-2" onclick="handleBooking('${p.name}', '${p.priceRange}')">Book Now</button>
-                <button class="btn btn-outline-warning rounded-pill w-100 mt-2" onclick="addToBudget('${vendorData.businessName.replace(/'/g,"\'")}','${p.name.replace(/'/g,"\'")}','${catGuess}',${numericPrice},'vendor')">
+                <p class="text-muted small">${p.description || ''}</p>
+                <button class="btn btn-outline-dark rounded-pill w-100 mt-2" onclick="handleBooking('${(p.name || '').replace(/'/g, "\\'")}')">Book Now</button>
+                <button class="btn btn-outline-warning rounded-pill w-100 mt-2" onclick="addToBudget('${vendorData.businessName.replace(/'/g,"\'")}','${(p.name || '').replace(/'/g,"\'")}','${catGuess}',${numericPrice},'vendor')">
                   <i class="fa-solid fa-wallet me-1"></i>Add to Budget
                 </button>
               </div>
@@ -228,7 +227,7 @@
                     <div class="mb-4 pb-4 ${reviews.indexOf(r) < reviews.length - 1 ? 'border-bottom' : ''}">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div class="d-flex align-items-center">
-                                <img src="${r.reviewerProfilePic ? r.reviewerProfilePic : `https://ui-avatars.com/api/?name=${encodeURIComponent(r.reviewerName)}&background=fdf4e7&color=b8963e`}" class="rounded-circle me-3" width="45" height="45" style="object-fit: cover;">
+                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(r.reviewerName)}&background=fdf4e7&color=b8963e" class="rounded-circle me-3" width="45" height="45">
                                 <div>
                                     <h6 class="fw-bold mb-0">${r.reviewerName} ${r.verified ? '<i class="fa-solid fa-circle-check text-primary ms-1" style="font-size: 0.8rem;"></i>' : ''}</h6>
                                     <small class="text-muted">${new Date(r.reviewDate).toLocaleDateString()}</small>
@@ -267,7 +266,7 @@
         }, btn);
     };
 
-    window.handleBooking = function(pkg, price) {
+    window.handleBooking = function(pkg) {
         const u = sessionStorage.getItem('dreamWeddingUser');
         if (!u) { window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href); return; }
         const user = JSON.parse(u);
