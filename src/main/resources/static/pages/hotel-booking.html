@@ -161,20 +161,9 @@
           });
         }
 
-        // Rooms
-        if (hotel.rooms && hotel.rooms.length > 0) {
-          hotel.rooms.forEach(r => {
-            allOptions.push({
-              name: r.type,
-              price: `${r.priceRange} / Night`,
-              detail: `Capacity: ${r.capacity}`,
-              type: 'Room'
-            });
-          });
-        }
 
         if (allOptions.length === 0) {
-          container.innerHTML = '<div class="alert alert-warning">This hotel has no halls or rooms set up yet. Contact them directly.</div>';
+          container.innerHTML = '<div class="alert alert-warning">This hotel has no halls or venues set up yet. Contact them directly.</div>';
         } else {
           allOptions.forEach((opt, i) => {
             const isPreselected = preselectedHall && opt.name === preselectedHall;
@@ -249,7 +238,7 @@
         }
         if (!selectedPackages.length) {
           msgEl.className = 'alert alert-danger';
-          msgEl.textContent = 'Please select at least one hall or room.';
+          msgEl.textContent = 'Please select at least one hall or venue.'
           return;
         }
 

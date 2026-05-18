@@ -247,33 +247,6 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mb-3" style="margin-top: 30px;">
-                            <h4 class="section-title mb-0" style="margin-top: 0; border: none;">Rooms & Pricing (Up to 6 room types)</h4>
-                            <button type="button" class="btn btn-outline-primary btn-sm" id="addRoomBtn"><i class="fa-solid fa-plus me-1"></i>Add Room</button>
-                        </div>
-                        <div style="border-bottom: 2px solid #f0e6d2; margin-bottom: 20px; margin-top: -10px;"></div>
-                        
-                        <div id="roomsContainer">
-                            <!-- Room 1 -->
-                            <div class="card mb-3 p-3 bg-light border-0 room-entry">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="fw-bold mb-0 room-heading">Room Type 1</h6>
-                                    <button type="button" class="btn btn-sm btn-outline-danger remove-room-btn" style="display:none;"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4 mb-2">
-                                        <input type="text" class="form-control rm-type" placeholder="Type (e.g. Deluxe Room)">
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <input type="text" class="form-control rm-price" placeholder="Price per night (e.g. Rs. 15,000)">
-                                    </div>
-                                    <div class="col-md-4 mb-2">
-                                        <input type="text" class="form-control rm-capacity" placeholder="Capacity (e.g. 2 Adults)">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <h4 class="section-title">Gallery (3 Photos)</h4>
                         <div class="mb-4 text-muted small">Please select 3 images of your hotel</div>
                         
@@ -385,60 +358,7 @@
             updateHallHeadings();
         });
 
-        // Dynamic Room Logic
-        const roomsContainer = document.getElementById('roomsContainer');
-        const addRoomBtn = document.getElementById('addRoomBtn');
-
-        function updateRoomHeadings() {
-            const entries = roomsContainer.querySelectorAll('.room-entry');
-            entries.forEach((entry, idx) => {
-                entry.querySelector('.room-heading').textContent = `Room Type ${idx + 1}`;
-                const removeBtn = entry.querySelector('.remove-room-btn');
-                if (entries.length > 1) {
-                    removeBtn.style.display = 'block';
-                } else {
-                    removeBtn.style.display = 'none';
-                }
-            });
-            if (entries.length >= 6) {
-                addRoomBtn.style.display = 'none';
-            } else {
-                addRoomBtn.style.display = 'inline-block';
-            }
-        }
-
-        addRoomBtn.addEventListener('click', () => {
-            const entries = roomsContainer.querySelectorAll('.room-entry');
-            if (entries.length >= 6) return;
-            
-            const newEntry = document.createElement('div');
-            newEntry.className = 'card mb-3 p-3 bg-light border-0 room-entry';
-            newEntry.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="fw-bold mb-0 room-heading">Room Type ${entries.length + 1}</h6>
-                    <button type="button" class="btn btn-sm btn-outline-danger remove-room-btn"><i class="fa-solid fa-trash"></i></button>
-                </div>
-                <div class="row">
-                    <div class="col-md-4 mb-2">
-                        <input type="text" class="form-control rm-type" placeholder="Type">
-                    </div>
-                    <div class="col-md-4 mb-2">
-                        <input type="text" class="form-control rm-price" placeholder="Price per night">
-                    </div>
-                    <div class="col-md-4 mb-2">
-                        <input type="text" class="form-control rm-capacity" placeholder="Capacity">
-                    </div>
-                </div>
-            `;
-            newEntry.querySelector('.remove-room-btn').addEventListener('click', function() {
-                newEntry.remove();
-                updateRoomHeadings();
-            });
-            roomsContainer.appendChild(newEntry);
-            updateRoomHeadings();
-        });
-
-        // Setup Initial remove btns
+        // Setup Initial remove btn for first hall
         const firstHallRemoveBtn = hallsContainer.querySelector('.remove-hall-btn');
         if (firstHallRemoveBtn) {
             firstHallRemoveBtn.addEventListener('click', function() {
@@ -447,15 +367,6 @@
             });
         }
         updateHallHeadings();
-
-        const firstRoomRemoveBtn = roomsContainer.querySelector('.remove-room-btn');
-        if (firstRoomRemoveBtn) {
-            firstRoomRemoveBtn.addEventListener('click', function() {
-                this.closest('.room-entry').remove();
-                updateRoomHeadings();
-            });
-        }
-        updateRoomHeadings();
 
         // Fetch existing data (if any) to prepopulate
         async function loadHotelProfile() {
@@ -526,37 +437,6 @@
                             updateHallHeadings();
                         }
 
-                        // Rooms prepopulate
-                        if (data.rooms && data.rooms.length > 0) {
-                            roomsContainer.innerHTML = '';
-                            data.rooms.forEach((room, index) => {
-                                const newEntry = document.createElement('div');
-                                newEntry.className = 'card mb-3 p-3 bg-light border-0 room-entry';
-                                newEntry.innerHTML = `
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <h6 class="fw-bold mb-0 room-heading">Room Type ${index + 1}</h6>
-                                        <button type="button" class="btn btn-sm btn-outline-danger remove-room-btn"><i class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4 mb-2">
-                                            <input type="text" class="form-control rm-type" placeholder="Type" value="${room.type || ''}">
-                                        </div>
-                                        <div class="col-md-4 mb-2">
-                                            <input type="text" class="form-control rm-price" placeholder="Price per night" value="${room.priceRange || ''}">
-                                        </div>
-                                        <div class="col-md-4 mb-2">
-                                            <input type="text" class="form-control rm-capacity" placeholder="Capacity" value="${room.capacity || ''}">
-                                        </div>
-                                    </div>
-                                `;
-                                newEntry.querySelector('.remove-room-btn').addEventListener('click', function() {
-                                    newEntry.remove();
-                                    updateRoomHeadings();
-                                });
-                                roomsContainer.appendChild(newEntry);
-                            });
-                            updateRoomHeadings();
-                        }
                         
                         // Populate gallery photo previews
                         if (data.galleryPhotos && data.galleryPhotos.length > 0) {
@@ -665,7 +545,6 @@
                     instagramLink: document.getElementById('instagramLink').value.trim(),
                     facebookLink: document.getElementById('facebookLink').value.trim(),
                     amenities,
-                    rooms,
                     hallArrangements,
                     galleryPhotos
                 };

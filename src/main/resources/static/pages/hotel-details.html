@@ -91,8 +91,6 @@
           <h4 class="mt-5 fw-bold">Hall Arrangements</h4>
           <div class="row g-4 mt-1 mb-5" id="hallsContainer"></div>
 
-          <h4 class="mt-5 fw-bold">Accommodation</h4>
-          <div class="row g-4 mt-1 mb-5" id="roomsContainer"></div>
 
           <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
             <h4 class="fw-bold mb-0">Guest reviews</h4>
@@ -173,7 +171,7 @@
                         <p class="text-primary fw-bold mb-2">${displayPrice}</p>
                         <p class="text-muted small">Capacity: ${h.seatingCapacity || 'N/A'}</p>
                         <button class="btn btn-outline-dark rounded-pill w-100 mt-2" onclick="handleBooking('${(h.hallName || '').replace(/'/g, "\'")}')" >Select Hall</button>
-                        <button class="btn btn-outline-warning rounded-pill w-100 mt-2" onclick="addToBudget('${hotelData.hotelName.replace(/'/g,"\'")}','${(h.hallName||'Hall').replace(/'/g,"\'")}','Food and catering',${numericPrice},'hotel')">
+                        <button class="btn btn-outline-warning rounded-pill w-100 mt-2" onclick="addToBudget('${hotelData.hotelName.replace(/'/g,"\'")}','${(h.hallName||'Hall').replace(/'/g,"\'")}','Hotels and Venue',${numericPrice},'hotel')">
                           <i class="fa-solid fa-wallet me-1"></i>Add to Budget
                         </button>
                     </div>
@@ -183,27 +181,6 @@
             document.getElementById('hallsContainer').innerHTML = '<div class="col-12 text-muted">No hall arrangements available.</div>';
         }
 
-        if (hotelData.rooms && hotelData.rooms.length > 0) {
-            document.getElementById('roomsContainer').innerHTML = hotelData.rooms.map(r => {
-                // Extract first number from price string e.g. "Rs. 5,000 - Rs. 10,000" → 5000
-                const numericPrice = parseFloat((r.priceRange || '').replace(/,/g,'').match(/\d+(\.\d+)?/)?.[0] || '0') || 0;
-                const displayPrice = numericPrice > 0 ? `Rs. ${numericPrice.toLocaleString()}` : (r.priceRange || 'N/A');
-                return `
-                <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 p-4 text-center">
-                        <h5 class="fw-bold">${r.type || 'Unnamed Room'}</h5>
-                        <p class="text-primary fw-bold mb-2">${displayPrice}</p>
-                        <p class="text-muted small">Capacity: ${r.capacity || 'N/A'}</p>
-                        <button class="btn btn-outline-dark rounded-pill w-100 mt-2" onclick="handleBooking('${(r.type || '').replace(/'/g, "\'")}')" >Select Room</button>
-                        <button class="btn btn-outline-warning rounded-pill w-100 mt-2" onclick="addToBudget('${hotelData.hotelName.replace(/'/g,"\'")}','${(r.type||'Room').replace(/'/g,"\'")}','Gifts',${numericPrice},'hotel')">
-                          <i class="fa-solid fa-wallet me-1"></i>Add to Budget
-                        </button>
-                    </div>
-                </div>`;
-            }).join('');
-        } else {
-            document.getElementById('roomsContainer').innerHTML = '<div class="col-12 text-muted">No accommodation details available.</div>';
-        }
 
         document.getElementById('contactPhone').textContent = hotelData.contactDetails?.phone || hotelData.phoneNumber || 'N/A';
         document.getElementById('contactEmail').textContent = hotelData.contactDetails?.email || hotelData.email || 'N/A';

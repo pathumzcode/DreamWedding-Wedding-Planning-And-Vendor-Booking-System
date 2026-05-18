@@ -230,17 +230,19 @@ public class BudgetController {
         });
     }
 
-    /** Maps vendor category string to one of the 6 budget categories */
+    /** Maps vendor category string to one of the 7 budget categories */
     private String guessCategoryFromVendor(String vendorCategory) {
         if (vendorCategory == null) return "Gifts";
         String cat = vendorCategory.toLowerCase();
-        if (cat.contains("photo"))                                                   return "Photography";
-        if (cat.contains("food") || cat.contains("cater") || cat.contains("hotel")) return "Food and catering";
-        if (cat.contains("florist") || cat.contains("flower"))                      return "Florist";
-        if (cat.contains("music") || cat.contains("danc") || cat.contains("dj"))    return "Wedding music and dancing";
+        if (cat.contains("hotel") || cat.contains("venue"))                                                      return "Hotels and Venue";
+        if (cat.contains("photo"))                                                                               return "Photography";
+        if (cat.contains("food") || cat.contains("cater"))                                                      return "Food and catering";
+        if (cat.contains("florist") || cat.contains("flower"))                                                  return "Florist";
+        if (cat.contains("music") || cat.contains("danc") || cat.contains("dj"))                                return "Wedding music and dancing";
         if (cat.contains("jewel") || cat.contains("attire") || cat.contains("dress") || cat.contains("beauty")) return "Jewellery and Attire";
         return "Gifts";
     }
+
 
     // ─────────────────────────────────────────────────────────────
     // Enrich the plan with computed totals per category

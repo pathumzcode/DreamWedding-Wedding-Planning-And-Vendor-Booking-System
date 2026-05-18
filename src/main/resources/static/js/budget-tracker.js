@@ -10,7 +10,9 @@ const CATEGORIES = [
   { id: 'music',    name: 'Wedding music and dancing', icon: 'fa-music',    color: '#8b5cf6', colorBg: '#f5f3ff' },
   { id: 'florist',  name: 'Florist',                   icon: 'fa-spa',      color: '#ec4899', colorBg: '#fdf2f8' },
   { id: 'gifts',    name: 'Gifts',                     icon: 'fa-gift',     color: '#22c55e', colorBg: '#f0fdf4' },
+  { id: 'hotels',   name: 'Hotels and Venue',          icon: 'fa-hotel',    color: '#92400e', colorBg: '#fdf3e7' },
 ];
+
 
 let customerId = null;
 let plan = null;
@@ -100,10 +102,21 @@ function renderOverBudgetAlert() {
 }
 
 function renderDonut() {
-  const cats = plan.categories || [];
+  const planCats = plan.categories || [];
+  const expenses = plan.expenses || [];
+
+  // Always show all 7 standard categories; compute spent DIRECTLY from expenses
+  const cats = CATEGORIES.map(def => {
+    const found = planCats.find(c => c.categoryName === def.name);
+    const directSpent = expenses
+      .filter(e => e.categoryName === def.name)
+      .reduce((s, e) => s + (e.amount || 0), 0);
+    return { categoryName: def.name, spentAmount: directSpent };
+  });
+
   const labels = cats.map(c => c.categoryName);
   const data   = cats.map(c => c.spentAmount || 0);
-  const colors = ['#f5c518','#3b82f6','#ef4444','#8b5cf6','#ec4899','#22c55e'];
+  const colors = ['#f5c518','#3b82f6','#ef4444','#8b5cf6','#ec4899','#22c55e','#92400e'];
 
   const totalSpent = plan.totalSpent || 0;
   const totalBudget = plan.totalBudget || 1;
@@ -132,7 +145,7 @@ function renderDonut() {
     }
   });
 
-  // Legend
+  // Legend — always show all 7 categories
   const legend = document.getElementById('donutLegend');
   legend.innerHTML = cats.map((c, i) => `
     <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; font-size:13px;">
@@ -143,13 +156,32 @@ function renderDonut() {
   `).join('');
 }
 
+
+
 function renderCategories() {
   const container = document.getElementById('categoryCards');
-  const cats = plan.categories || [];
-  if (cats.length === 0) {
-    container.innerHTML = '<p class="text-muted text-center small py-3">No categories set. <a href="budget-calculator.html">Edit setup</a></p>';
-    return;
-  }
+  const planCats = plan.categories || [];
+  const expenses = plan.expenses || [];
+
+  // Always show all 7 standard categories; compute spent DIRECTLY from expenses
+  const cats = CATEGORIES.map(def => {
+    const found = planCats.find(c => c.categoryName === def.name);
+    const directSpent = expenses
+      .filter(e => e.categoryName === def.name)
+      .reduce((s, e) => s + (e.amount || 0), 0);
+    const allocated = found ? (found.allocatedAmount || 0) : 0;
+    const remaining = allocated - directSpent;
+    const pctUsed   = allocated > 0 ? Math.round(directSpent / allocated * 1000) / 10 : 0;
+    const isOver    = allocated > 0 && directSpent > allocated;
+    return found
+      ? { ...found, spentAmount: directSpent, remainingAmount: remaining, percentUsed: pctUsed, isOverBudget: isOver }
+      : { categoryName: def.name, allocatedAmount: 0, spentAmount: directSpent, remainingAmount: 0, percentUsed: 0, isOverBudget: false };
+  });
+  // Also keep any legacy expense categories not in the standard list
+  planCats.forEach(cat => {
+    if (!CATEGORIES.find(c => c.name === cat.categoryName)) cats.push(cat);
+  });
+
   container.innerHTML = cats.map(cat => {
     const pct = cat.percentUsed || 0;
     const overClass = cat.isOverBudget ? 'over' : '';
@@ -159,6 +191,7 @@ function renderCategories() {
     const iconBg = catMeta?.colorBg || '#f5f5f5';
     const estimateForCat = (plan.estimates || []).filter(e => e.categoryName === cat.categoryName);
     const totalEst = estimateForCat.reduce((s, e) => s + e.estimatedAmount, 0);
+    const notAllocated = (cat.allocatedAmount || 0) === 0;
     return `
       <div class="cat-card ${overClass}">
         <div class="cat-header">
@@ -189,11 +222,13 @@ function renderCategories() {
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             ${cat.isOverBudget ? '<span class="over-tag"><i class="fa-solid fa-triangle-exclamation me-1"></i>Over budget</span>' : ''}
             ${totalEst > 0 ? `<span class="estimate-tag"><i class="fa-solid fa-file-invoice-dollar me-1"></i>Est: Rs. ${totalEst.toLocaleString()}</span>` : ''}
+            ${notAllocated ? '<span style="font-size:10px;color:#b8963e;"><i class="fa-solid fa-circle-info me-1"></i>Not allocated — <a href="budget-calculator.html" style="color:#b8963e;">Edit Setup</a></span>' : ''}
           </div>
         </div>
       </div>`;
   }).join('');
 }
+
 
 function renderExpenses() {
   const tbody = document.getElementById('expenseTableBody');
