@@ -14,6 +14,7 @@ public class CustomerController {
 
     private final CustomerRepository customerRepository;
 
+    // READ Operation: Retrieve a customer by their unique ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getCustomerById(@PathVariable String id) {
         Customer customer = customerRepository.findById(id)
@@ -21,6 +22,7 @@ public class CustomerController {
         return ResponseEntity.ok(customer);
     }
 
+    // UPDATE Operation: Modify an existing customer's profile details
     @PutMapping("/{id}/profile")
     public ResponseEntity<?> updateProfile(@PathVariable String id, @RequestBody CustomerProfileUpdateRequest request) {
         Customer customer = customerRepository.findById(id)

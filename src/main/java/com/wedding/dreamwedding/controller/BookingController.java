@@ -25,7 +25,7 @@ public class BookingController {
     private static final List<String> VALID_STATUSES =
             List.of("PENDING", "CONFIRMED", "REJECTED", "COMPLETED", "CANCELLED");
     
-    // Create booking
+    // CREATE Operation: Create a new booking request
     @PostMapping
     public ResponseEntity<?> createBooking(@Valid @RequestBody BookingRequest request) {
         Booking booking = new Booking();
@@ -61,7 +61,7 @@ public class BookingController {
         return ResponseEntity.ok(Map.of("message", "Booking request submitted successfully!", "booking", saved));
     }
 
-    // Export report for a booking (Demonstrates File Creation)
+    // READ Operation: Export report for a booking (Demonstrates File Creation)
     @GetMapping("/{id}/report")
     public ResponseEntity<?> exportReport(@PathVariable String id) {
         return bookingRepository.findById(id).map(b -> {
@@ -75,25 +75,25 @@ public class BookingController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Get all bookings for a customer
+    // READ Operation: Get all bookings for a customer
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<List<Booking>> getCustomerBookings(@PathVariable String customerId) {
         return ResponseEntity.ok(bookingRepository.findByCustomerId(customerId));
     }
 
-    // Get all bookings for a vendor
+    // READ Operation: Get all bookings for a vendor
     @GetMapping("/vendor/{vendorId}")
     public ResponseEntity<List<Booking>> getVendorBookings(@PathVariable String vendorId) {
         return ResponseEntity.ok(bookingRepository.findByVendorId(vendorId));
     }
 
-    // Get all bookings (admin)
+    // READ Operation: Get all bookings (admin)
     @GetMapping
     public ResponseEntity<List<Booking>> getAllBookings() {
         return ResponseEntity.ok(bookingRepository.findAll());
     }
 
-    // Update booking status (vendor: CONFIRMED / REJECTED / add note)
+    // UPDATE Operation: Update booking status (vendor: CONFIRMED / REJECTED / add note)
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable String id, @RequestBody Map<String, String> body) {
         return bookingRepository.findById(id).map(b -> {
@@ -132,7 +132,7 @@ public class BookingController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Customer edits their booking — only allowed if booking is still PENDING
+    // UPDATE Operation: Customer edits their booking — only allowed if booking is still PENDING
     @PutMapping("/{id}")
     public ResponseEntity<?> updateBooking(@PathVariable String id, @Valid @RequestBody BookingRequest request) {
         return bookingRepository.findById(id).map(b -> {
@@ -151,7 +151,7 @@ public class BookingController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Delete a booking
+    // DELETE Operation: Delete a booking
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBooking(@PathVariable String id) {
         // ── BUDGET SYNC: remove expense linked to this booking ───

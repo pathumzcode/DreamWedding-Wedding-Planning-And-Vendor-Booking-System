@@ -17,7 +17,7 @@ public class PromotionController {
 
     private final PromotionRepository promotionRepository;
 
-    // Get all active (APPROVED + not expired) promotions for homepage
+    // READ Operation: Get all active (APPROVED + not expired) promotions for homepage
     @GetMapping("/active")
     public ResponseEntity<List<Promotion>> getActivePromotions() {
         String today = LocalDate.now().toString();
@@ -28,13 +28,13 @@ public class PromotionController {
         return ResponseEntity.ok(active);
     }
 
-    // Get all promotions (admin view)
+    // READ Operation: Get all promotions (admin view)
     @GetMapping
     public ResponseEntity<List<Promotion>> getAllPromotions() {
         return ResponseEntity.ok(promotionRepository.findAll());
     }
 
-    // Vendor/Hotel submits a promotion
+    // CREATE Operation: Vendor/Hotel submits a promotion
     @PostMapping
     public ResponseEntity<?> submitPromotion(@RequestBody Promotion promotion) {
         promotion.setStatus("PENDING");
@@ -42,7 +42,7 @@ public class PromotionController {
         return ResponseEntity.ok(Map.of("message", "Promotion submitted for review"));
     }
 
-    // Admin approves a promotion
+    // UPDATE Operation: Admin approves a promotion
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> approvePromotion(@PathVariable String id) {
         return promotionRepository.findById(id).map(p -> {
@@ -52,7 +52,7 @@ public class PromotionController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Admin creates a promotion directly
+    // CREATE Operation: Admin creates a promotion directly
     @PostMapping("/admin")
     public ResponseEntity<?> createAdminPromotion(@RequestBody Promotion promotion) {
         promotion.setStatus("APPROVED");
@@ -60,7 +60,7 @@ public class PromotionController {
         return ResponseEntity.ok(saved);
     }
 
-    // Update an existing promotion
+    // UPDATE Operation: Update an existing promotion
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePromotion(@PathVariable String id, @RequestBody Promotion promotion) {
         return promotionRepository.findById(id).map(p -> {
@@ -81,7 +81,7 @@ public class PromotionController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Delete a promotion
+    // DELETE Operation: Delete a promotion
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePromotion(@PathVariable String id) {
         promotionRepository.deleteById(id);

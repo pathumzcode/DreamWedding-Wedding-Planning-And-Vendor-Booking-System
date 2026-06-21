@@ -14,6 +14,7 @@ public class SiteSettingsController {
 
     private final SiteSettingsRepository siteSettingsRepository;
 
+    // READ Operation: Retrieve the global site settings
     @GetMapping
     public ResponseEntity<?> getSettings() {
         return siteSettingsRepository.findById("global")
@@ -21,6 +22,7 @@ public class SiteSettingsController {
             .orElse(ResponseEntity.ok(new SiteSettings()));
     }
 
+    // UPDATE Operation: Modify the global site settings
     @PutMapping
     public ResponseEntity<?> updateSettings(@RequestBody SiteSettings settings) {
         settings.setId("global");

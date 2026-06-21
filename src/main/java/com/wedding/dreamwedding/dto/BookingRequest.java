@@ -14,7 +14,6 @@ public class BookingRequest {
 
     private String vendorName;
     private String vendorCategory;
-    private String customerName;
 
     @NotBlank(message = "Event date is required")
     private String eventDate;

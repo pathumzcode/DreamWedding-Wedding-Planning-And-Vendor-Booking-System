@@ -16,6 +16,7 @@ public class HotelController {
 
     private final HotelRepository hotelRepository;
 
+    // UPDATE Operation: Modify a hotel's profile details
     @PutMapping("/{id}/profile")
     public ResponseEntity<?> updateProfile(@PathVariable String id, @Valid @RequestBody HotelProfileUpdateRequest request) {
         Hotel hotel = hotelRepository.findById(id).orElse(null);
@@ -44,11 +45,13 @@ public class HotelController {
         hotelRepository.save(hotel);
         return ResponseEntity.ok(Map.of("message", "Hotel profile updated successfully"));
     }
+    // READ Operation: Retrieve all hotels
     @GetMapping
     public ResponseEntity<?> getAllHotels() {
         return ResponseEntity.ok(hotelRepository.findAll());
     }
 
+    // READ Operation: Retrieve a specific hotel by ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getHotelById(@PathVariable String id) {
         return hotelRepository.findById(id)
