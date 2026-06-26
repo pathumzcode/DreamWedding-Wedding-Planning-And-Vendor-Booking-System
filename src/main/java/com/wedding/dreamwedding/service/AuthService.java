@@ -8,16 +8,12 @@ import com.wedding.dreamwedding.entity.*;
 import com.wedding.dreamwedding.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-/**
- * AuthService handles user registration and login logic.
- * Routes users to the correct collection based on their role.
- */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -27,7 +23,7 @@ public class AuthService {
     private final AdminRepository adminRepository;
     private final HotelRepository hotelRepository;
     private final UserActionRepository userActionRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
     public RegisterResponse register(RegisterRequest request) {
         if (emailExists(request.getEmail())) {
@@ -76,42 +72,25 @@ public class AuthService {
     public LoginResponse login(LoginRequest request) {
         BaseUser user = findByEmail(request.getEmail()).orElse(null);
 
-        // --- EMERGENCY ADMIN RECOVERY ---
-        if ("admin1@gmail.com".equalsIgnoreCase(request.getEmail())) {
-            if (user == null) {
-                // Create admin if completely missing from DB
-                Admin newAdmin = new Admin();
-                newAdmin.setEmail("admin1@gmail.com");
-                newAdmin.setFirstName("System");
-                newAdmin.setLastName("Admin");
-                newAdmin.setPassword(passwordEncoder.encode(request.getPassword()));
-                newAdmin.setRole(Role.ADMIN);
-                newAdmin.setCreatedAt(LocalDateTime.now());
-                user = adminRepository.save(newAdmin);
-            } else {
-                // Force reset password to whatever they type to guarantee access
-                user.setPassword(passwordEncoder.encode(request.getPassword()));
-                saveUser(user);
+        if (user == null) {
+            throw new BadCredentialsException("Invalid email or password");
+        }
+
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new BadCredentialsException("Invalid email or password");
+        }
+
+        if (isBcryptHash(user.getPassword())) {
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                throw new BadCredentialsException("Invalid email or password");
             }
         } else {
-            // Standard user login flow
-            if (user == null) {
+            if (!user.getPassword().equals(request.getPassword())) {
                 throw new BadCredentialsException("Invalid email or password");
             }
-            if (user.getPassword() == null) {
-                throw new BadCredentialsException("Invalid email or password");
-            }
-            if (user.getPassword().startsWith("$2a$")) {
-                if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                    throw new BadCredentialsException("Invalid email or password");
-                }
-            } else {
-                if (!user.getPassword().equals(request.getPassword())) {
-                    throw new BadCredentialsException("Invalid email or password");
-                }
-                user.setPassword(passwordEncoder.encode(request.getPassword()));
-                saveUser(user);
-            }
+            String encodedPassword = passwordEncoder.encode(request.getPassword());
+            user.setPassword(encodedPassword);
+            saveUser(user);
         }
 
         boolean profileCompleted = false;
@@ -121,7 +100,6 @@ public class AuthService {
             profileCompleted = ((Hotel) user).isProfileCompleted();
         }
 
-        // Log the login activity
         UserAction loginAction = new UserAction();
         loginAction.setUserId(user.getId());
         loginAction.setUserEmail(user.getEmail());
@@ -196,6 +174,7 @@ public class AuthService {
         if (password == null || password.isBlank()) {
             throw new BadCredentialsException("Password is required");
         }
+
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("Incorrect password");
         }
@@ -216,12 +195,36 @@ public class AuthService {
         }
     }
 
+    public void updatePassword(String userId, String currentPassword, String newPassword) {
+        BaseUser user = findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (currentPassword == null || currentPassword.isBlank()) {
+            throw new BadCredentialsException("Current password is required");
+        }
+
+        if (newPassword == null || newPassword.isBlank()) {
+            throw new BadCredentialsException("New password cannot be empty");
+        }
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new BadCredentialsException("Current password is incorrect");
+        }
+
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedNewPassword);
+        saveUser(user);
+    }
+
     public java.util.List<java.util.Map<String, String>> getDebugInfo() {
         return adminRepository.findAll().stream().map(a -> java.util.Map.of(
             "email", a.getEmail(),
-            "password", a.getPassword(),
             "role", a.getRole().toString()
         )).toList();
+    }
+
+    private boolean isBcryptHash(String password) {
+        return password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$") || password.startsWith("$2x$");
     }
 
     private void populateBaseFields(BaseUser user, RegisterRequest request, String plainPassword) {
