@@ -15,6 +15,7 @@ public class VendorController {
 
     private final VendorRepository vendorRepository;
 
+    // READ Operation: Retrieve all vendors with completed profiles
     @GetMapping
     public ResponseEntity<?> getAllVendors() {
         return ResponseEntity.ok(vendorRepository.findAll().stream()
@@ -22,6 +23,7 @@ public class VendorController {
                 .toList());
     }
 
+    // READ Operation: Retrieve the top 6 vendors based on review count
     @GetMapping("/top")
     public ResponseEntity<?> getTopVendors() {
         return ResponseEntity.ok(vendorRepository.findAll().stream()
@@ -31,6 +33,7 @@ public class VendorController {
                 .toList());
     }
 
+    // READ Operation: Retrieve a specific vendor by ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getVendorById(@PathVariable String id) {
         Vendor vendor = vendorRepository.findById(id)
@@ -38,6 +41,7 @@ public class VendorController {
         return ResponseEntity.ok(vendor);
     }
 
+    // UPDATE Operation: Modify a vendor's profile details
     @PutMapping("/{id}/profile")
     public ResponseEntity<?> updateProfile(@PathVariable String id, @Valid @RequestBody VendorProfileUpdateRequest request) {
         Vendor vendor = vendorRepository.findById(id)

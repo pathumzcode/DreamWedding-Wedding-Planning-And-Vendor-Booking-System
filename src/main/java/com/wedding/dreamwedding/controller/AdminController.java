@@ -18,6 +18,7 @@ public class AdminController {
     private final BookingRepository bookingRepository;
 
     // --- Stats ---
+    // READ Operation: Get system statistics
     @GetMapping("/stats")
     public ResponseEntity<?> getStats() {
         return ResponseEntity.ok(Map.of(
@@ -29,46 +30,54 @@ public class AdminController {
     }
 
     // --- Users Lists ---
+    // READ Operation: Get all vendors
     @GetMapping("/vendors")
     public ResponseEntity<?> getAllVendors() {
         return ResponseEntity.ok(vendorRepository.findAll());
     }
 
+    // READ Operation: Get all customers
     @GetMapping("/customers")
     public ResponseEntity<?> getAllCustomers() {
         return ResponseEntity.ok(customerRepository.findAll());
     }
 
+    // READ Operation: Get all hotels
     @GetMapping("/hotels")
     public ResponseEntity<?> getAllHotels() {
         return ResponseEntity.ok(hotelRepository.findAll());
     }
 
     // --- Delete Users ---
+    // DELETE Operation: Delete a vendor
     @DeleteMapping("/vendors/{id}")
     public ResponseEntity<?> deleteVendor(@PathVariable String id) {
         vendorRepository.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Vendor deleted"));
     }
 
+    // DELETE Operation: Delete a customer
     @DeleteMapping("/customers/{id}")
     public ResponseEntity<?> deleteCustomer(@PathVariable String id) {
         customerRepository.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Customer deleted"));
     }
 
+    // DELETE Operation: Delete a hotel
     @DeleteMapping("/hotels/{id}")
     public ResponseEntity<?> deleteHotel(@PathVariable String id) {
         hotelRepository.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Hotel deleted"));
     }
 
+    // DELETE Operation: Delete a booking
     @DeleteMapping("/bookings/{id}")
     public ResponseEntity<?> deleteBooking(@PathVariable String id) {
         bookingRepository.deleteById(id);
         return ResponseEntity.ok(Map.of("message", "Booking deleted"));
     }
 
+    // READ Operation: Get all business names
     @GetMapping("/business-names")
     public ResponseEntity<?> getBusinessNames() {
         java.util.List<String> names = new java.util.ArrayList<>();
@@ -86,6 +95,7 @@ public class AdminController {
      * Used by the admin promotion form for smart autocomplete + navigation linking.
      * Demonstrates OOP: each result is a polymorphic map representing either a Vendor or Hotel.
      */
+    // READ Operation: Returns all registered vendors and hotels as structured objects
     @GetMapping("/business-entities")
     public ResponseEntity<?> getBusinessEntities() {
         java.util.List<java.util.Map<String, String>> entities = new java.util.ArrayList<>();

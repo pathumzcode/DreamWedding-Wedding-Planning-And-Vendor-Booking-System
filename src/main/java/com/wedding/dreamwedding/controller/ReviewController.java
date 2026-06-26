@@ -18,6 +18,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
+    // CREATE Operation: Create a new review for a vendor
     @PostMapping("/vendor")
     public ResponseEntity<?> createVendorReview(@Valid @RequestBody ReviewDTO dto) {
         try {
@@ -28,6 +29,7 @@ public class ReviewController {
         }
     }
 
+    // CREATE Operation: Create a new site review
     @PostMapping("/site")
     public ResponseEntity<?> createSiteReview(@Valid @RequestBody ReviewDTO dto, @RequestParam String role) {
         // Validate role parameter value
@@ -42,31 +44,37 @@ public class ReviewController {
         }
     }
 
+    // READ Operation: Retrieve reviews for a specific vendor
     @GetMapping("/vendor/{vendorId}")
     public ResponseEntity<List<Review>> getVendorReviews(@PathVariable String vendorId) {
         return ResponseEntity.ok(reviewService.getVendorReviews(vendorId));
     }
 
+    // READ Operation: Retrieve all site reviews
     @GetMapping("/site")
     public ResponseEntity<List<Review>> getSiteReviews() {
         return ResponseEntity.ok(reviewService.getSiteReviews());
     }
 
+    // READ Operation: Retrieve reviews created by a specific user
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Review>> getMyReviews(@PathVariable String userId) {
         return ResponseEntity.ok(reviewService.getMyReviews(userId));
     }
 
+    // READ Operation: Retrieve all reviews (admin view)
     @GetMapping("/all")
     public ResponseEntity<List<Review>> getAllReviews() {
         return ResponseEntity.ok(reviewService.getAllReviews());
     }
 
+    // UPDATE Operation: Mark a review as helpful
     @PostMapping("/{reviewId}/helpful/{userId}")
     public ResponseEntity<Review> markHelpful(@PathVariable String reviewId, @PathVariable String userId) {
         return ResponseEntity.ok(reviewService.markHelpful(reviewId, userId));
     }
 
+    // UPDATE Operation: Add a vendor's reply to a review
     @PostMapping("/{reviewId}/reply")
     public ResponseEntity<?> addVendorReply(@PathVariable String reviewId, @RequestBody Map<String, String> body) {
         try {
@@ -85,6 +93,7 @@ public class ReviewController {
         }
     }
 
+    // UPDATE Operation: Update the status of a review (e.g., approve/reject)
     @PutMapping("/{reviewId}/status")
     public ResponseEntity<?> updateStatus(@PathVariable String reviewId, @RequestBody Map<String, String> body) {
         String status = body.get("status");
@@ -95,6 +104,7 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.updateStatus(reviewId, status));
     }
 
+    // DELETE Operation: Delete a review
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<?> deleteReview(@PathVariable String reviewId) {
         reviewService.deleteReview(reviewId);

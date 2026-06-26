@@ -14,6 +14,7 @@ public class UserActionController {
     @Autowired
     private UserActionRepository userActionRepository;
 
+    // CREATE Operation: Log a new user action
     @PostMapping("/log")
     public void logAction(@RequestBody UserAction action) {
         action.setTimestamp(LocalDateTime.now());

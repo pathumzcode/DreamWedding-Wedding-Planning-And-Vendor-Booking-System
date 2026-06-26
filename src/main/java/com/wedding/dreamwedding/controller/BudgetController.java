@@ -44,6 +44,7 @@ public class BudgetController {
     // ─────────────────────────────────────────────────────────────
     // GET full budget plan
     // ─────────────────────────────────────────────────────────────
+    // READ Operation: Retrieve the full budget plan for a customer
     @GetMapping("/{customerId}")
     public ResponseEntity<?> getPlan(@PathVariable String customerId) {
         BudgetPlan plan = getOrCreate(customerId);
@@ -53,6 +54,7 @@ public class BudgetController {
     // ─────────────────────────────────────────────────────────────
     // PUT setup: set totalBudget + category allocations
     // ─────────────────────────────────────────────────────────────
+    // UPDATE Operation: Set up or update the total budget and category allocations
     @PutMapping("/{customerId}/setup")
     public ResponseEntity<?> setupBudget(@PathVariable String customerId, @RequestBody Map<String, Object> body) {
         BudgetPlan plan = getOrCreate(customerId);
@@ -86,6 +88,7 @@ public class BudgetController {
     // ─────────────────────────────────────────────────────────────
     // POST add expense
     // ─────────────────────────────────────────────────────────────
+    // CREATE Operation: Add a new expense to a customer's budget plan
     @PostMapping("/{customerId}/expenses")
     public ResponseEntity<?> addExpense(@PathVariable String customerId, @RequestBody Map<String, Object> body) {
         BudgetPlan plan = getOrCreate(customerId);
@@ -115,6 +118,7 @@ public class BudgetController {
     // ─────────────────────────────────────────────────────────────
     // PUT update expense
     // ─────────────────────────────────────────────────────────────
+    // UPDATE Operation: Modify an existing expense in a customer's budget plan
     @PutMapping("/{customerId}/expenses/{expenseId}")
     public ResponseEntity<?> updateExpense(@PathVariable String customerId,
                                            @PathVariable String expenseId,
@@ -136,6 +140,7 @@ public class BudgetController {
     // ─────────────────────────────────────────────────────────────
     // DELETE expense
     // ─────────────────────────────────────────────────────────────
+    // DELETE Operation: Remove an expense from a customer's budget plan
     @DeleteMapping("/{customerId}/expenses/{expenseId}")
     public ResponseEntity<?> deleteExpense(@PathVariable String customerId, @PathVariable String expenseId) {
         BudgetPlan plan = getOrCreate(customerId);
