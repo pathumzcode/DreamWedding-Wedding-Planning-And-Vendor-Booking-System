@@ -5,6 +5,12 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### OS-generated files ###
+.DS_Store
+**/.DS_Store
+Thumbs.db
+Desktop.ini
+
 ### STS ###
 .apt_generated
 .classpath
